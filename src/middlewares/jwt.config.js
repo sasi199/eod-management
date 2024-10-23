@@ -2,6 +2,7 @@ const JWT = require("jsonwebtoken");
 const ApiError = require("../utils/apiError");
 const httpStatus = require("http-status");
 const AdminModel = require("../models/adminModel");
+const SuperAdmin = require("../models/superAdminModel")
 const secretKey = process.env.JWT_SECRET || "Nit";
 
 
@@ -65,20 +66,20 @@ const verifyAuthToken = async (req, res, next) => {
     }
 
     // Extract the second segment of the URL to determine the request source (admin/user/deliveryPerson)
-    const reqFrom = req.originalUrl.split("/")[2];
+    // const reqFrom = req.originalUrl.split("/")[2];
 
     // Dynamically assign the model based on the request source
     let model = null;
     switch (reqFrom) {
-      case 'admin':
+      case 'SuperAdmin':
+        model = SuperAdmin;
+        break;
+      case 'Admin':
         model = AdminModel;
         break;
-      case 'user':
-        model = UserModel;
-        break;
-      case 'deliveryPerson':
-        model = DeliveryPersonModel;
-        break;
+      // case 'deliveryPerson':
+      //   model = DeliveryPersonModel;
+      //   break;
       default:
         return res.status(400).send({ message: "Invalid request source" });
     }

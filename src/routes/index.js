@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const adminRouter = require("../routes/adminRoute");
+const superAdmin = require("../routes/superAdminRoute");
 
 
 
@@ -9,10 +10,10 @@ const Routes = [
     path: "/admin",
     route: adminRouter,
   },
-//   {
-//     path: "/user",
-//     route: userRouter,
-//   },
+  {
+    path: "/superAdmin",
+    route: superAdmin,
+  },
 //   {
 //     path: "/deliveryPerson",
 //     route: deliveryPersonRouter,

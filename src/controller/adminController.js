@@ -13,3 +13,9 @@ exports.adminLogin = catchAsync (async(req,res)=>{
     }
     res.status(200).json({status:true, message:'Login succesfull',data:response,authToken})
 })
+
+
+exports.createAdmin = catchAsync (async(req,res)=>{
+    const response = await adminService.createAdmin(req);
+    res.status(200).json({status:true, message:'Admin created succesfully',data:response})
+})

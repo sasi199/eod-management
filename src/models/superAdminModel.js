@@ -4,15 +4,9 @@ const schemaFields = require("../utils/schemaFieldUtils");
 
 const adminSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
-    logId:schemaFields.requiredAndString,
     email: schemaFields.requireStringAndUnique,
-    phoneNumber:schemaFields.requireNumberAndUnique, 
-    fullName: schemaFields.requiredAndString,
-    // profiePic: schemaFields.requiredAndString,
-    gender: schemaFields.requiredAndString,
-    address: schemaFields.requiredAndString,
-    isActive: schemaFields.BooleanWithDefault,
-    role: schemaFields.requiredAndString,
+    mobileNumber:schemaFields.requireNumberAndUnique, 
+    password: schemaFields.requiredAndString,
     // role: schemaFields.StringWithEnumAndRequired(["admin","superAdmin"]),
     // createdBy:schemaFields.UUIDIdReference('Admin'),
     isArchive: schemaFields.BooleanWithDefault,
@@ -23,8 +17,8 @@ const adminSchema = new mongoose.Schema({
             return this.role === 'superAdmin'?'full-access':'write'
         }
     },
-},{timestamps: true, collection: "Admin"});
+},{timestamps: true, collection: "SuperAdmin"});
 
-const AdminModel = mongoose.model('Admin',adminSchema);
+const SuperAdminModel = mongoose.model('SuperAdmin',adminSchema);
 
-module.exports = {AdminModel};
+module.exports = SuperAdminModel;
