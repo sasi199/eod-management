@@ -42,7 +42,11 @@ const extractToken = (req) => {
 const verifyToken = async (token, model) => {
   try {
     const payload = JWT.verify(token, secretKey);
+    console.log(payload,"payload");
+    
     const user = await model.findById(payload.id);
+    console.log(user,"userid");
+    
     if (user) {
       return { userId: payload.id, user };
     }
@@ -66,15 +70,17 @@ const verifyAuthToken = async (req, res, next) => {
     }
 
     // Extract the second segment of the URL to determine the request source (admin/user/deliveryPerson)
-    // const reqFrom = req.originalUrl.split("/")[2];
+    const reqFrom = req.originalUrl.split("/")[2];
+    console.log("request source",reqFrom);
+    
 
     // Dynamically assign the model based on the request source
     let model = null;
     switch (reqFrom) {
-      case 'SuperAdmin':
+      case 'superAdmin':
         model = SuperAdmin;
         break;
-      case 'Admin':
+      case 'admin':
         model = AdminModel;
         break;
       // case 'deliveryPerson':
@@ -96,6 +102,9 @@ const verifyAuthToken = async (req, res, next) => {
 
     // Attach user ID to request object for further use in the route handler
     req._id = result.userId;
+    req.role = result.user.role
+    console.log(req.role,"eeeeeeeeeeeeee");
+    
     next();
   } catch (error) {
     // Catch any unexpected errors and send a 500 response

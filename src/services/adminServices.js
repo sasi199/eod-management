@@ -2,6 +2,7 @@ const ApiError = require("../utils/apiError");
 const httpStatus = require('http-status');
 const utils = require("../utils/utils");
 const {AdminModel} = require("../models/adminModel");
+const validator = require('validator');
 
 
 const generateAdminLogId = async () => {
@@ -43,26 +44,26 @@ exports.adminLogin = async(req)=>{
 
 
 exports.createAdmin = async(req)=>{
-   const {Body}  = req.body;
-   console.log(Body,"body");
+   const {email} = req.body;
+   console.log(req.body,"llllll");
    
 
    if (req.role !== 'superAdmin') {
       throw new ApiError(httpStatus.FORBIDDEN, { message: "Only super admins can create an admin" });
     }    
 
-   if (!validator.isEmail(Body.email)) {
-      throw new ApiError(httpStatus.BAD_REQUEST, {message:"Provide email"});      
-  }
+    if (!email || !validator.isEmail(email)) {
+      throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email" });
+    }
 
-  if (Body.password.length < 8) {
-     throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid password"});
-  }
+//   if (data.password.length < 8) {
+//      throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid password"});
+//   }
 
-  const imageFile = req.file
-  if (imageFile) {
-   throw new ApiError(httpStatus.BAD_REQUEST, {message:"No upload file"});
-  }
+//   const imageFile = req.file
+//   if (imageFile) {
+//    throw new ApiError(httpStatus.BAD_REQUEST, {message:"No upload file"});
+//   }
 
   const existingAdmin = await AdminModel.findOne({email})
   if (existingAdmin) {
@@ -72,9 +73,8 @@ exports.createAdmin = async(req)=>{
   const logId = await generateAdminLogId();
 
   const newAdmin = new AdminModel({
-   ...Body,
+   ...req.body,
    logId,
-   imageFile
   })
 
   await newAdmin.save();

@@ -7,7 +7,7 @@ const adminSchema = new mongoose.Schema({
     email: schemaFields.requireStringAndUnique,
     mobileNumber:schemaFields.requireNumberAndUnique, 
     password: schemaFields.requiredAndString,
-    // role: schemaFields.StringWithEnumAndRequired(["admin","superAdmin"]),
+    role: schemaFields.StringWithEnumAndRequired(["admin","superAdmin"]),
     // createdBy:schemaFields.UUIDIdReference('Admin'),
     isArchive: schemaFields.BooleanWithDefault,
     permission:{
