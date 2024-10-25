@@ -1,11 +1,10 @@
-const adminRoles = [
+const userRoles = [
     "trainer",
     "trainee",
     "superAdmin",
     "admin",
   ];
-  
-  module.exports = {
-    adminRoles,
-  };
+
+
+  module.exports ={userRoles};
   

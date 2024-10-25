@@ -44,30 +44,25 @@ exports.adminLogin = async(req)=>{
 
 
 exports.createAdmin = async(req)=>{
-   const {email} = req.body;
+   const { email,userName} = req.body;
    console.log(req.body,"llllll");
-   
+
+   const existingAdmin = await AdminModel.findOne({email})
+   if (existingAdmin) {
+      throw new ApiError(httpStatus.BAD_REQUEST, {message:"Admin already exist"});
+   }
 
    if (req.role !== 'superAdmin') {
       throw new ApiError(httpStatus.FORBIDDEN, { message: "Only super admins can create an admin" });
     }    
 
-    if (!email || !validator.isEmail(email)) {
+    if (!email) {
       throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email" });
     }
 
-//   if (data.password.length < 8) {
-//      throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid password"});
-//   }
-
-//   const imageFile = req.file
-//   if (imageFile) {
-//    throw new ApiError(httpStatus.BAD_REQUEST, {message:"No upload file"});
-//   }
-
-  const existingAdmin = await AdminModel.findOne({email})
-  if (existingAdmin) {
-   throw new ApiError(httpStatus.BAD_REQUEST, {message:"Admin already exist"});
+  let imageFile;
+  if (req.file) {
+   imageFile = await uploadFileToS3(req.file);
   }
 
   const logId = await generateAdminLogId();
@@ -75,6 +70,7 @@ exports.createAdmin = async(req)=>{
   const newAdmin = new AdminModel({
    ...req.body,
    logId,
+   imageFile
   })
 
   await newAdmin.save();

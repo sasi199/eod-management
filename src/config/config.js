@@ -10,6 +10,26 @@ const envVarSchema = joi.object()
 .keys({
     PORT: joi.number().default(9999),
     MONGODB_URL: joi.string().required().description("Mongo DB url"),
+    JWT_SECRET: joi.string().required().description("JWT secret key"),
+    JWT_ACCESS_EXPIRATION_MINUTES: joi.number()
+      .default(43200)
+      .description("minutes after which access tokens expire"),
+    JWT_REFRESH_EXPIRATION_DAYS: joi.number()
+      .default(30)
+      .description("days after which refresh tokens expire"),
+    JWT_RESET_PASSWORD_EXPIRATION_MINUTES: joi.number()
+      .default(10)
+      .description("minutes after which reset password token expires"),
+    JWT_VERIFY_EMAIL_EXPIRATION_MINUTES: joi.number()
+      .default(10)
+      .description("minutes after which verify email token expires"),
+    SMTP_HOST: joi.string().description("server that will send the emails"),
+    SMTP_PORT: joi.number().description("port to connect to the email server"),
+    SMTP_USERNAME: joi.string().description("username for email server"),
+    SMTP_PASSWORD: joi.string().description("password for email server"),
+    EMAIL_FROM: joi.string().description(
+      "the from field in the emails sent by the app"
+    ),
 }).unknown();
 
 
@@ -26,5 +46,31 @@ module.exports = {
     port: envVars.PORT,
     mongoose: {
         url:envVars.MONGODB_URL
-    }
+    },
+    jwt: {
+        secret: envVars.JWT_SECRET,
+        accessExpirationMinutes: envVars.JWT_ACCESS_EXPIRATION_MINUTES,
+        refreshExpirationDays: envVars.JWT_REFRESH_EXPIRATION_DAYS,
+        resetPasswordExpirationMinutes:
+          envVars.JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
+        verifyEmailExpirationMinutes: envVars.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
+      },
+      email: {
+        smtp: {
+          host: envVars.SMTP_HOST,
+          port: envVars.SMTP_PORT,
+          auth: {
+            user: envVars.SMTP_USERNAME,
+            pass: envVars.SMTP_PASSWORD,
+          },
+        },
+        from: envVars.EMAIL_FROM,
+      },
+      cloudCred : {
+        accessKeyId :  envVars.ACCESS_KEY_ID,
+        secretAccessKey :  envVars.SECRET_ACCESS_KEY,
+        region : envVars.REGION,
+        awsEndPoint: envVars.AWS_ENDPOINT,
+      },
+      
 }
