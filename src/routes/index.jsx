@@ -1,11 +1,10 @@
 import React from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import routePages from "./routes";
-import PageNotFound from "../common/PageNotFound";
-import UnauthorizedAccess from "../common/UnauthorizedAccess";
-import Navbar from "../common/Navbar";
-import Topbar from "../common/Topbar";
-import Footer from "../common/Footer";
+import { PageNotFound } from "../components/notfound";
+import { UnauthorizedAccess } from "../components/unauthorized";
+import { Navbar } from "../components/navbar";
+import { Footer } from "../components/footer";
 
 const isAllowed = (access = []) => {
   const token = localStorage.getItem("userToken");
@@ -60,9 +59,9 @@ const Routers = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  
-  const currentRoute = routePages.find((route) => route.path === location.pathname);
-
+  const currentRoute = routePages.find(
+    (route) => route.path === location.pathname
+  );
 
   const showLayout = currentRoute?.layout !== false;
 

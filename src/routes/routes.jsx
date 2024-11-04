@@ -1,8 +1,10 @@
+import { Login } from "../components/login";
+
 const pages = [
   {
-    title: "Home",
+    title: "login",
     path: "/",
-    element: <Home />,
+    element: <Login />,
     access: ["open"],
     layout: true,
   },

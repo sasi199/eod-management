@@ -1,10 +1,9 @@
 export function Login() {
   return (
-    <section>
-      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Dolorum
-      repellat, vero nam unde ea error numquam perspiciatis, ad, corrupti
-      necessitatibus doloribus? Veniam laborum voluptas quam, est doloribus
-      voluptates aperiam delectus.
+    <section className="bg-green-600">
+
+      <span className="text-9xl">this is login</span>
+
     </section>
   );
 }
