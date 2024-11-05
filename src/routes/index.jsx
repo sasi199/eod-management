@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import routePages from "./routes";
+import { pages } from "./routes";
 import { PageNotFound } from "../components/notfound";
 import { UnauthorizedAccess } from "../components/unauthorized";
 import { Navbar } from "../components/navbar";
@@ -55,27 +55,34 @@ const renderRoutes = (routesArray = []) => {
   });
 };
 
-const Routers = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
+// const Routers = () => {
+//   const location = useLocation();
+//   const navigate = useNavigate();
 
-  const currentRoute = routePages.find(
-    (route) => route.path === location.pathname
-  );
+//   const currentRoute = routePages.find(
+//     (route) => route.path === location.pathname
+//   );
 
-  const showLayout = currentRoute?.layout !== false;
+//   const showLayout = currentRoute?.layout !== false;
 
-  return (
-    <article>
-      {/* {showLayout && <Topbar />} */}
-      {showLayout && <Navbar />}
-      <Routes>
-        {renderRoutes(routePages)}
-        <Route path="*" element={<PageNotFound />} />
-      </Routes>
-      {showLayout && <Footer />}
-    </article>
-  );
-};
+//   return (
+//     <article>
+//       {/* {showLayout && <Topbar />} */}
+//       {showLayout && <Navbar />}
+//       <Routes>
+//         {renderRoutes(routePages)}
+//         <Route path="*" element={<PageNotFound />} />
+//       </Routes>
+//       {showLayout && <Footer />}
+//     </article>
+//   );
+// };
 
-export default Routers;
+// export default Routers;
+
+export function Routers() {
+  const pageRoutes = pages.map(({ title, path, element }) => {
+    return <Route key={title} path={`${path}`} element={element} />;
+  });
+  return <Routes>{pageRoutes}</Routes>;
+}

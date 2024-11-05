@@ -1,13 +1,21 @@
 import { Login } from "../components/login";
 
-const pages = [
+// const pages = [
+//   {
+//     title: "login",
+//     path: "/",
+//     element: <Login />,
+//     access: ["open"],
+//     layout: true,
+//   },
+// ];
+
+// export default pages;
+
+export const pages = [
   {
     title: "login",
     path: "/",
     element: <Login />,
-    access: ["open"],
-    layout: true,
   },
 ];
-
-export default pages;
