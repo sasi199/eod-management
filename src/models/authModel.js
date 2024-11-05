@@ -13,16 +13,21 @@ const authSchema = new mongoose.Schema(
       unique: true,
       required: true,
     },
-    password: {
-      type: String,
-      required: true,
-    },
+    // password: {
+    //   type: String,
+    //   required: true,
+    // },
     userName: {
       type: String,
     },
     role: {
       type: String,
-      enum: userRole,
+      enum: [
+        "trainer",
+        "trainee",
+        "superAdmin",
+        "admin",
+      ],
       required: true,
     },
     traineeId: {

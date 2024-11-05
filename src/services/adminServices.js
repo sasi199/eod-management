@@ -3,56 +3,52 @@ const httpStatus = require('http-status');
 const utils = require("../utils/utils");
 const {AdminModel} = require("../models/adminModel");
 const validator = require('validator');
+const Auth = require("../models/authModel");
+const config = require("../config/config");
+const uploadCloud = require("../utils/uploadCloud");
 
 
 const generateAdminLogId = async () => {
    // Find the last created admin based on the logId in descending order
    const lastAdmin = await AdminModel.findOne().sort({ logId: -1 });
+   const lostLogIdNumber = lastAdmin ? parseInt(lastAdmin.logId.split('-')[2],10) : 0;
+   const newLogIdNumber = (lostLogIdNumber + 1).toString().padStart(3, '0');
 
-   let newLogId;
-   if (lastAdmin && lastAdmin.logId) {
-       // Extract the numeric part from the last logId
-       const lastLogIdNumber = parseInt(lastAdmin.logId.split('-')[2], 10);
-
-       // Increment the numeric part by 1 and pad it to ensure it's 3 digits
-       const newLogIdNumber = (lastLogIdNumber + 1).toString().padStart(3, '0');
-
-       // Generate the new logId with the incremented number
-       newLogId = `ADM-ID-${newLogIdNumber}`;
-   }
-
-   return newLogId;
+   return `ADM-ID-${newLogIdNumber}`
 };
 
 
+//ignore this adminlogin
 
-exports.adminLogin = async(req)=>{
-   const { email, password } = req.body;
+// exports.adminLogin = async(req)=>{
+//    const { email, logId} = req.body;
 
-   const admin = await AdminModel.findOne({email})
-   if (!admin) {
-    throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid Email",status:false,field:"email"});
+//    const admin = await Auth.findOne({email, logId, role:'admin'})
+//    if (!admin) {
+//     throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid Email",status:false,field:"email"});
     
-   }
+//    }
 
-   const isPasswordCorrect = await utils.comparePassword(password, admin.password);
-   if (isPasswordCorrect) {
-    throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid password"});
-   }
-   return admin;
-}
+//    const token = jwt.sign(
+//       {id:admin._id, logId, role:admin.role},
+//       config.jwt.secret,
+//       {expiresIn: config.jwt.expiresIn}
+//    )
+   
+   
+//    return {admin, token};
+// }
 
 
 exports.createAdmin = async(req)=>{
-   const { email,userName} = req.body;
-   console.log(req.body,"llllll");
+   const { email,userName,role} = req.body;
 
    const existingAdmin = await AdminModel.findOne({email})
    if (existingAdmin) {
       throw new ApiError(httpStatus.BAD_REQUEST, {message:"Admin already exist"});
    }
 
-   if (req.role !== 'superAdmin') {
+   if (req.user.role !== 'superAdmin') {
       throw new ApiError(httpStatus.FORBIDDEN, { message: "Only super admins can create an admin" });
     }    
 
@@ -60,10 +56,15 @@ exports.createAdmin = async(req)=>{
       throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email" });
     }
 
+//   if (req.file) {
+//    req.body.imageFile = uploadCloud('adminProfile',req.file)
+//   }
+
   let imageFile;
-  if (req.file) {
-   imageFile = await uploadFileToS3(req.file);
-  }
+   if (req.file) {
+      imageFile = await uploadCloud('adminProfile', req.file);
+   }
+
 
   const logId = await generateAdminLogId();
 

@@ -75,20 +75,27 @@ const verifyAuthToken = async (req, res, next) => {
     
 
     // Dynamically assign the model based on the request source
-    let model = null;
-    switch (reqFrom) {
-      case 'superAdmin':
-        model = SuperAdmin;
-        break;
-      case 'admin':
-        model = AdminModel;
-        break;
-      // case 'deliveryPerson':
-      //   model = DeliveryPersonModel;
-      //   break;
-      default:
-        return res.status(400).send({ message: "Invalid request source" });
+    // let model = null;
+    // switch (reqFrom) {
+    //   case 'superAdmin':
+    //     model = SuperAdmin;
+    //     break;
+    //   case 'admin':
+    //     model = AdminModel;
+    //     break;
+    //   // case 'deliveryPerson':
+    //   //   model = DeliveryPersonModel;
+    //   //   break;
+    //   default:
+    //     return res.status(400).send({ message: "Invalid request source" });
+    // }
+
+    const modelMap = {
+      superAdmin : SuperAdmin,
+      admin : AdminModel,
     }
+
+    const model = modelMap[reqFrom]; 
 
     if (!model) {
       throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Something went wrong, please try again');
@@ -103,7 +110,6 @@ const verifyAuthToken = async (req, res, next) => {
     // Attach user ID to request object for further use in the route handler
     req._id = result.userId;
     req.role = result.user.role
-    console.log(req.role,"eeeeeeeeeeeeee");
     
     next();
   } catch (error) {
