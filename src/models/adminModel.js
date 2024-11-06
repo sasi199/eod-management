@@ -8,7 +8,7 @@ const adminSchema = new mongoose.Schema({
     email: schemaFields.requireStringAndUnique,
     phoneNumber:schemaFields.requireNumberAndUnique, 
     fullName: schemaFields.requiredAndString,
-    profiePic: schemaFields.requiredAndString,
+    profilePic: schemaFields.requiredAndString,
     gender: schemaFields.requiredAndString,
     address: schemaFields.requiredAndString,
     isActive: schemaFields.BooleanWithDefault,

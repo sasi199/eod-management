@@ -1,8 +1,10 @@
 const JWT = require("jsonwebtoken");
 const ApiError = require("../utils/apiError");
 const httpStatus = require("http-status");
-const AdminModel = require("../models/adminModel");
-const SuperAdmin = require("../models/superAdminModel")
+const {AdminModel} = require("../models/adminModel");
+const SuperAdmin = require("../models/superAdminModel");
+const Auth = require("../models/authModel");
+
 const secretKey = process.env.JWT_SECRET || "Nit";
 
 
@@ -12,8 +14,8 @@ const secretKey = process.env.JWT_SECRET || "Nit";
  * @returns {string} - The generated JWT token.
  */
 const getAuthToken = async (data) => {
-  const { _id } = data;
-  let token = JWT.sign({ id: _id }, secretKey);
+  const { _id, role } = data;
+  let token = JWT.sign({ id: _id, role }, secretKey);
   return token;
 };
 
@@ -47,11 +49,12 @@ const verifyToken = async (token, model) => {
     const user = await model.findById(payload.id);
     console.log(user,"userid");
     
-    if (user) {
+    if (user && user.role === payload.role) {
       return { userId: payload.id, user };
     }
     return null;
   } catch (error) {
+    console.log(error,"error in verify tokn")
     return null;
   }
 };
@@ -92,10 +95,11 @@ const verifyAuthToken = async (req, res, next) => {
 
     const modelMap = {
       superAdmin : SuperAdmin,
-      admin : AdminModel,
+      auth:Auth,
+      admin : SuperAdmin,
     }
 
-    const model = modelMap[reqFrom]; 
+    const model = Auth; 
 
     if (!model) {
       throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Something went wrong, please try again');
@@ -108,7 +112,7 @@ const verifyAuthToken = async (req, res, next) => {
     }
 
     // Attach user ID to request object for further use in the route handler
-    // req._id = result.userId;
+    req._id = result.userId;
     req.user = result.user
     
     next();

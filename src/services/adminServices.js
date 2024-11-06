@@ -41,7 +41,7 @@ const generateAdminLogId = async () => {
 
 
 exports.createAdmin = async(req)=>{
-   const { email,userName,role} = req.body;
+   const { email,fullName, role} = req.body;
    console.log(req.body);
    
 
@@ -54,7 +54,7 @@ exports.createAdmin = async(req)=>{
       throw new ApiError(httpStatus.FORBIDDEN, { message: "Only super admins can create an admin" });
     }    
 
-    if (!validator.isEmail(email).toString) {
+    if (!validator.isEmail(email)) {
       throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email" });
     }
 
@@ -62,9 +62,11 @@ exports.createAdmin = async(req)=>{
 //    req.body.imageFile = uploadCloud('adminProfile',req.file)
 //   }
 
-  let imageFile;
+  let profilePic;
    if (req.file) {
-      imageFile = await uploadCloud('adminProfile', req.file);
+      profilePic = await uploadCloud('adminProfile', req.file);
+      console.log(profilePic,"gokul raja palavarama kingmMaker");
+      
    }
 
 
@@ -73,7 +75,7 @@ exports.createAdmin = async(req)=>{
   const newAdmin = new AdminModel({
    ...req.body,
    logId,
-   imageFile
+   profilePic
   })
 
   await newAdmin.save();

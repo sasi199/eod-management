@@ -25,7 +25,7 @@ exports.loginByEmailAndLogId = async(req)=>{
       const token = jwt.sign(
         {id:user._id, role:user.role},
         config.jwt.secret,
-        {expiresIn: config.jwt.accessExpirationMinutes}
+        // {expiresIn: config.jwt.accessExpirationMinutes}
       )
 
       return token;
