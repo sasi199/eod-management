@@ -3,13 +3,14 @@ const Auth = require("../models/authModel");
 const ApiError = require("../utils/apiError");
 const utils = require("../utils/utils");
 const httpStatus = require('http-status');
+const jwt = require('jsonwebtoken')
 
 
 
 exports.loginByEmailAndLogId = async(req)=>{
-    const { email,role } = req.body
+    const { email,role, logId } = req.body
     
-    const user = await Auth.findOne({email,role});
+    const user = await Auth.findOne({email,role,logId});
     if (!user) {
         throw new ApiError(httpStatus.UNAUTHORIZED, {message:"Invalid credantials",status:false,});
       }
@@ -24,7 +25,7 @@ exports.loginByEmailAndLogId = async(req)=>{
       const token = jwt.sign(
         {id:user._id, role:user.role},
         config.jwt.secret,
-        {expiresIn: config.jwt.expiresIn}
+        {expiresIn: config.jwt.accessExpirationMinutes}
       )
 
       return token;
@@ -32,14 +33,19 @@ exports.loginByEmailAndLogId = async(req)=>{
 
 
 exports.authCreation = async(req)=>{
-    const {email, userName,role} = req.body
+    const {email, userName, role, logId} = req.body
     let findEmail = await Auth.findOne({email});
     if (findEmail) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"User already exist",status:false,field:"email"});
     }
 
     
-  if (!userRole.includes(role)) {
+  // if (!userRole.includes(role)) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, "Invalid user role");
+  // }
+
+  const validRoles = ["superAdmin","admin","trainer","trainee"];
+  if (!validRoles.includes(role)) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Invalid user role");
   }
 

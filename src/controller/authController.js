@@ -14,3 +14,10 @@ exports.authLogin = catchAsync (async(req,res)=>{
 
     res.status(200).json({status:true, message: "Login successfully", data:response, authToken})
 })
+
+
+
+exports.authCreation = catchAsync(async(req,res)=>{
+    const response = await authService.authCreation(req);
+    res.status(200).json({status:true, message: "Auth created successfully",data:response})
+})

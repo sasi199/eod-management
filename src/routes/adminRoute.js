@@ -12,7 +12,7 @@ const checkSuperAdmin = (req,res,next)=>{
 }
 
 //admin
-Router.route('/createAdmin').post(verifyAuthToken,adminController.createAdmin);
+Router.route('/createAdmin').post(verifyAuthToken,checkSuperAdmin,adminController.createAdmin);
 
 
 module.exports = Router;

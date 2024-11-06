@@ -42,6 +42,8 @@ const generateAdminLogId = async () => {
 
 exports.createAdmin = async(req)=>{
    const { email,userName,role} = req.body;
+   console.log(req.body);
+   
 
    const existingAdmin = await AdminModel.findOne({email})
    if (existingAdmin) {
@@ -52,7 +54,7 @@ exports.createAdmin = async(req)=>{
       throw new ApiError(httpStatus.FORBIDDEN, { message: "Only super admins can create an admin" });
     }    
 
-    if (!email) {
+    if (!validator.isEmail(email).toString) {
       throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email" });
     }
 
