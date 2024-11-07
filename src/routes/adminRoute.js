@@ -12,9 +12,13 @@ const checkSuperAdmin = (req,res,next)=>{
     }
     next();
 }
-
+Router.use(verifyAuthToken)
 //admin
-Router.route('/createAdmin').post(verifyAuthToken,checkSuperAdmin,uploads.single('profilePic'),adminController.createAdmin);
+Router.route('/createAdmin').post(checkSuperAdmin,uploads.single('profilePic'),adminController.createAdmin);
+Router.route('/getAdmin').get(adminController.getAdminAll);
+Router.route('/getAdminId').get(adminController.getAdminById);
+Router.route('/editAdmin').put(uploads.single('profilePic'),adminController.editAdmin);
+Router.route('/deleteAdmin').delete(adminController.deleteAdmin);
 
 
 module.exports = Router;

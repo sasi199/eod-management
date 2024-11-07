@@ -6,6 +6,7 @@ const validator = require('validator');
 const Auth = require("../models/authModel");
 const config = require("../config/config");
 const uploadCloud = require("../utils/uploadCloud");
+const { Amplify } = require("aws-sdk");
 
 
 const generateAdminLogId = async () => {
@@ -55,7 +56,7 @@ exports.createAdmin = async(req)=>{
     }    
 
     if (!validator.isEmail(email)) {
-      throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email" });
+      throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email"});
     }
 
 //   if (req.file) {
@@ -65,7 +66,6 @@ exports.createAdmin = async(req)=>{
   let profilePic;
    if (req.file) {
       profilePic = await uploadCloud('adminProfile', req.file);
-      console.log(profilePic,"gokul raja palavarama kingmMaker");
       
    }
 
@@ -78,10 +78,101 @@ exports.createAdmin = async(req)=>{
    profilePic
   })
 
+  const newAuth = new Auth({
+   adminId:newAdmin._id,
+   email,
+   logId,
+   role
+  })
+
   await newAdmin.save();
+  await newAuth.save();
+
   return newAdmin;
   
 }
 
 
+exports.getAdminAll = async(req)=> {
+   const Admin = await AdminModel.find({})
+   if (!Admin) {
+      throw new ApiError(httpStatus.BAD_REQUEST, {message:"Admin not found"});
+   }
 
+   return Admin;
+}
+
+
+exports.getAdminById = async(req)=>{
+   const {authId} = req._id
+   const {adminId} = req.user;
+   
+
+   if (!adminId) {
+      throw new ApiError(httpStatus.BAD_REQUEST, {message:"Admin Id required"});
+   }
+
+   const admin = await AdminModel.findById(adminId)
+
+   if (!admin) {
+      throw new ApiError(httpStatus.BAD_REQUEST, {message: "Admin not Found"});
+   }
+
+   return admin;
+}
+
+
+
+exports.editAdmin = async(req)=>{
+   const {authId} = req._id
+   const {adminId} = req.user
+   if (!adminId) {
+      throw new ApiError(httpStatus.BAD_REQUEST,{message: "Admin id required"});
+   }
+
+   const admin = await AdminModel.findById(adminId);
+   if (!admin) {
+      throw new ApiError(httpStatus.BAD_REQUEST, {message: "Admin not found"});
+   }
+
+   const updateData = {...req.body}
+   // console.log(updateData,"eeeeee");
+   
+
+   if (req.file) {
+      const profilePic = await uploadCloud('adminProfile',req.file);
+      updateData.profilePic = profilePic;
+   }
+
+   const updateAdmin = await AdminModel.findByIdAndUpdate(adminId,updateData,
+      { new:true, runValidators:true});
+
+   const updateAuth = await Auth.findByIdAndUpdate(authId,updateData,
+      {new:true, runValidators: true}
+   )   
+
+      return updateAdmin;
+}
+
+
+exports.deleteAdmin = async(req)=>{
+   const {authId} = req._id
+   const {adminId} = req.user
+   if (!adminId) {
+      throw new ApiError(httpStatus.BAD_REQUEST,{message: "Admin id required"});
+   }
+
+   const admin = AdminModel.findById(adminId)
+   const auth = Auth.findById(authId)
+   if (!admin) {
+      throw new ApiError(httpStatus.BAD_REQUEST,{message: "Admin not found"});
+   }
+
+   if (!auth) {
+      throw new ApiError(httpStatus.BAD_REQUEST,{message: "Auth not found"});
+   }
+
+   await AdminModel.findByIdAndDelete(adminId);
+   await Auth.findByIdAndDelete(authId);
+
+}

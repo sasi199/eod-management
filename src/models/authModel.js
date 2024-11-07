@@ -23,10 +23,10 @@ const authSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: [
-        "trainer",
-        "trainee",
-        "superAdmin",
-        "admin",
+        "Trainer",
+        "Trainee",
+        "SuperAdmin",
+        "Admin",
       ],
       required: true,
     },
