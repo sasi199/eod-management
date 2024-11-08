@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const schemaFields = require('../utils/schemaFieldUtils');
 
 
-const trainerSchema = new mongoose.Schema({
+const staffSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     logId: schemaFields.requiredAndString,
     fullName: schemaFields.requiredAndString,
@@ -16,7 +16,7 @@ const trainerSchema = new mongoose.Schema({
     designation:schemaFields.requiredAndString,
     qualification:schemaFields.requiredAndString,
     experience: schemaFields.StringWithEnumAndRequired(['0 to 1', '1 to 3', '3 to 5', '5+']),
-    role: schemaFields.StringWithEnumAndRequired(["Admin","SuperAdmin","Trainer","Trainee"]),
+    role: schemaFields.StringWithEnumAndRequired(["Admin","Trainer","Staff","Cordinator"]),
     createdBy:schemaFields.UUIDIdReference('superAdmin'),
     isArchive: schemaFields.BooleanWithDefault,
     permission:{
@@ -26,9 +26,9 @@ const trainerSchema = new mongoose.Schema({
             return this.role === 'superAdmin'?'full-access':'write'
         }
     },
-},{timestamps:true, collection: "Trainer"});
+},{timestamps:true, collection: "Staff"});
 
-const TrainerModel = mongoose.model('Trainer',trainerSchema);
+const StaffModel = mongoose.model('Staff',staffSchema);
 
-module.exports = TrainerModel;
+module.exports = StaffModel;
 
