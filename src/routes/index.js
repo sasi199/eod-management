@@ -4,6 +4,8 @@ const adminRouter = require("../routes/adminRoute");
 const superAdmin = require("../routes/superAdminRoute");
 const authRouter = require("../routes/authRoute");
 const trainerRouter = require("../routes/trainerRoute");
+const staffRouter = require("../routes/staffRoute");
+const traineeRouter = require("../routes/traineeRoute");
 
 
 
@@ -23,6 +25,14 @@ const Routes = [
   {
     path: "/trainer",
     route: trainerRouter,
+  },
+  {
+    path: "/staff",
+    route: staffRouter,
+  },
+  {
+    path: "/trainee",
+    route: traineeRouter,
   },
 //   {
 //     path: "/deliveryPerson",

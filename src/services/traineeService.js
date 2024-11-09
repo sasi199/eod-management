@@ -2,12 +2,14 @@ const Auth = require("../models/authModel");
 const TraineeModel = require("../models/traineeModel");
 const ApiError = require("../utils/apiError");
 const httpStatus = require('http-status');
+const validator = require('validator');
+const uploadCloud = require("../utils/uploadCloud");
 
 
 
-const generateTrainerLogId = async () => {
+const generateTraineeLogId = async () => {
     // Find the last created admin based on the logId in descending order
-    const lastAdmin = await TraineeModel.findOne().sort({ logId: -1 });
+    const lastTrainee = await TraineeModel.findOne().sort({ logId: -1 });
     const lostLogIdNumber = lastTrainee ? parseInt(lastTrainee.logId.split('-')[2],10) : 0;
     const newLogIdNumber = (lostLogIdNumber + 1).toString().padStart(3, '0');
  
@@ -18,9 +20,9 @@ const generateTrainerLogId = async () => {
 
 exports.createTrainee = async(req)=>{
     const { email, fullName, role } = req.body
-    console.log(req.body);
+    // console.log(req.body);
 
-    const existingTrainee = await TraineeModel.findOne(email)
+    const existingTrainee = await TraineeModel.findOne({email})
     if (existingTrainee) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Trainer already exist'});   
     }
@@ -33,17 +35,21 @@ exports.createTrainee = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email"});
     }
 
-    let profilePic;
-   if (req.file) {
-      profilePic = await uploadCloud('tarineeProfile', req.file)      
+    let profilePic,resumeUpload;
+   if (req.files['profilePic']) {
+      profilePic = await uploadCloud('tarineeProfile', req.files['profilePic'][0])      
+   }
+   if (req.files['resumeUpload']) {
+      resumeUpload = await uploadCloud('resume-file', req.files['resumeUpload'][0])      
    }
 
-   const logId = await generateTrainerLogId();
+   const logId = await generateTraineeLogId();
 
    const newTrainee = new TraineeModel({
     ...req.body,
     logId,
-    profilePic
+    profilePic,
+    resumeUpload
    })
 
    const newAuth = new Auth({

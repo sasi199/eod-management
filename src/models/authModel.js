@@ -27,6 +27,8 @@ const authSchema = new mongoose.Schema(
         "Trainee",
         "SuperAdmin",
         "Admin",
+        "Coordinator",
+        "Human Resource",
       ],
       required: true,
     },
