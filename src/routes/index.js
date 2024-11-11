@@ -6,6 +6,7 @@ const authRouter = require("../routes/authRoute");
 const trainerRouter = require("../routes/trainerRoute");
 const staffRouter = require("../routes/staffRoute");
 const traineeRouter = require("../routes/traineeRoute");
+const batchRouter = require("../routes/batchRoute");
 
 
 
@@ -34,10 +35,10 @@ const Routes = [
     path: "/trainee",
     route: traineeRouter,
   },
-//   {
-//     path: "/deliveryPerson",
-//     route: deliveryPersonRouter,
-//   },
+  {
+    path: "/batch",
+    route: batchRouter,
+  },
 
 
 ];

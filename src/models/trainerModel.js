@@ -15,6 +15,10 @@ const trainerSchema = new mongoose.Schema({
     isActive: schemaFields.BooleanWithDefault,
     designation:schemaFields.requiredAndString,
     qualification:schemaFields.requiredAndString,
+    assignedBatches: [{
+        type: String,
+        ref: 'Batch'
+    }],
     experience: schemaFields.StringWithEnumAndRequired(['0 to 1', '1 to 3', '3 to 5', '5+']),
     role: schemaFields.StringWithEnumAndRequired(["Admin","SuperAdmin","Trainer","Trainee"]),
     createdBy:schemaFields.UUIDIdReference('superAdmin'),

@@ -13,20 +13,7 @@ const traineeSchema = new mongoose.Schema({
     gender: schemaFields.requiredAndString,
     permanentAddress: schemaFields.requiredAndString,
     currentAddress: schemaFields.requiredAndString,
-    parentDetails:{
-        fatherName: schemaFields.requiredAndString,
-        motherName: schemaFields.requiredAndString,
-        guardian: schemaFields.requiredAndString,
-        contact: schemaFields.requiredAndString,
-    },
-    bankDetails:{
-        accountHolderName: schemaFields.requiredAndString,
-        accountNumber: schemaFields.requiredAndString,
-        bankName: schemaFields.requiredAndString,
-        ifscCode: schemaFields.requiredAndString,
-        branch: schemaFields.requiredAndString
-    },
-    resumeUpload: schemaFields.BooleanWithDefault,
+    resumeUpload: schemaFields.requiredAndString,
     isActive: schemaFields.BooleanWithDefault,
     // designation:schemaFields.requiredAndString,
     qualification:schemaFields.requiredAndString,
@@ -36,9 +23,9 @@ const traineeSchema = new mongoose.Schema({
     isArchive: schemaFields.BooleanWithDefault,
     permission:{
         type: String,
-        enum: ["read"],
+        enum: ["read","write"],
         default: ()=>{
-            return this.role === 'superAdmin'?'full-access':'write'
+            return this.role === 'superAdmin'?'full-access':'write';
         }
     },
 },{timestamps:true, collection: "Trainee"});

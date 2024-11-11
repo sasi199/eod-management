@@ -4,6 +4,7 @@ const ApiError = require("../utils/apiError");
 const httpStatus = require('http-status');
 const validator = require('validator');
 const uploadCloud = require("../utils/uploadCloud");
+const TraineeDetailsModel = require("../models/traineeDetails");
 
 
 
@@ -19,7 +20,7 @@ const generateTraineeLogId = async () => {
 
 
 exports.createTrainee = async(req)=>{
-    const { email, fullName, role } = req.body
+    const { email, fullName, role} = req.body
     // console.log(req.body);
 
     const existingTrainee = await TraineeModel.findOne({email})
@@ -59,6 +60,7 @@ exports.createTrainee = async(req)=>{
     role
    })
 
+   
    await newTrainee.save();
    await newAuth.save();
 

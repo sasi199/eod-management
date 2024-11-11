@@ -8,7 +8,7 @@ const Auth = require('../models/authModel');
 
 const generateTrainerLogId = async () => {
     // Find the last created admin based on the logId in descending order
-    const lastAdmin = await TrainerModel.findOne().sort({ logId: -1 });
+    const lastTrainer = await TrainerModel.findOne().sort({ logId: -1 });
     const lostLogIdNumber = lastTrainer ? parseInt(lastTrainer.logId.split('-')[2],10) : 0;
     const newLogIdNumber = (lostLogIdNumber + 1).toString().padStart(3, '0');
  

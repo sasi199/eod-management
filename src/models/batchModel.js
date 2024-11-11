@@ -3,14 +3,11 @@ const schemaFields = require('../utils/schemaFieldUtils');
 
 const batchSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
-    // course_id: schemaFields.requiredAndString,
     courseName: schemaFields.StringWithEnumAndRequired(['Full Stack','Digital Marketing']),
-    // courseId: schemaFields.idWithV4UUID,
-    // subjects: schemaFields.arrayWithDefault(),
     batchId: schemaFields.requiredAndString,
     batchName:schemaFields.requiredAndString,
-    batchTimings: schemaFields.requiredAndString,
-    startDate: schemaFields.StringWithDefault(),
+    batchTimings: schemaFields.StringWithEnumAndRequired(['10 am to 02 pm','02 pm 06 pm']),
+    courseDuration: schemaFields.StringWithEnumAndRequired(['3 Months','6 Months', '9 Months','12 Months']),
     active: schemaFields.BooleanWithDefaultTrue,
     archive: schemaFields.BooleanWithDefault,
     maxStrength: {
@@ -20,6 +17,10 @@ const batchSchema = new mongoose.Schema({
     trainees: [{
         type: String,
         ref: 'Trainee'
+    }],
+    trainer: [{
+        type: String,
+        ref: 'Trainer'
     }]
 }, { timestamps: true, collection: "Batch" });
 
