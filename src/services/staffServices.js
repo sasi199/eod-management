@@ -9,7 +9,7 @@ const Auth = require("../models/authModel");
 const generateStaffLogId = async(role)=>{
     const rolePrefixMap = {
         Admin: 'ADM',
-        Hr: 'HR',
+        HR: 'HR',
         Coordinator: 'CDR'
     };
 

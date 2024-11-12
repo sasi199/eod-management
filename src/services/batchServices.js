@@ -1,12 +1,14 @@
 const BatchModel = require("../models/batchModel");
+const TraineeModel = require("../models/traineeModel");
 const TrainerModel = require("../models/trainerModel");
 const ApiError = require("../utils/apiError");
+const httpStatus = require('http-status');
 
 
 const generateBatchId = async (courseName)=>{
    const courseNamePrefix ={
-    FullstackWebDevelopment : 'FSWD',
-    DigitalMarketing: 'DM'
+    "Full Stack" : 'FSWD',
+    "Digital Marketing": 'DM'
    }
 
     const prefix = courseNamePrefix[courseName]
@@ -14,6 +16,7 @@ const generateBatchId = async (courseName)=>{
     .sort({createdAt: -1})
     .select('batchId')
     .lean();
+    
 
     let newIdNumber = 1;
     if (lastBatch && lastBatch.batchId) {
@@ -37,10 +40,19 @@ const generateBatchName = () =>{
 
 
 exports.createBatch = async(req)=>{
-    const { batchData } = req.body
+    const { courseName, courseDuration, batchTimings, trainers, trainees } = req.body
+    console.log(req.body,"eeeeeeeeee");
+    
 
-    const existingBatch = await BatchModel.findOne(batchId)
-    if (!existingBatch) {
+    const batchId = await generateBatchId(courseName);
+    // console.log(batchId,"ggggggg");
+    
+    if (!batchId) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: 'Invalid course name provided' });
+    }
+
+    const existingBatch = await BatchModel.findOne({batchId});
+    if (existingBatch) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Batch already exist'}); 
     }
 
@@ -48,13 +60,14 @@ exports.createBatch = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Only super admin can create staff'});
     }
     
-    const batchId = await generateBatchId(courseName);
     const batchName = await generateBatchName();
 
     const newBatch = new BatchModel({
-        ...batchData,
         batchId,
-        batchName
+        batchName,
+        courseName,
+        courseDuration,
+        batchTimings
     })
 
     await newBatch.save();
@@ -63,6 +76,13 @@ exports.createBatch = async(req)=>{
         await TrainerModel.updateMany(
             {_id:{ $in: trainers }},
             {$addToSet:{assignedBatches: newBatch._id}}
+        )
+    }
+
+    if (trainees && trainees.length >0) {
+        await TraineeModel.updateMany(
+            {_id:{ $in: trainees }},
+            {$addToSet:{assignedBatch: newBatch._id}}
         )
     }
 

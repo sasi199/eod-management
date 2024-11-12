@@ -14,6 +14,10 @@ const traineeDetailsSchema = new mongoose.Schema({
     motherName: schemaFields.requiredAndString,
     guardian: schemaFields.requiredAndString,
     contact: schemaFields.requiredAndString,
+    assignedSchedule:[{
+        type: String,
+        ref: 'Schedule'
+    }]
 
 },{timestamps:true, collection:"TraineeDetails"});
 

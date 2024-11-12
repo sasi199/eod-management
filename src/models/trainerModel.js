@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const schemaFields = require('../utils/schemaFieldUtils');
+const { ref } = require('joi');
 
 
 const trainerSchema = new mongoose.Schema({
@@ -19,6 +20,10 @@ const trainerSchema = new mongoose.Schema({
         type: String,
         ref: 'Batch'
     }],
+    assignedSchedule: [{
+        type: String,
+        ref: 'Schedule'
+    }],
     experience: schemaFields.StringWithEnumAndRequired(['0 to 1', '1 to 3', '3 to 5', '5+']),
     role: schemaFields.StringWithEnumAndRequired(["Admin","SuperAdmin","Trainer","Trainee"]),
     createdBy:schemaFields.UUIDIdReference('superAdmin'),
@@ -27,7 +32,7 @@ const trainerSchema = new mongoose.Schema({
         type: String,
         enum: ["read"],
         default: ()=>{
-            return this.role === 'superAdmin'?'full-access':'write'
+            return this.role === 'superAdmin'?'full-access':'read'
         }
     },
 },{timestamps:true, collection: "Trainer"});

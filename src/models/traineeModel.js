@@ -15,6 +15,10 @@ const traineeSchema = new mongoose.Schema({
     currentAddress: schemaFields.requiredAndString,
     resumeUpload: schemaFields.requiredAndString,
     isActive: schemaFields.BooleanWithDefault,
+    assignedBatch:{
+        type: String,
+        ref: 'Batch'
+    },
     // designation:schemaFields.requiredAndString,
     qualification:schemaFields.requiredAndString,
     experience: schemaFields.StringWithEnumAndRequired(['0 to 1', '1 to 3', '3 to 5', '5+']),

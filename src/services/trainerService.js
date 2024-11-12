@@ -3,6 +3,7 @@ const ApiError = require('../utils/apiError');
 const httpStatus = require('http-status');
 const uploadCloud = require('../utils/uploadCloud');
 const Auth = require('../models/authModel');
+const validator = require('validator');
 
 
 

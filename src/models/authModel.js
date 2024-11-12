@@ -28,7 +28,7 @@ const authSchema = new mongoose.Schema(
         "SuperAdmin",
         "Admin",
         "Coordinator",
-        "Human Resource",
+        "HR",
       ],
       required: true,
     },
