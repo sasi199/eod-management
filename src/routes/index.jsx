@@ -55,34 +55,24 @@ const renderRoutes = (routesArray = []) => {
   });
 };
 
-// const Routers = () => {
-//   const location = useLocation();
-//   const navigate = useNavigate();
 
-//   const currentRoute = routePages.find(
-//     (route) => route.path === location.pathname
-//   );
-
-//   const showLayout = currentRoute?.layout !== false;
-
-//   return (
-//     <article>
-//       {/* {showLayout && <Topbar />} */}
-//       {showLayout && <Navbar />}
-//       <Routes>
-//         {renderRoutes(routePages)}
-//         <Route path="*" element={<PageNotFound />} />
-//       </Routes>
-//       {showLayout && <Footer />}
-//     </article>
-//   );
-// };
-
-// export default Routers;
 
 export function Routers() {
-  const pageRoutes = pages.map(({ title, path, element }) => {
-    return <Route key={title} path={`${path}`} element={element} />;
+  const pageRoutes = pages.map(({ title, path, element, children }) => {
+    // Handle parent route with potential children
+    if (children) {
+      return (
+        <Route key={title} path={path} element={element}>
+          {children.map(({ path: childPath, element: childElement }) => (
+            <Route key={childPath} path={childPath} element={childElement} />
+          ))}
+        </Route>
+      );
+    }
+
+    // Handle route without children
+    return <Route key={title} path={path} element={element} />;
   });
+
   return <Routes>{pageRoutes}</Routes>;
 }
