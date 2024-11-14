@@ -1,4 +1,3 @@
-
 // const pages = [
 //   {
 //     title: "login",
@@ -24,6 +23,13 @@ import Batches from "../Panel/SuperAdmin/Pages/Batches/Batches";
 import Attendance from "../Panel/SuperAdmin/Pages/Attendance/Attendance";
 import Notifications from "../Panel/SuperAdmin/Pages/Notifications/Notifications";
 import Schedule from "../Panel/SuperAdmin/Pages/Schedule/Schedule";
+import TraineeSidebar from "../Panel/Trainee/TraineeSidebar";
+import TraineeDashboard from "../Panel/Trainee/Pages/Dashboard/TraineeDashboard";
+import TraineeSyllabus from "../Panel/Trainee/Pages/Syllabus/TraineeSyllabus";
+import TraineeNotificaitons from "../Panel/Trainee/Pages/Notifications/TraineeNotificaitons";
+import TraineeReports from "../Panel/Trainee/Pages/Report/TraineeReports";
+import TrainerSidebar from "../Panel/Trainer/TrainerSidebar";
+
 
 
 // export default pages;
@@ -34,8 +40,8 @@ export const pages = [
     path: "/",
     element: <Login />,
   },
-  
-  //superadmin 
+
+  //superadmin
 
   {
     title: "SuperSidebar",
@@ -50,53 +56,135 @@ export const pages = [
         path: "batches",
         element: <Batches />,
       },
-    
+
       {
         path: "admin",
         element: <Admin />,
       },
       {
         path: "hr",
-        element: <HR/>,
+        element: <HR />,
       },
       {
         path: "Coordinator",
-        element: <Coordinator/>,
+        element: <Coordinator />,
       },
       {
         path: "staffs",
-        element: <Staffs/>,
+        element: <Staffs />,
       },
-    
-     
+
       {
         path: "trainer",
         element: <Trainer />,
       },
       {
         path: "trainee",
-        element: <Trainee    />,
+        element: <Trainee />,
       },
-     
+
       {
         path: "chat",
-        element: <Chat    />,
+        element: <Chat />,
       },
       {
         path: "attendance",
-        element: <Attendance   />,
+        element: <Attendance />,
       },
       {
         path: "notifications",
-        element: <Notifications   />,
+        element: <Notifications />,
       },
       {
         path: "schedule",
-        element: <Schedule   />,
+        element: <Schedule />,
       },
-    
     ],
   },
 
+  // Trainee
 
+  {
+    title: "TraineeSidebar",
+    path: "/traineesidebar",
+    element: <TraineeSidebar />,
+    children: [
+      {
+        path: "dashboard",
+        element: <TraineeDashboard />,
+      },
+
+      {
+        path: "syllabus",
+        element: <TraineeSyllabus />,
+      },
+      {
+        path: "notifications",
+        element: <TraineeNotificaitons />,
+      },
+      // {
+      //   path: "assessment",
+      //   element: <TraineeAssessment />,
+      // },
+      {
+        path: "attendance",
+        element: <Attendance />,
+      },
+      {
+        path: "notifications",
+        element: <Notifications />,
+      },
+      {
+        path: "schedule",
+        element: <Schedule />,
+      },
+      {
+        path: "reports",
+        element: <TraineeReports />,
+      },
+    ],
+  },
+
+  // Trainer
+
+  {
+    title: "TrainerSidebar",
+    path: "/trainersidebar",
+    element: <TrainerSidebar/>,
+    children: [
+      {
+        path: "dashboard",
+        element: <TraineeDashboard />,
+      },
+
+      // {
+      //   path: "syllabus",
+      //   element: <TraineeSyllabus />,
+      // },
+      // {
+      //   path: "notifications",
+      //   element: <TraineeNotificaitons />,
+      // },
+      // {
+      //   path: "assessment",
+      //   element: <TraineeAssessment />,
+      // },
+      // {
+      //   path: "attendance",
+      //   element: <Attendance />,
+      // },
+      // {
+      //   path: "notifications",
+      //   element: <Notifications />,
+      // },
+      // {
+      //   path: "schedule",
+      //   element: <Schedule />,
+      // },
+      // {
+      //   path: "reports",
+      //   element: <TraineeReports />,
+      // },
+    ],
+  },
 ];

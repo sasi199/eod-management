@@ -17,9 +17,9 @@ const Login = () => {
     } else if (loginCred === "admin" && password === "admin123") {
       navigate("/admin");
     } else if (loginCred === "trainer" && password === "trainer123") {
-      navigate("/trainer");
+      navigate("/trainersidebar");
     } else if (loginCred === "trainee" && password === "trainee123") {
-      navigate("/trainee");
+      navigate("/traineesidebar");
     } else {
       alert("Invalid credentials");
     }
