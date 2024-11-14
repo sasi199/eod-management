@@ -88,3 +88,69 @@ exports.createBatch = async(req)=>{
 
     return newBatch;
 }
+
+
+exports.getBatchAll = async(req)=>{
+    const batch = await BatchModel.find({})
+    if (!batch) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Batch not found"});
+    }
+
+    return batch;
+}
+
+
+exports.getBatchId = async(req)=>{
+    const { auth } = req._id
+    const { batchId } = req.user
+    
+    if (batchId) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Batch id required"});
+    }
+
+    const batch = await BatchModel.findById(batchId)
+    if (batch) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Batch not found"});
+    }
+    return batch;
+}
+
+
+exports.editBatch = async(req)=>{
+    const { authId } = req._id;
+    const { batchId } = req.user;
+
+    if (batchId) {
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Batch id required"});
+    }
+
+    const batch = await BatchModel.findById(batchId);
+    if (!batch) {
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Batch not found"});
+    }
+
+    const updateData = {...req.body}
+    const updateBatch =  await BatchModel.findByIdAndUpdate(batchId,updateData,
+        {new: true, runValidators: true}
+    )
+
+    return updateBatch;
+
+}
+
+
+exports.deleteBatch = async(req)=>{
+    const { authId } = req._id;
+    const { batchId } = req.user;
+
+    if (batchId) {
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Batch id required"});
+    }
+
+    const batch = await BatchModel.findById(batchId)
+    if (!batch) {
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Btach not found"});
+     }
+
+     await BatchModel.findByIdAndDelete(batchId);
+}

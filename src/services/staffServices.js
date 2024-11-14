@@ -10,7 +10,8 @@ const generateStaffLogId = async(role)=>{
     const rolePrefixMap = {
         Admin: 'ADM',
         HR: 'HR',
-        Coordinator: 'CDR'
+        Coordinator: 'CDR',
+        Employee: 'EMP'
     };
 
     const prefix = rolePrefixMap[role]

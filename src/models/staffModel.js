@@ -16,7 +16,7 @@ const staffSchema = new mongoose.Schema({
     designation:schemaFields.requiredAndString,
     qualification:schemaFields.requiredAndString,
     experience: schemaFields.StringWithEnumAndRequired(['0 to 1', '1 to 3', '3 to 5', '5+']),
-    role: schemaFields.StringWithEnumAndRequired(["Admin","HR","Coordinator"]),
+    role: schemaFields.StringWithEnumAndRequired(["Admin","HR","Coordinator","Employee"]),
     createdBy:schemaFields.UUIDIdReference('superAdmin'),
     isArchive: schemaFields.BooleanWithDefault,
     permission:{

@@ -3,13 +3,16 @@ const Auth = require("../models/authModel");
 const ApiError = require("../utils/apiError");
 const utils = require("../utils/utils");
 const httpStatus = require('http-status');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 
 
 
 exports.loginByEmailAndLogId = async(req)=>{
-    const { email,role, logId } = req.body
+    const { email,role, logId, latitude,longitude} = req.body
+
+    console.log(req.body,"req.body");
     
+
     const user = await Auth.findOne({email,role,logId});
     if (!user) {
         throw new ApiError(httpStatus.UNAUTHORIZED, {message:"Invalid credantials",status:false,});
@@ -20,6 +23,17 @@ exports.loginByEmailAndLogId = async(req)=>{
       }
       if (user.archive) {
         throw new ApiError(httpStatus.FORBIDDEN, "Your account is archived and cannot be used.");
+      }
+
+      const allowedDistance = 0.1;
+      const isWithinRange = config.companyLocations.some(company=>{ 
+        const distance = utils.haversinDistance(latitude, longitude, company.latitude, company.longitude);
+        return distance <= allowedDistance;
+      })
+
+      if (!isWithinRange) {
+        throw new ApiError(httpStatus.BAD_REQUEST,"Login denied. You are not within the allowed location range.");
+        
       }
 
       const token = jwt.sign(

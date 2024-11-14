@@ -27,9 +27,12 @@ const envVarSchema = joi.object()
     SMTP_PORT: joi.number().description("port to connect to the email server"),
     SMTP_USERNAME: joi.string().description("username for email server"),
     SMTP_PASSWORD: joi.string().description("password for email server"),
-    EMAIL_FROM: joi.string().description(
-      "the from field in the emails sent by the app"
-    ),
+    EMAIL_FROM: joi.string().description("the from field in the emails sent by the app"),
+    COMPANY_LOCAT_1_LAT: joi.number().required().description("Latitude of company location 1"),
+    COMPANY_LOCAT_1_LONG: joi.number().required().description("Latitude of company location 1"),
+    COMPANY_LOCAT_2_LAT: joi.number().required().description("Latitude of company location 2"),
+    COMPANY_LOCAT_2_LONG: joi.number().required().description("Latitude of company location 2"),
+    LOCATION_RADIUS: joi.number().default(100).description('Allowed login radius in meters')
 }).unknown();
 
 
@@ -72,5 +75,10 @@ module.exports = {
         region : envVars.REGION,
         awsEndPoint: envVars.AWS_ENDPOINT,
       },
+      companyLocations:[
+        { latitude:  parseFloat(envVars.COMPANY_LOCAT_1_LAT),longitude: parseFloat(envVars.COMPANY_LOCAT_1_LONG)},
+        { latitude:  parseFloat(envVars.COMPANY_LOCAT_2_LAT),longitude: parseFloat(envVars.COMPANY_LOCAT_2_LONG)},
+      ],
+      locationRadius: envVars.LOCATION_RADIUS
       
 }

@@ -7,15 +7,21 @@ const attendanceSchema = new mongoose.Schema({
     date: schemaFields.requiredAndDate,
     checkIn: schemaFields.requiredAndDate,
     checkOut: schemaFields.requiredAndDate,
-    location: schemaFields.requiredAndString,
+    location:{
+        type: {
+            latitude: { type: Number, required: true },
+            longitude: { type: Number, required: true }
+        },
+        required: true
+    },
     status: {
         type: String,
-        enum: ['Present', 'Absent', 'On Leave', 'Half Day'],
+        enum: ['Present', 'Absent', 'WFH', 'Off-Day','1 hour','Online'],
         required: true,
         default: 'Present'
     },
     islate: schemaFields.BooleanWithDefault,
-    comments: schemaFields.requiredAndString,
+    comments: {...schemaFields.requiredAndString},
     createdBy:schemaFields.UUIDIdReference('superAdmin'),
     permission:{
         type: String,
@@ -25,6 +31,15 @@ const attendanceSchema = new mongoose.Schema({
         }
     },
 },{timestamps:true, collection: "Attendance"});
+
+attendanceSchema.pre('save', function (next) {
+    if (this.createdBy.role === 'superAdmin') {
+        this.permission = 'full-access';
+    } else {
+        this.permission = 'write';
+    }
+    next();
+});
 
 const AttendanceModel = mongoose.model('Attendance',attendanceSchema);
 
