@@ -6,7 +6,10 @@ const attendanceSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     date: schemaFields.requiredAndDate,
     checkIn: schemaFields.requiredAndDate,
-    checkOut: schemaFields.requiredAndDate,
+    checkOut:{
+        type: Date,
+        required: false,
+    },
     location:{
         type: {
             latitude: { type: Number, required: true },
@@ -25,7 +28,7 @@ const attendanceSchema = new mongoose.Schema({
     createdBy:schemaFields.UUIDIdReference('superAdmin'),
     permission:{
         type: String,
-        enum: ["read"],
+        enum: ["write"],
         default: ()=>{
             return this.role === 'superAdmin'?'full-access':'write'
         }

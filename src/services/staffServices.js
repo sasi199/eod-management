@@ -4,6 +4,7 @@ const httpStatus = require('http-status');
 const validator = require('validator');
 const uploadCloud = require("../utils/uploadCloud");
 const Auth = require("../models/authModel");
+const utils = require("../utils/utils");
 
 
 const generateStaffLogId = async(role)=>{
@@ -32,14 +33,14 @@ const generateStaffLogId = async(role)=>{
 
 
 exports.createStaff = async(req)=>{
-    const {email, fullName , role} = req.body
+    const {email, fullName , role, password} = req.body
 
     const existingStaff = await StaffModel.findOne({email});
     if (existingStaff) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Staff already exist"});  
     }
 
-    if (req.user.role !== 'superAdmin') {
+    if (req.user.role !== 'SuperAdmin') {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Only super admin can create staff"});
         
     }
@@ -47,6 +48,8 @@ exports.createStaff = async(req)=>{
     if (!validator.isEmail(email)) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email"});
       }
+
+      const hashedPassword = await utils.hashPassword(password);
 
     let profilePic;
     if (req.file) {
@@ -58,6 +61,7 @@ exports.createStaff = async(req)=>{
     const newStaff = new StaffModel({
         ...req.body,
         logId,
+        password: hashedPassword,
         profilePic
     })
 
@@ -65,6 +69,7 @@ exports.createStaff = async(req)=>{
         staffId: newStaff._id,
         email,
         logId,
+        password:hashedPassword,
         role
     })
 

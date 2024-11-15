@@ -1,25 +1,18 @@
 const mongoose = require("mongoose");
 const { v4 } = require("uuid");
 const userRole = require("../utils/roles");
+const schemaFields = require("../utils/schemaFieldUtils");
 
 const authSchema = new mongoose.Schema(
   {
-    _id: {
-      type: String,
-      default: v4,
-    },
-    email: {
-      type: String,
-      unique: true,
-      required: true,
-    },
-    logId: {
-      type: String,
-      required: true,
-    },
-    userName: {
+    _id: schemaFields.idWithV4UUID,
+    email: schemaFields.requireStringAndUnique,
+    logId: schemaFields.requiredAndString,
+    password: schemaFields.requiredAndString,
+    fullName: {
       type: String,
     },
+    hybrid: schemaFields.StringWithEnumAndRequired(['Online','WFH']),
     role: {
       type: String,
       enum: [
@@ -28,6 +21,7 @@ const authSchema = new mongoose.Schema(
         "SuperAdmin",
         "Admin",
         "Coordinator",
+        "Employee",
         "HR",
       ],
       required: true,

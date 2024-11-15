@@ -5,6 +5,7 @@ const schemaFields = require('../utils/schemaFieldUtils');
 const traineeSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     logId: schemaFields.requiredAndString,
+    password : schemaFields.requiredAndString,
     fullName: schemaFields.requiredAndString,
     email: schemaFields.requireStringAndUnique,
     dob:schemaFields.requiredAndString,
@@ -15,6 +16,7 @@ const traineeSchema = new mongoose.Schema({
     currentAddress: schemaFields.requiredAndString,
     resumeUpload: schemaFields.requiredAndString,
     isActive: schemaFields.BooleanWithDefault,
+    hybrid: schemaFields.StringWithEnumAndRequired(['Online','WFH']),
     assignedBatch:{
         type: String,
         ref: 'Batch'

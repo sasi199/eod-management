@@ -10,6 +10,7 @@ const adminSchema = new mongoose.Schema({
     role: schemaFields.StringWithEnumAndRequired(["admin","superAdmin"]),
     // createdBy:schemaFields.UUIDIdReference('Admin'),
     isArchive: schemaFields.BooleanWithDefault,
+    hybrid: schemaFields.StringWithEnumAndRequired(["Onlime","Offline"]),
     permission:{
         type: String,
         enum: ["read","write","manage","full-access"],

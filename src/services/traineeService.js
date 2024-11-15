@@ -5,6 +5,7 @@ const httpStatus = require('http-status');
 const validator = require('validator');
 const uploadCloud = require("../utils/uploadCloud");
 const TraineeDetailsModel = require("../models/traineeDetails");
+const utils = require("../utils/utils");
 
 
 
@@ -20,16 +21,16 @@ const generateTraineeLogId = async () => {
 
 
 exports.createTrainee = async(req)=>{
-    const { email, fullName, role} = req.body
+    const { email, fullName, password,role,hybrid} = req.body
     // console.log(req.body);
 
     const existingTrainee = await TraineeModel.findOne({email})
     if (existingTrainee) {
-        throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Trainer already exist'});   
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Trainee already exist'});   
     }
     
-    if (req.user.role !== 'superAdmin') {
-        throw new ApiError(httpStatus.FORBIDDEN, {message: 'Trainer already exist'}); 
+    if (req.user.role !== 'SuperAdmin') {
+        throw new ApiError(httpStatus.FORBIDDEN, {message: 'Only super admin can create trainee'}); 
     }
 
     if (!validator.isEmail(email)) {
@@ -46,18 +47,23 @@ exports.createTrainee = async(req)=>{
 
    const logId = await generateTraineeLogId();
 
+   const hashedPassword = await utils.hashPassword(password)
+
    const newTrainee = new TraineeModel({
     ...req.body,
     logId,
     profilePic,
-    resumeUpload
+    resumeUpload,
+    password: hashedPassword
    })
 
    const newAuth = new Auth({
     traineeId: newTrainee._id,
     email,
     logId,
-    role
+    role,
+    hybrid,
+    password: hashedPassword
    })
 
    
@@ -101,12 +107,12 @@ exports.editTrainee = async(req)=>{
     const { traineeId } = req.user
 
     if (!traineeId) {
-        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Trainer id required"});
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Trainee id required"});
      }
   
      const trainee = await TraineeModel.findById(trainerId);
      if (!trainee) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message: "Trainer not found"});
+        throw new ApiError(httpStatus.BAD_REQUEST, {message: "Trainee not found"});
      }
      
      const updateData = {...req.body}
@@ -133,7 +139,7 @@ exports.deleteTrainee = async(req)=>{
     const { traineeId } = req.user
 
     if (!traineeId) {
-        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Trainer id required"});
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Trainee id required"});
      }
 
      const trainee = await TraineeModel.findById(traineeId);
