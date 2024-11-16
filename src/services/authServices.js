@@ -28,7 +28,6 @@ exports.loginByEmailAndLogId = async(req)=>{
 
 
       const isPasswordCorrect = await utils.comparePassword(password, user.password);
-      console.log(isPasswordCorrect,"ppppppp");
       
       if (!isPasswordCorrect) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid password"});
