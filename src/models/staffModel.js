@@ -21,7 +21,7 @@ const staffSchema = new mongoose.Schema({
     isTrainer: schemaFields.BooleanWithDefault,
     createdBy:schemaFields.UUIDIdReference('superAdmin'),
     isArchive: schemaFields.BooleanWithDefault,
-    hybrid: schemaFields.StringWithEnumAndRequired(['Online','WFH']),
+    hybrid: schemaFields.StringWithEnumAndRequired(['Online','Ofline','WFH']),
     permission:{
         type: String,
         enum: ["read","write","manage","full-access"],

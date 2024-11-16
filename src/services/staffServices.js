@@ -33,7 +33,7 @@ const generateStaffLogId = async(role)=>{
 
 
 exports.createStaff = async(req)=>{
-    const {email, fullName , role, password} = req.body
+    const {email, fullName , role, password, hybrid} = req.body
 
     const existingStaff = await StaffModel.findOne({email});
     if (existingStaff) {
@@ -69,6 +69,7 @@ exports.createStaff = async(req)=>{
         staffId: newStaff._id,
         email,
         logId,
+        hybrid,
         password:hashedPassword,
         role
     })
