@@ -71,37 +71,37 @@ const TrainerSidebar = () => {
             Task
           </Link>
           <Link 
-            to="/trainersidebar/myBatch" 
+            to="/trainersidebar/assessment" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
             <MdAssignment/>
             Assessment
           </Link>
           <Link 
-            to="/trainersidebar/myBatch" 
+            to="/trainersidebar/attendance" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
             <FaCalendarAlt />
             Attendance
           </Link>
           <Link 
-            to="/trainersidebar/myBatch" 
+            to="/trainersidebar/syllabus" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
             <FaBook />
             Syllabus
           </Link>
           <Link 
-            to="/trainersidebar/myBatch" 
+            to="/trainersidebar/notifications" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
             <FaBell/>
             Notifications
           </Link>
           <Link 
-            to="/trainersidebar/myBatch" 
+            to="/trainersidebar/chat" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
             <FaComments />
             Chat
           </Link>
           <Link 
-            to="/trainersidebar/myBatch" 
+            to="/trainersidebar/reports" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
             <FaFileAlt />
             Report
