@@ -28,7 +28,9 @@ exports.loginByEmailAndLogId = async(req)=>{
 
 
       const isPasswordCorrect = await utils.comparePassword(password, user.password);
-      if (isPasswordCorrect) {
+      console.log(isPasswordCorrect,"ppppppp");
+      
+      if (!isPasswordCorrect) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid password"});
       }
 
@@ -53,6 +55,10 @@ exports.loginByEmailAndLogId = async(req)=>{
         date: today,
         checkIn: workStart > now ? workStart : now,
         status: workStart > now ? "Late" : "Present",
+        location:{
+          latitude: latitude,
+          longitude: longitude,
+        },
         comments: "User logged in successfully.",
       })
 
