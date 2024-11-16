@@ -34,7 +34,7 @@ exports.loginByEmailAndLogId = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid password"});
       }
 
-      const allowedDistance = 0.1;
+      const allowedDistance = 2.8;
       const isWithinRange = config.companyLocations.some(company=>{ 
         const distance = utils.haversinDistance(latitude, longitude, company.latitude, company.longitude);
         return distance <= allowedDistance;
