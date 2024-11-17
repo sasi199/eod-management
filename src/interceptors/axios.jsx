@@ -11,7 +11,7 @@ apiInstance.interceptors.request.use(
 
     if (authToken) {
       config.headers.Authorization = `Bearer ${authToken}`;
-console.log(config);
+      // console.log(config);
     }
     return config;
   },

@@ -15,6 +15,6 @@ export const login = async (data)=>{
 //add staffs
 
 export const AddStaffs = async (staffData)=>{
-  const res = await interceptors.post("v1/staff/createStaff",staffData);
+  const res = await interceptors.post("/v1/staff/createStaff",staffData);
   return res;
 }

@@ -22,7 +22,21 @@ const Staffs = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-
+  const [staffData, SetStaffData] = useState({
+    fullName: "",
+    email: "",
+    gender: "",
+    phoneNumber: "",
+    address: "",
+    designation: "",
+    qualification: "",
+    dob: "",
+    experience: "",
+    profilePic: "",
+    hybrid: "",
+    role: "",
+    password: "",
+  });
   const staffs = [
     { id: 1, name: "ElangaiVendhan", position: "Admin", image: admin1 },
     { id: 2, name: "Kavin", position: "Admin", image: admin2 },
@@ -46,41 +60,53 @@ const Staffs = () => {
   };
 
   const handleAddStaff = async (values) => {
-    try {
-      const staffData = {
-        fullName: values.fullName,
-        email: values.email,
-        gender: values.gender,
-        phoneNumber: values.phoneNumber,
-        address: values.address,
-        designation: values.designation,
-        qualification: values.qualification,
-        dob: values.dob.format("YYYY-MM-DD"),
-        experience: values.experience,
-        profilePic: values.profilePic?.file?.name || null,
-        hybrid: values.hybrid,
-        role: values.role,
-        password: values.password,
-      };
-      console.log(response,"rtyuio");
-      const response = await AddStaffs(staffData);
+    // try {
+    SetStaffData({
+      fullName: values.fullName,
+      email: values.email,
+      gender: values.gender,
+      phoneNumber: values.phoneNumber,
+      address: values.address,
+      designation: values.designation,
+      qualification: values.qualification,
+      dob: values.dob,
+      experience: values.experience,
+      profilePic: values.profilePic?.file?.name || null,
+      hybrid: values.hybrid,
+      role: values.role,
+      password: values.password,
+    });
+    //   console.log(response, "rtyuio");
+    //   const response = await AddStaffs(staffData);
 
-      if (response.status === 200) {
-        message.success("Staff added successfully!");
-        handleCloseModal();
-      } else {
-        message.error("Failed to add staff.");
-      }
-    } catch (error) {
-      message.error("Error adding staff. Please try again.");
-    }
+    //   if (response.status === 200) {
+    //     message.success("Staff added successfully!");
+    //     handleCloseModal();
+    //   } else {
+    //     message.error("Failed to add staff.");
+    //   }
+    // } catch (error) {
+    //   message.error("Error adding staff. Please try again.");
+    // }
+
+    await AddStaffs(staffData)
+      .then((res) => {
+        if (res.status === 200) {
+          message.success("Staff added successfully!");
+          handleCloseModal();
+        } else {
+          message.error("Failed to add staff.");
+        }
+      })
+      .catch((err) => {
+        console.log(err, "error adding staffs");
+      });
   };
 
   const handleProfilePicUpload = (file) => {
     form.setFieldValue("profilePic", file);
     return false;
   };
-
 
   return (
     <div className="px-6 py-2">
