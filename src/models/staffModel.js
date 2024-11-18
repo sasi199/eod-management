@@ -22,6 +22,14 @@ const staffSchema = new mongoose.Schema({
     createdBy:schemaFields.UUIDIdReference('superAdmin'),
     isArchive: schemaFields.BooleanWithDefault,
     hybrid: schemaFields.StringWithEnumAndRequired(['Online','Offline','WFH']),
+    // assignedBatches: [{
+    //     type: String,
+    //     ref: 'Batch'
+    // }],
+    // assignedSchedule: [{
+    //     type: String,
+    //     ref: 'Schedule'
+    // }],
     permission:{
         type: String,
         enum: ["read","write","manage","full-access"],

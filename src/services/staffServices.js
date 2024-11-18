@@ -33,7 +33,7 @@ const generateStaffLogId = async(role)=>{
 
 
 exports.createStaff = async(req)=>{
-    const {email, fullName , role, password, hybrid} = req.body
+    const {email, fullName , role, password, hybrid, isTrainer} = req.body
 
     const existingStaff = await StaffModel.findOne({email});
     if (existingStaff) {
@@ -59,11 +59,18 @@ exports.createStaff = async(req)=>{
 
     const logId = await generateStaffLogId(role);
 
+    const isTrainerBoolean = role === 'Employee' && isTrainer === 'Yes';
+    if (role === 'Employee' && isTrainer !== 'Yes' && isTrainer !== 'No') {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Invalid value for isTrainer. Use 'Yes' or 'No'." });
+    }
+
+
     const newStaff = new StaffModel({
         ...req.body,
         logId,
         password: hashedPassword,
-        profilePic
+        profilePic,
+        isTrainer:isTrainerBoolean
     })
 
     const newAuth = new Auth({

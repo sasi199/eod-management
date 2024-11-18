@@ -14,13 +14,13 @@ const batchSchema = new mongoose.Schema({
         type: Number,
         default: 25,
     },
-    trainees: [{
+    trainee: [{
         type: String,
         ref: 'Trainee'
     }],
     trainer: [{
         type: String,
-        ref: 'Trainer'
+        ref: 'Staff'
     }]
 }, { timestamps: true, collection: "Batch" });
 

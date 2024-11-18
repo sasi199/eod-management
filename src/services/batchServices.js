@@ -1,4 +1,5 @@
 const BatchModel = require("../models/batchModel");
+const StaffModel = require("../models/staffModel");
 const TraineeModel = require("../models/traineeModel");
 const TrainerModel = require("../models/trainerModel");
 const ApiError = require("../utils/apiError");
@@ -56,7 +57,7 @@ exports.createBatch = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Batch already exist'}); 
     }
 
-    if (req.user.role !== 'superAdmin') {
+    if (req.user.role !== 'SuperAdmin') {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Only super admin can create staff'});
     }
     
@@ -73,7 +74,7 @@ exports.createBatch = async(req)=>{
     await newBatch.save();
 
     if (trainers && trainers.length >0) {
-        await TrainerModel.updateMany(
+        await StaffModel.updateMany(
             {_id:{ $in: trainers }},
             {$addToSet:{assignedBatches: newBatch._id}}
         )
