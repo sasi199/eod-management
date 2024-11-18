@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoMdAdd } from "react-icons/io";
 import {
   Modal,
@@ -11,10 +11,7 @@ import {
   message,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import admin1 from "../../../../assets/SuperAdmin/admin1.jpg";
-import admin2 from "../../../../assets/SuperAdmin/admin2.jpg";
-import admin3 from "../../../../assets/SuperAdmin/admin3.jpg";
-import { AddStaffs } from "../../../../services";
+import { AddStaffs, AllStaffs} from "../../../../services";
 
 const { Option } = Select;
 
@@ -22,29 +19,24 @@ const Staffs = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const [staffData, SetStaffData] = useState({
-    fullName: "",
-    email: "",
-    gender: "",
-    phoneNumber: "",
-    address: "",
-    designation: "",
-    qualification: "",
-    dob: "",
-    experience: "",
-    profilePic: "",
-    hybrid: "",
-    role: "",
-    password: "",
-  });
-  const staffs = [
-    { id: 1, name: "ElangaiVendhan", position: "Admin", image: admin1 },
-    { id: 2, name: "Kavin", position: "Admin", image: admin2 },
-    { id: 3, name: "Gopi", position: "Admin", image: admin3 },
-    { id: 4, name: "Elangaivendan", position: "HR", image: admin2 },
-    { id: 5, name: "Kavin", position: "Coordinator", image: admin2 },
-    { id: 6, name: "Gopi", position: "Trainer", image: admin3 },
-  ];
+
+  const [staffs, setStaffs] = useState([]);
+
+  useEffect(() => {
+    const fetchStaffData = () => {
+      AllStaffs()
+        .then((res) => {
+          setStaffs(res.data.data);
+          console.log(res.data.data);
+        })
+        .catch((error) => {
+          message.error('Error fetching staff data. Please try again.');
+          console.error('Error fetching staff data:', error.message);
+        });
+    };
+
+    fetchStaffData();
+  }, []);
 
   const filteredStaffs = staffs.filter((staff) =>
     staff.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -60,22 +52,24 @@ const Staffs = () => {
   };
 
   const handleAddStaff = async (values) => {
-    // try {
-    SetStaffData({
-      fullName: values.fullName,
-      email: values.email,
-      gender: values.gender,
-      phoneNumber: values.phoneNumber,
-      address: values.address,
-      designation: values.designation,
-      qualification: values.qualification,
-      dob: values.dob,
-      experience: values.experience,
-      profilePic: values.profilePic?.file?.name || null,
-      hybrid: values.hybrid,
-      role: values.role,
-      password: values.password,
-    });
+    const formData = new FormData();
+    formData.append('fullName', values.fullName);
+    formData.append('email', values.email);
+    formData.append('gender', values.gender);
+    formData.append('phoneNumber', values.phoneNumber);
+    formData.append('address', values.address);
+    formData.append('designation', values.designation);
+    formData.append('qualification', values.qualification);
+    formData.append('dob', values.dob);
+    formData.append('experience', values.experience);
+    formData.append('hybrid', values.hybrid);
+    formData.append('role', values.role);
+    formData.append('password', values.password);
+    
+    // Append profile picture if it's present
+    if (values.profilePic && values.profilePic.file) {
+      formData.append('profilePic', values.profilePic.file);
+    }
     //   console.log(response, "rtyuio");
     //   const response = await AddStaffs(staffData);
 
@@ -89,7 +83,7 @@ const Staffs = () => {
     //   message.error("Error adding staff. Please try again.");
     // }
 
-    await AddStaffs(staffData)
+    await AddStaffs(formData)
       .then((res) => {
         if (res.status === 200) {
           message.success("Staff added successfully!");
@@ -130,8 +124,8 @@ const Staffs = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        {filteredStaffs.length > 0 ? (
-          filteredStaffs.map((staff) => (
+        {staffs.length > 0 ? (
+          staffs.map((staff) => (
             <div
               key={staff.id}
               className="bg-white shadow-lg rounded-lg border-2 overflow-hidden border-gray-200 w-full"

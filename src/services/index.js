@@ -12,9 +12,19 @@ export const login = async (data)=>{
   return res;
 }
 
+//staffs
+
 //add staffs
 
 export const AddStaffs = async (staffData)=>{
   const res = await interceptors.post("/v1/staff/createStaff",staffData);
   return res;
 }
+
+//get staffs
+
+export const AllStaffs = async () =>{
+  const res = await interceptors.get("/v1/staff/getStaffAll");
+  return res;
+}
+

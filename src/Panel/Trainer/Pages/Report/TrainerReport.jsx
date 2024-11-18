@@ -157,7 +157,7 @@ const TrainerReports = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="w-full">
+            <Button  htmlType="submit" className="w-full bg-orange-500 text-white">
               Submit Report
             </Button>
           </Form.Item>

@@ -125,8 +125,9 @@ const Schedule = () => {
         title="Add New Schedule"
         visible={isBatchModalOpen}
         onCancel={() => setIsBatchModalOpen(false)}
-        onOk={handleAddBatch}
-        okText="Add Schedule"
+        // onOk={handleAddBatch}
+        // okText="Add Schedule"
+        footer={null}
       >
         <Input
           placeholder="Batch Name"
@@ -155,6 +156,9 @@ const Schedule = () => {
           onChange={(date) => setNewBatch({ ...newBatch, date })}
           className="w-full"
         />
+        <button className="w-full bg-orange-500 text-white hover:bg-orange-600 py-1 mt-4 rounded-lg  text-lg">
+          Add Schedule
+        </button>
       </Modal>
 
       <Modal
