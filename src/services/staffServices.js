@@ -95,15 +95,17 @@ exports.getStaffId = async(req)=>{
     const {authId} = req
     console.log(authId,"pppppppp");
     
-    // const { _id } = req.user;
-    // console.log(_id,"mmmmm");
+    const { _id } = req.params;
+    console.log(_id,"mmmmm");
     
 
-    if (!authId) {
+    if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Staff Id required"});
      }
 
-     const staff = await StaffModel.findById(authId)
+     const staff = await StaffModel.findById(_id)
+     console.log(staff,"ssssssssss");
+     
 
      if (!staff) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Staff not Found"});
@@ -114,24 +116,29 @@ exports.getStaffId = async(req)=>{
 
 
 exports.editStaff = async(req)=>{
-    const { authId } = req._id;
-    const { staffId } = req.user;
+    const { authId } = req
+    const { _id } = req.params;
 
-    const staff = await StaffModel.findById(staffId);
+    const staff = await StaffModel.findById(_id);
+    console.log(staff,"i");
+    
 
     if (!staff) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Staff not found"});
     }
 
     const updateData = {...req.body}
+    console.log(updateData,"stafffff");
     if(req.file){
-        const profilePic = await uploadCloud('staff-Profile',req.file)
+        const originalUrl = req.file.originalname.split('.').pop();
+        const profilePic = await uploadCloud(`staff-Profile${originalUrl}`,req.file)
         updateData.profilePic = profilePic;
     }
 
-    const updateStaff = await StaffModel.findByIdAndUpdate(staffId,updateData,
+    const updateStaff = await StaffModel.findByIdAndUpdate(_id,updateData,
         { new:true,runValidators:true }
     )
+    
 
     const updateAuth = await Auth.findByIdAndUpdate(authId,updateData,
         {new:true, runValidators: true})
