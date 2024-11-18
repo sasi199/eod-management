@@ -9,6 +9,9 @@ const authSchema = new mongoose.Schema(
     email: schemaFields.requireStringAndUnique,
     logId: schemaFields.requiredAndString,
     password: schemaFields.requiredAndString,
+    accountId:{
+      type: String
+    },
     fullName: {
       type: String,
     },
@@ -26,21 +29,21 @@ const authSchema = new mongoose.Schema(
       ],
       required: true,
     },
-    traineeId: {
-      type: String,
-    },
+    // traineeId: {
+    //   type: String,
+    // },
     dob: {
       type: String,
     },
-    adminId: {
-      type: String,
-    },
+    // adminId: {
+    //   type: String,
+    // },
     batch_id: {
       type: String
     },
-    trainerId:{
-        type:String
-    },
+    // trainerId:{
+    //     type:String
+    // },
     archive: {
       type: Boolean,
       default: false,

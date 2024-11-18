@@ -91,18 +91,18 @@ exports.getStaffAll = async(req)=>{
 }
 
 exports.getStaffId = async(req)=>{
-    // const {authId} = req
-    // console.log(authId,"pppppppp");
+    const {authId} = req
+    console.log(authId,"pppppppp");
     
-    const { _id } = req.user;
-    console.log(_id,"mmmmm");
+    // const { _id } = req.user;
+    // console.log(_id,"mmmmm");
     
 
-    // if (!staffId) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, {message:"Staff Id required"});
-    //  }
+    if (!authId) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Staff Id required"});
+     }
 
-     const staff = await StaffModel.findById(_id)
+     const staff = await StaffModel.findById(authId)
 
      if (!staff) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Staff not Found"});
