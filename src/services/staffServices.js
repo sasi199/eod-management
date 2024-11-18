@@ -53,7 +53,7 @@ exports.createStaff = async(req)=>{
 
     let profilePic;
     if (req.file) {
-        const originalUrl = file.originalname.split('.').pop();
+        const originalUrl = req.file.originalname.split('.').pop();
          profilePic = await uploadCloud(`staff-Profile/${originalUrl}`,req.file)
     }
 
