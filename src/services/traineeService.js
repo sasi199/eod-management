@@ -77,7 +77,7 @@ exports.createTrainee = async(req)=>{
 
 exports.getTraineeAll = async(req)=>{
     const trainee = await TraineeModel.find({})
-    if (trainee) {
+    if (!trainee) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainer not found"});
     }
 
