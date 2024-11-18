@@ -53,7 +53,7 @@ exports.createStaff = async(req)=>{
 
     let profilePic;
     if (req.file) {
-         profilePic = await uploadCloud('staff-Profile',req.file)
+         profilePic = await uploadCloud('staff-Profile/:id',req.file)
     }
 
     const logId = await generateStaffLogId(role);
@@ -66,7 +66,7 @@ exports.createStaff = async(req)=>{
     })
 
     const newAuth = new Auth({
-        staffId: newStaff._id,
+        accountId: newStaff._id,
         email,
         logId,
         hybrid,
