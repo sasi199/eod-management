@@ -114,7 +114,7 @@ const verifyAuthToken = async (req, res, next) => {
     // Attach user ID to request object for further use in the route handler
     req.authId = result.userId;
     req.user = result.user
-    console.log(result.userId,"resulteeee");
+    console.log(result.userId,"ahsjsgbw");
     console.log(result.user,"resulteeee");
    
     

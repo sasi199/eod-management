@@ -18,5 +18,9 @@ const checkSuperAdmin = (req,res,next)=>{
 Router.use(verifyAuthToken);
 
 Router.route('/createStaff').post(checkSuperAdmin,uploads.single('profilePic'),staffController.createStaff);
+Router.route('/getStaffAll').get(checkSuperAdmin,staffController.getStaffAll);
+Router.route('/getStaffId').get(staffController.getStaffId);
+Router.route('/editStaff').get(checkSuperAdmin,staffController.editStaff);
+Router.route('/deleteStaff').get(checkSuperAdmin,staffController.deleteStaff);
 
 module.exports = Router;

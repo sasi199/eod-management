@@ -79,3 +79,81 @@ exports.createStaff = async(req)=>{
 
     return newStaff;
 }
+
+
+exports.getStaffAll = async(req)=>{
+    const staff = await StaffModel.find()
+    if (!staff) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Staff not found"});
+     }
+  
+     return staff;
+}
+
+exports.getStaffId = async(req)=>{
+    // const {authId} = req
+    // console.log(authId,"pppppppp");
+    
+    const { _id } = req.user;
+    console.log(_id,"mmmmm");
+    
+
+    // if (!staffId) {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, {message:"Staff Id required"});
+    //  }
+
+     const staff = await StaffModel.findById(_id)
+
+     if (!staff) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message: "Staff not Found"});
+     }
+  
+     return staff;
+}
+
+
+exports.editStaff = async(req)=>{
+    const { authId } = req._id;
+    const { staffId } = req.user;
+
+    const staff = await StaffModel.findById(staffId);
+
+    if (!staff) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message: "Staff not found"});
+    }
+
+    const updateData = {...req.body}
+    if(req.file){
+        const profilePic = await uploadCloud('staff-Profile',req.file)
+        updateData.profilePic = profilePic;
+    }
+
+    const updateStaff = await StaffModel.findByIdAndUpdate(staffId,updateData,
+        { new:true,runValidators:true }
+    )
+
+    const updateAuth = await Auth.findByIdAndUpdate(authId,updateData,
+        {new:true, runValidators: true})
+
+        return updateStaff;
+}
+
+exports.deleteStaff = async(req)=>{
+    const {authId}= req._id;
+    const {staffId} = req.user;
+
+    const staff = await StaffModel.findById(staffId);
+    const auth = await Auth.findById(authId);
+
+    if (!staff) {
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Admin not found"});
+     }
+  
+     if (!auth) {
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Auth not found"});
+     }
+
+     await  StaffModel.findByIdAndDelete();
+     await Auth.findByIdAndDelete();
+
+}
