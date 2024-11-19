@@ -53,8 +53,9 @@ exports.createStaff = async(req)=>{
 
     let profilePic;
     if (req.file) {
-        const originalUrl = req.file.originalname.split('.').pop();
-         profilePic = await uploadCloud(`staff-Profile/${originalUrl}`,req.file)
+        const fileExtension = req.file.originalname.split('.').pop();
+        const fileName = `${Date.now()}.${fileExtension}`
+         profilePic = await uploadCloud(`staff-Profile/${fileName}`,req.file)
     }
 
     const logId = await generateStaffLogId(role);

@@ -47,3 +47,36 @@ exports.getTaskId = async(req)=>{
 
     return task;
 }
+
+exports.editTask = async(req)=>{
+    const { taskId } = req.params;
+    if (taskId) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task Id required"});
+    }
+
+    const updateData = req.body
+    const task = await TaskModel.findById(taskId)
+    if (!task) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task not found"});
+    }
+
+    const updateTask = await TaskModel(taskId,updateData,
+        { new:true,runValidators:true }
+    )
+
+    await updateTask.save();
+
+    return updateTask;
+
+}
+
+exports.deleteTask = async(req)=>{
+    const { taskId } = req.params
+
+    const task = await TaskModel.findById(taskId);
+    if(!task){
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task not found"});
+    }
+
+    await TaskModel.findByIdAndDelete();
+}
