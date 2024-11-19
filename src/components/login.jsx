@@ -32,7 +32,7 @@ const Login = () => {
             console.log("Login Response:", response); 
   
             if (response.data.status === true) {
-              localStorage.setItem("authToken", response.data.authToken);
+              localStorage.setItem("authToken", response.data);
               setEmail('');
               setPassword('');
               setRole('');

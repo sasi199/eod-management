@@ -34,3 +34,19 @@ export const EditStaffs = async (id , data) =>{
   const res= await interceptors.put(`/v1/staff/editStaff/${id}`,data)
   return res;
 }
+
+
+//batches
+
+//add Batches
+export const AddBatches= async (data)=>{
+  const res = await interceptors.post('/v1/batch/createBatch',data)
+return res;
+}
+
+//Get Batches
+
+export const GetBatches = async ()=>{
+  const res= await interceptors.get('/v1/batch/getBatchAll')
+  return res;
+}

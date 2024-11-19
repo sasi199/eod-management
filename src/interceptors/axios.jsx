@@ -21,18 +21,18 @@ console.log(config);
   }
 );
 
-apiInstance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      console.error("Unauthorized access - logging out...");
-      localStorage.removeItem("userToken");
-      window.location.href = "/sidebar/staffs";
-    }
-    return Promise.reject(error);
-  }
-);
+// apiInstance.interceptors.response.use(
+//   (response) => {
+//     return response;
+//   },
+//   (error) => {
+//     if (error.response && error.response.status === 401) {
+//       console.error("Unauthorized access - logging out...");
+//       localStorage.removeItem("userToken");
+//       window.location.href = "/sidebar/staffs";
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 export default apiInstance;
