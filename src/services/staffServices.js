@@ -124,7 +124,9 @@ exports.getStaffId = async(req)=>{
 
 
 exports.editStaff = async(req)=>{
-    const { authId } = req
+    const { accountId } = req
+    console.log(req,"wwwwwwwww");
+    
     const { _id } = req.params;
 
     const staff = await StaffModel.findById(_id);
@@ -148,13 +150,13 @@ exports.editStaff = async(req)=>{
         }
 
         const existingAuth = await Auth.findOne({ email: updateData.email });
-        if (existingAuth && existingAuth._id.toString() !== authId) {
+        if (existingAuth && existingAuth._id.toString() !== accountId) {
             throw new ApiError(httpStatus.BAD_REQUEST, { message: "Email already in use by another user." });
         }
     }
 
     const authUpdateData = { email: updateData.email};
-    const updateAuth = await Auth.findByIdAndUpdate(authId, authUpdateData, {
+    const updateAuth = await Auth.findByIdAndUpdate(accountId, authUpdateData, {
         new: true,
         runValidators: true
     });
