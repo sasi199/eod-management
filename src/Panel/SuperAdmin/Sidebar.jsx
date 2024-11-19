@@ -98,27 +98,7 @@ const Sidebar = () => {
             
             {isStaffDropdownOpen && (
               <div className="ml-8 mt-2 space-y-2">
-                <Link 
-                  to="/sidebar/admin" 
-                  className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
-                  <FaUserShield />
-                  Admin
-                </Link>
-
-                <Link 
-                  to="/sidebar/hr" 
-                  className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
-                  <FaUserShield />
-                  HR
-                </Link>
-
-                <Link 
-                  to="/sidebar/Coordinator" 
-                  className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
-                  <FaChalkboardTeacher />
-                  Coordinator
-                </Link>
-                
+                     
                 <Link 
             to="/sidebar/trainer" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">

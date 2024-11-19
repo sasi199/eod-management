@@ -8,12 +8,8 @@
 //   },
 // ];
 
-import Admin from "../Panel/SuperAdmin/Pages/Staffs/Admin";
-import Coordinator from "../Panel/SuperAdmin/Pages/Staffs/Coordiator";
 import Dashboard from "../Panel/SuperAdmin/Pages/Dashboard/Dashboard";
-import HR from "../Panel/SuperAdmin/Pages/Staffs/HR";
 import Sidebar from "../Panel/SuperAdmin/Sidebar";
-import Login from "../components/login";
 import Staffs from "../Panel/SuperAdmin/Pages/Staffs/Staffs";
 import Trainer from "../Panel/SuperAdmin/Pages/Staffs/Trainer";
 import Trainee from "../Panel/SuperAdmin/Pages/Trainee/Trainee";
@@ -37,6 +33,7 @@ import TrainerAttendance from "../Panel/Trainer/Pages/Attendance/TrainerAttendan
 import TrainerAttendace from "../Panel/Trainer/Pages/Attendance/TrainerAttendance";
 import TrainerAssessment from "../Panel/Trainer/Pages/Assessment/TrainerAssessment";
 import CreatePage from "../Panel/Trainer/Pages/Assessment/CreateAssessment";
+import Login from "../components/Login";
 
 
 
@@ -65,18 +62,7 @@ export const pages = [
         element: <Batches />,
       },
 
-      {
-        path: "admin",
-        element: <Admin />,
-      },
-      {
-        path: "hr",
-        element: <HR />,
-      },
-      {
-        path: "Coordinator",
-        element: <Coordinator />,
-      },
+   
       {
         path: "staffs",
         element: <Staffs />,

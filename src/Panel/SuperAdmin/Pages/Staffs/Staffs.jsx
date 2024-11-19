@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { IoMdAdd } from "react-icons/io";
+import { FiEdit, FiEye, FiTrash } from "react-icons/fi";
 import {
   Modal,
   Form,
@@ -11,7 +12,7 @@ import {
   message,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { AddStaffs, AllStaffs} from "../../../../services";
+import { AddStaffs, AllStaffs } from "../../../../services";
 
 const { Option } = Select;
 
@@ -21,6 +22,8 @@ const Staffs = () => {
   const [form] = Form.useForm();
 
   const [staffs, setStaffs] = useState([]);
+  const [isCardModalVisible, setIsCardModalVisible] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState(null);
 
   useEffect(() => {
     const fetchStaffData = () => {
@@ -30,17 +33,13 @@ const Staffs = () => {
           console.log(res.data.data);
         })
         .catch((error) => {
-          message.error('Error fetching staff data. Please try again.');
-          console.error('Error fetching staff data:', error.message);
+          message.error("Error fetching staff data. Please try again.");
+          console.error("Error fetching staff data:", error.message);
         });
     };
 
     fetchStaffData();
   }, []);
-
-  const filteredStaffs = staffs.filter((staff) =>
-    staff.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const handleOpenModal = () => {
     setIsModalVisible(true);
@@ -51,37 +50,34 @@ const Staffs = () => {
     form.resetFields();
   };
 
+  const handleCardClick = (staff) => {
+    setSelectedStaff(staff);
+    setIsCardModalVisible(true);
+  };
+  const handleCloseCardModal = () => {
+    setSelectedStaff(null);
+    setIsCardModalVisible(false);
+  };
+
   const handleAddStaff = async (values) => {
     const formData = new FormData();
-    formData.append('fullName', values.fullName);
-    formData.append('email', values.email);
-    formData.append('gender', values.gender);
-    formData.append('phoneNumber', values.phoneNumber);
-    formData.append('address', values.address);
-    formData.append('designation', values.designation);
-    formData.append('qualification', values.qualification);
-    formData.append('dob', values.dob);
-    formData.append('experience', values.experience);
-    formData.append('hybrid', values.hybrid);
-    formData.append('role', values.role);
-    formData.append('password', values.password);
-    
-    // Append profile picture if it's present
-    if (values.profilePic && values.profilePic.file) {
-      formData.append('profilePic', values.profilePic.file);
-    }
-    //   console.log(response, "rtyuio");
-    //   const response = await AddStaffs(staffData);
+    formData.append("fullName", values.fullName);
+    formData.append("email", values.email);
+    formData.append("gender", values.gender);
+    formData.append("phoneNumber", values.phoneNumber);
+    formData.append("address", values.address);
+    formData.append("designation", values.designation);
+    formData.append("qualification", values.qualification);
+    formData.append("dob", values.dob);
+    formData.append("experience", values.experience);
+    formData.append("hybrid", values.hybrid);
+    formData.append("role", values.role);
+    formData.append("password", values.password);
+    console.log(values);
 
-    //   if (response.status === 200) {
-    //     message.success("Staff added successfully!");
-    //     handleCloseModal();
-    //   } else {
-    //     message.error("Failed to add staff.");
-    //   }
-    // } catch (error) {
-    //   message.error("Error adding staff. Please try again.");
-    // }
+    if (values.profilePic && values.profilePic.file) {
+      formData.append("profilePic", values.profilePic.file);
+    }
 
     await AddStaffs(formData)
       .then((res) => {
@@ -128,18 +124,59 @@ const Staffs = () => {
           staffs.map((staff) => (
             <div
               key={staff.id}
-              className="bg-white shadow-lg rounded-lg border-2 overflow-hidden border-gray-200 w-full"
+              className="bg-white shadow-[0px_1px_14px_7px_#00000024] rounded-lg  overflow-hidden w-full"
             >
-              <img
-                className="w-full h-60 object-cover"
-                src={staff.image}
-                alt={staff.name}
-              />
+              {/* Image Container with Overlay */}
+              <div className="relative group">
+                {/* Staff Image */}
+                <img
+                  className="w-full h-60 object-cover p-2 rounded-xl"
+                  src={staff?.profilePic || "https://via.placeholder.com/400"}
+                  alt={staff.name}
+                />
+
+                {/* Overlay for Hover */}
+                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="flex gap-4">
+                    {/* View Icon */}
+                    <button
+                      className="flex flex-col justify-center items-center w-8 h-8 rounded-full text-white bg-orange-500 hover:bg-white hover:text-orange-500 duration-200"
+                      onClick={() => handleCardClick(staff)}
+                    >
+                      <span className="text-sm">
+                        <FiEye size={20} />
+                      </span>
+                    </button>
+
+                    {/* Edit Icon */}
+                    <button
+                      className="flex flex-col justify-center items-center w-8 h-8 rounded-full bg-orange-500 text-white hover:bg-white hover:text-orange-500 duration-200"
+                      onClick={() => console.log("Edit", staff)}
+                    >
+                      <span className="text-sm">
+                        <FiEdit size={20} />
+                      </span>
+                    </button>
+
+                    {/* Delete Icon */}
+                    <button
+                      className="flex flex-col items-center justify-center w-8 h-8 rounded-full bg-orange-500 text-white hover:bg-white hover:text-orange-500 duration-200"
+                      onClick={() => console.log("Delete", staff)}
+                    >
+                      <span className="text-sm ">
+                        <FiTrash size={20} />
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Staff Details */}
               <div className="p-4">
                 <h2 className="text-lg font-semibold text-gray-800">
-                  Name: {staff.name}
+                  Name: {staff.fullName}
                 </h2>
-                <p className="text-gray-600">Position: {staff.position}</p>
+                <p className="text-gray-600">Position: {staff.role}</p>
               </div>
             </div>
           ))
@@ -305,6 +342,69 @@ const Staffs = () => {
             </Button>
           </Form.Item>
         </Form>
+      </Modal>
+      <Modal
+        title={
+          <h2 className="text-2xl font-bold text-gray-800">Staff Details</h2>
+        }
+        visible={isCardModalVisible}
+        onCancel={handleCloseCardModal}
+        footer={null}
+        width="60%"
+        centered
+      >
+        {selectedStaff && (
+          <div className="flex flex-col md:flex-row items-center gap-8 p-">
+            {/* Image Section */}
+            <div className="flex justify-center">
+              <img
+                className="h-[400px] w-[600px]   object-cover rounded-lg"
+                src={
+                  selectedStaff.profilePic || "https://via.placeholder.com/400"
+                }
+                alt={selectedStaff.fullName}
+              />
+            </div>
+
+            {/* Data Section */}
+            <div className="bg-gradient-to-r from-orange-500 to-orange-700 text-white w-full p-6 h-96 rounded-lg shadow-lg">
+              <h2 className="text-4xl font-bold mb-4">
+                {selectedStaff.fullName}
+              </h2>
+              <div className="space-y-4 text-lg">
+                <p>
+                  <span className="font-semibold">Gender:</span>{" "}
+                  {selectedStaff.gender}
+                </p>
+                <p>
+                  <span className="font-semibold">Role:</span>{" "}
+                  {selectedStaff.role}
+                </p>
+                <p>
+                  <span className="font-semibold">Email:</span>{" "}
+                  {selectedStaff.email}
+                </p>
+                <p>
+                  <span className="font-semibold">Phone:</span>{" "}
+                  {selectedStaff.phoneNumber}
+                </p>
+                <p>
+                  <span className="font-semibold">Address:</span>{" "}
+                  {selectedStaff.address}
+                </p>
+
+                <p>
+                  <span className="font-semibold">Qualification:</span>{" "}
+                  {selectedStaff.qualification}
+                </p>
+                <p>
+                  <span className="font-semibold">Designation:</span>{" "}
+                  {selectedStaff.designation}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );

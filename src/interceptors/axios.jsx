@@ -11,7 +11,7 @@ apiInstance.interceptors.request.use(
 
     if (authToken) {
       config.headers.Authorization = `Bearer ${authToken}`;
-      // console.log(config);
+console.log(config);
     }
     return config;
   },
@@ -28,8 +28,8 @@ apiInstance.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       console.error("Unauthorized access - logging out...");
-      // localStorage.removeItem("userToken");
-      // window.location.href = "/sidebar/staffs";
+      localStorage.removeItem("userToken");
+      window.location.href = "/sidebar/staffs";
     }
     return Promise.reject(error);
   }

@@ -28,3 +28,9 @@ export const AllStaffs = async () =>{
   return res;
 }
 
+//edit staffs
+
+export const EditStaffs = async (id , data) =>{
+  const res= await interceptors.put(`/v1/staff/editStaff/${id}`,data)
+  return res;
+}
