@@ -8,9 +8,9 @@ Router.use(verifyAuthToken)
 
 Router.route('/createBatch').post(batchController.createBatch);
 Router.route('/getBatchAll').get(batchController.getBatchAll);
-Router.route('/getBatchId').get(batchController.getBatchId);
-Router.route('/editBatch').put(batchController.editBatch);
-Router.route('/deleteBatch').delete(batchController.deleteBatch);
+Router.route('/getBatchId/:id').get(batchController.getBatchId);
+Router.route('/editBatch/:id').put(batchController.editBatch);
+Router.route('/deleteBatch/:id').delete(batchController.deleteBatch);
 
 
 module.exports = Router;

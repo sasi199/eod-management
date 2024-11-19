@@ -5,6 +5,7 @@ const validator = require('validator');
 const uploadCloud = require("../utils/uploadCloud");
 const Auth = require("../models/authModel");
 const utils = require("../utils/utils");
+const { log } = require("winston");
 
 
 const generateStaffLogId = async(role)=>{
@@ -124,12 +125,11 @@ exports.getStaffId = async(req)=>{
 
 
 exports.editStaff = async(req)=>{
-    const { accountId } = req
-    console.log(req,"wwwwwwwww");
+    const { authId } = req
     
     const { _id } = req.params;
-
     const staff = await StaffModel.findById(_id);
+    const auth = await Auth.findOne({accountId:_id});
 
     if (!staff) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Staff not found"});
@@ -143,27 +143,12 @@ exports.editStaff = async(req)=>{
         updateData.profilePic = profilePic;
     }
 
-    if (updateData.email) {
-        const existingStaff = await StaffModel.findOne({ email: updateData.email });
-        if (existingStaff && existingStaff._id.toString() !== _id) {
-            throw new ApiError(httpStatus.BAD_REQUEST, { message: "Email already in use by another staff member." });
-        }
-
-        const existingAuth = await Auth.findOne({ email: updateData.email });
-        if (existingAuth && existingAuth._id.toString() !== accountId) {
-            throw new ApiError(httpStatus.BAD_REQUEST, { message: "Email already in use by another user." });
-        }
-    }
-
-    const authUpdateData = { email: updateData.email};
-    const updateAuth = await Auth.findByIdAndUpdate(accountId, authUpdateData, {
+    const updateAuth = await Auth.findOneAndUpdate({accountId: _id}, updateData, {
         new: true,
         runValidators: true
     });
 
-    
-    const { email, ...staffUpdateData } = updateData;
-    const updateStaff = await StaffModel.findByIdAndUpdate(_id, staffUpdateData, {
+    const updateStaff = await StaffModel.findByIdAndUpdate(_id, updateData, {
         new: true,
         runValidators: true
     });
