@@ -215,9 +215,9 @@ generateOtp = (length) => {
 
 
 haversinDistance = (lat1,lon1,lat2,lon2)=>{
-  const toRad = (angle) =>(angle * Math.PI)/360
+  const toRad = (angle) =>(angle * Math.PI) / 180
 
-  const R = 6371; 
+  const R = 6371e3; 
     const dLat = toRad(lat2 - lat1);
     const dLon = toRad(lon2 - lon1);
 

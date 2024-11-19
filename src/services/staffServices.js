@@ -55,7 +55,7 @@ exports.createStaff = async(req)=>{
     if (req.file) {
         const fileExtension = req.file.originalname.split('.').pop();
         const fileName = `${Date.now()}.${fileExtension}`
-         profilePic = await uploadCloud(`staff-Profile/${fileName}`,req.file)
+        profilePic = await uploadCloud(`staff-Profile/${fileName}`,req.file)
     }
 
     const logId = await generateStaffLogId(role);
@@ -128,19 +128,29 @@ exports.editStaff = async(req)=>{
     const { _id } = req.params;
 
     const staff = await StaffModel.findById(_id);
-    console.log(staff,"i");
-    
 
     if (!staff) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Staff not found"});
     }
 
     const updateData = {...req.body}
-    console.log(updateData,"stafffff");
     if(req.file){
-        const originalUrl = req.file.originalname.split('.').pop();
-        const profilePic = await uploadCloud(`staff-Profile${originalUrl}`,req.file)
+        const fileExtension = req.file.originalname.split('.').pop();
+        const fileName = `${_id}-${Date.now()}.${fileExtension}`
+        const profilePic = await uploadCloud(`staff-Profile${fileName}`,req.file)
         updateData.profilePic = profilePic;
+    }
+
+    if (updateData.email) {
+        const existingStaff = await StaffModel.findOne({ email: updateData.email });
+        if (existingStaff && existingStaff._id.toString() !== _id) {
+            throw new ApiError(httpStatus.BAD_REQUEST, { message: "Email already in use by another staff member." });
+        }
+
+        const existingAuth = await Auth.findOne({ email: updateData.email });
+        if (existingAuth && existingAuth._id.toString() !== authId) {
+            throw new ApiError(httpStatus.BAD_REQUEST, { message: "Email already in use by another user." });
+        }
     }
 
     const updateStaff = await StaffModel.findByIdAndUpdate(_id,updateData,
