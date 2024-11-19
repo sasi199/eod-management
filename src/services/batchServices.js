@@ -102,15 +102,15 @@ exports.getBatchAll = async(req)=>{
 
 
 exports.getBatchId = async(req)=>{
-    const { auth } = req._id
-    const { batchId } = req.user
-    
-    if (batchId) {
+    const { authId } = req
+    const { _id } = req.params
+
+    if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Batch id required"});
     }
 
-    const batch = await BatchModel.findById(batchId)
-    if (batch) {
+    const batch = await BatchModel.findById(_id)
+    if (!batch) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Batch not found"});
     }
     return batch;
@@ -118,20 +118,20 @@ exports.getBatchId = async(req)=>{
 
 
 exports.editBatch = async(req)=>{
-    const { authId } = req._id;
-    const { batchId } = req.user;
+    const { authId } = req;
+    const { _id } = req.params;
 
-    if (batchId) {
+    if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Batch id required"});
     }
 
-    const batch = await BatchModel.findById(batchId);
+    const batch = await BatchModel.findById(_id);
     if (!batch) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Batch not found"});
     }
 
     const updateData = {...req.body}
-    const updateBatch =  await BatchModel.findByIdAndUpdate(batchId,updateData,
+    const updateBatch =  await BatchModel.findByIdAndUpdate(_id,updateData,
         {new: true, runValidators: true}
     )
 
@@ -141,17 +141,17 @@ exports.editBatch = async(req)=>{
 
 
 exports.deleteBatch = async(req)=>{
-    const { authId } = req._id;
-    const { batchId } = req.user;
+    const { authId } = req;
+    const { _id } = req.params;
 
-    if (batchId) {
+    if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Batch id required"});
     }
 
-    const batch = await BatchModel.findById(batchId)
+    const batch = await BatchModel.findById(_id)
     if (!batch) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Btach not found"});
      }
 
-     await BatchModel.findByIdAndDelete(batchId);
+     await BatchModel.findByIdAndDelete(_id);
 }
