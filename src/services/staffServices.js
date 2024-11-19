@@ -153,13 +153,18 @@ exports.editStaff = async(req)=>{
         }
     }
 
-    const updateStaff = await StaffModel.findByIdAndUpdate(_id,updateData,
-        { new:true,runValidators:true }
-    )
-    
+    const authUpdateData = { email: updateData.email};
+    const updateAuth = await Auth.findByIdAndUpdate(authId, authUpdateData, {
+        new: true,
+        runValidators: true
+    });
 
-    const updateAuth = await Auth.findByIdAndUpdate(authId,updateData,
-        {new:true, runValidators: true})
+    
+    const { email, ...staffUpdateData } = updateData;
+    const updateStaff = await StaffModel.findByIdAndUpdate(_id, staffUpdateData, {
+        new: true,
+        runValidators: true
+    });
 
         return updateStaff;
 }
