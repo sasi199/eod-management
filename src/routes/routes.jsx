@@ -33,7 +33,7 @@ import TrainerAttendance from "../Panel/Trainer/Pages/Attendance/TrainerAttendan
 import TrainerAttendace from "../Panel/Trainer/Pages/Attendance/TrainerAttendance";
 import TrainerAssessment from "../Panel/Trainer/Pages/Assessment/TrainerAssessment";
 import CreatePage from "../Panel/Trainer/Pages/Assessment/CreateAssessment";
-import Login from "../components/Login";
+import Login from "../components/login";
 
 
 

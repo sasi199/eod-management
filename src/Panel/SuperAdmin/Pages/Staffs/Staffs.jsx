@@ -12,7 +12,8 @@ import {
   message,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { AddStaffs, AllStaffs } from "../../../../services";
+import { AddStaffs, AllStaffs, EditStaffs } from "../../../../services";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -24,6 +25,23 @@ const Staffs = () => {
   const [staffs, setStaffs] = useState([]);
   const [isCardModalVisible, setIsCardModalVisible] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
+  const [editModal, SetEditModal] = useState(false);
+  const [editStaff, SetEditStaff] = useState({
+    id: "",
+    fullName: "",
+    email: "",
+    gender: "",
+    phoneNumber: "",
+    address: "",
+    designation: "",
+    qualification: "",
+    dob: "",
+    experience: "",
+    hybrid: "",
+    role: "",
+    password: "",
+    profilePic: "",
+  });
 
   useEffect(() => {
     const fetchStaffData = () => {
@@ -98,6 +116,58 @@ const Staffs = () => {
     return false;
   };
 
+  const handleEditStaffModal = (staff) => {
+    console.log(staff);
+
+    SetEditModal(true);
+    SetEditStaff({
+      id: staff._id,
+      fullName: staff.fullName,
+      email: staff.email,
+      gender: staff.gender,
+      phoneNumber: staff.phoneNumber,
+      address: staff.address,
+      designation: staff.designation,
+      qualification: staff.qualification,
+      dob: staff.dob,
+      experience: staff.experience,
+      hybrid: staff.hybrid,
+      role: staff.role,
+      password: staff.password,
+    });
+  };
+
+  const handleEditStaff = (values) => {
+    const editFormData = new FormData();
+    editFormData.append("fullName", editStaff.fullName);
+    editFormData.append("email", editStaff.email);
+    editFormData.append("gender", editStaff.gender);
+    editFormData.append("phoneNumber", editStaff.phoneNumber);
+    editFormData.append("address", editStaff.address);
+    editFormData.append("designation", editStaff.designation);
+    editFormData.append("qualification", editStaff.qualification);
+    editFormData.append("dob", editStaff.dob);
+    editFormData.append("experience", editStaff.experience);
+    editFormData.append("hybrid", editStaff.hybrid);
+    editFormData.append("role", editStaff.role);
+    editFormData.append("password", editStaff.password);
+
+    if (values.profilePic && values.profilePic.file) {
+      editFormData.append("profilePic", values.profilePic.file);
+    }
+
+    EditStaffs(editStaff.id, editFormData)
+      .then((res) => {
+        if (res.status === 200) {
+          message.success("Edit Successfull");
+          SetEditModal(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err, "error editing staffs");
+      });
+  };
+
   return (
     <div className="px-6 py-2">
       <div className="flex justify-between mb-4">
@@ -151,7 +221,7 @@ const Staffs = () => {
                     {/* Edit Icon */}
                     <button
                       className="flex flex-col justify-center items-center w-8 h-8 rounded-full bg-orange-500 text-white hover:bg-white hover:text-orange-500 duration-200"
-                      onClick={() => console.log("Edit", staff)}
+                      onClick={() => handleEditStaffModal(staff)}
                     >
                       <span className="text-sm">
                         <FiEdit size={20} />
@@ -404,6 +474,250 @@ const Staffs = () => {
               </div>
             </div>
           </div>
+        )}
+      </Modal>
+
+      <Modal
+        title="Edit Staff Details"
+        visible={editModal}
+        footer={null}
+        onCancel={() => SetEditModal(false)}
+        centered
+      >
+        {editStaff && (
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleEditStaff}
+            className="grid grid-cols-1 md:grid-cols-2 md:gap-x-4"
+          >
+            <Form.Item
+              label="Full Name"
+              // name="fullName"
+              rules={[{ required: true, message: "Please enter full name" }]}
+              className="col-span-1"
+            >
+              <Input
+                className="w-full"
+                value={editStaff.fullName}
+                onChange={(e) =>
+                  SetEditStaff({ ...editStaff, fullName: e.target.value })
+                }
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Email"
+              // name="email"
+              rules={[{ type: "email", message: "Please enter a valid email" }]}
+              className="col-span-1"
+            >
+              <Input
+                className="w-full"
+                value={editStaff.email}
+                onChange={(e) =>
+                  SetEditStaff({ ...editStaff, email: e.target.value })
+                }
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Password"
+              // name="password"
+              rules={[{ required: true, message: "Please enter password" }]}
+              className="col-span-1"
+            >
+              <Input.Password
+                className="w-full"
+                value={editStaff.password}
+                onChange={(e) =>
+                  SetEditStaff({ ...editStaff, password: e.target.value })
+                }
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Gender"
+              // name="gender"
+              rules={[{ required: true, message: "Please select gender" }]}
+              className="col-span-1"
+            >
+              <Select
+                className="w-full"
+                value={editStaff.gender}
+                onChange={(value) =>
+                  SetEditStaff({ ...editStaff, gender: value })
+                }
+              >
+                <Option value="Male">Male</Option>
+                <Option value="Female">Female</Option>
+                <Option value="Other">Other</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              label="Phone Number"
+              // name="phoneNumber"
+              rules={[{ required: true, message: "Please enter phone number" }]}
+              className="col-span-1"
+            >
+              <Input
+                className="w-full"
+                value={editStaff.phoneNumber}
+                onChange={(e) =>
+                  SetEditStaff({ ...editStaff, phoneNumber: e.target.value })
+                }
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Address"
+              // name="address"
+              className="col-span-1"
+            >
+              <Input
+                className="w-full"
+                value={editStaff.address}
+                onChange={(e) =>
+                  SetEditStaff({ ...editStaff, address: e.target.value })
+                }
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Designation"
+              // name="designation"
+              className="col-span-1"
+            >
+              <Input
+                className="w-full"
+                value={editStaff.designation}
+                onChange={(e) =>
+                  SetEditStaff({ ...editStaff, designation: e.target.value })
+                }
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Role"
+              // name="role"
+              rules={[{ required: true, message: "Please select role" }]}
+              className="col-span-1"
+            >
+              <Select
+                className="w-full"
+                value={editStaff.role}
+                onChange={(value) => {
+                  console.log("role", value);
+
+                  SetEditStaff({ ...editStaff, role: value });
+                }}
+              >
+                <Option value="Admin">Admin</Option>
+                <Option value="HR">HR</Option>
+                <Option value="Coordinator">Coordinator</Option>
+                <Option value="Employee">Employee</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              label="Qualification"
+              // name="qualification"
+              className="col-span-1"
+            >
+              <Input
+                className="w-full"
+                value={editStaff.qualification}
+                onChange={(e) =>
+                  SetEditStaff({ ...editStaff, qualification: e.target.value })
+                }
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Date of Birth"
+              // name="dob"
+              rules={[
+                { required: true, message: "Please select date of birth" },
+              ]}
+              className="col-span-1"
+            >
+              <DatePicker
+                className="w-full"
+                value={
+                  editStaff.dob ? dayjs(editStaff.dob, "DD-MM-YYYY") : null
+                }
+                onChange={(e) =>
+                  SetEditStaff({
+                    ...editStaff,
+                    dob: e ? e.format("DD-MM-YYYY") : null,
+                  })
+                }
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Experience"
+              // name="experience"
+              className="col-span-1"
+            >
+              <Select
+                className="w-full"
+                value={editStaff.experience}
+                onChange={(value) =>
+                  SetEditStaff({ ...editStaff, experience: value })
+                }
+              >
+                <Option value="0 to 1">0 to 1</Option>
+                <Option value="1 to 3">1 to 3</Option>
+                <Option value="3 to 5">3 to 5</Option>
+                <Option value="5+">5+</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              label="Hybrid"
+              // name="hybrid"
+              rules={[
+                { required: true, message: "Please select hybrid work model" },
+              ]}
+              className="col-span-1"
+            >
+              <Select
+                className="w-full"
+                value={editStaff.hybrid}
+                onChange={(value) =>
+                  SetEditStaff({ ...editStaff, hybrid: value })
+                }
+              >
+                <Option value="Online">Online</Option>
+                <Option value="Offline">Offline</Option>
+                <Option value="WFH">WFH</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              label="Profile Picture"
+              name="profilePic"
+              valuePropName="file"
+              className="col-span-2"
+            >
+              <Upload
+                beforeUpload={handleProfilePicUpload}
+                showUploadList={false}
+              >
+                <Button icon={<UploadOutlined />} className="w-full">
+                  Upload Profile Picture
+                </Button>
+              </Upload>
+            </Form.Item>
+
+            <Form.Item className="col-span-2">
+              <Button type="primary" htmlType="submit" className="w-full">
+                Add Staff
+              </Button>
+            </Form.Item>
+          </Form>
         )}
       </Modal>
     </div>
