@@ -14,11 +14,11 @@ const scheduleSchema = new mongoose.Schema({
         ref: 'Staff',
         required: true,
     },
-    traineeId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Trainee',
-        required: true,
-    },
+    // traineeId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Trainee',
+    //     required: true,
+    // },
     subject: schemaFields.requiredAndString,
     batchTimings: schemaFields.StringWithEnumAndRequired([
         '10 am to 11 am',
