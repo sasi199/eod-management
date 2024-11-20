@@ -46,7 +46,6 @@ exports.createBatch = async(req)=>{
     
 
     const batchId = await generateBatchId(courseName);
-    // console.log(batchId,"ggggggg");
     
     if (!batchId) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: 'Invalid course name provided' });
@@ -60,6 +59,7 @@ exports.createBatch = async(req)=>{
     if (req.user.role !== 'SuperAdmin') {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Only super admin can create staff'});
     }
+
     
     const batchName = await generateBatchName();
 

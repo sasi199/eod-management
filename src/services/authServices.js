@@ -77,7 +77,7 @@ exports.loginByEmailAndLogId = async(req)=>{
 exports.getAttendance = async(req)=>{
   const attendance = await AttendanceModel.find().populate({
     path:'user',
-    select:'fullName profilePic',
+    select:'fullName profilePic role',
   });
 
   if (!attendance) {
