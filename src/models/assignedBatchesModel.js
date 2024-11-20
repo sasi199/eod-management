@@ -5,11 +5,11 @@ const schemaFields = require('../utils/schemaFieldUtils');
 const assignedBatchSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     batchId: schemaFields.requiredAndString,
-    assignedTrainer:[{
+    trainer:[{
         type: String,
         ref: 'Staff'
     }],
-    assignedTrainee:[{
+    trainee:[{
         type: String,
         ref: 'Trainee'
     }]

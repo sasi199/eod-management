@@ -1,3 +1,4 @@
+const AssignedBatchModel = require("../models/assignedBatchesModel");
 const BatchModel = require("../models/batchModel");
 const StaffModel = require("../models/staffModel");
 const TraineeModel = require("../models/traineeModel");
@@ -41,7 +42,9 @@ const generateBatchName = () =>{
 
 
 exports.createBatch = async(req)=>{
-    const { courseName, courseDuration, batchTimings, trainers, trainees } = req.body
+    const { authId } = req
+    
+    const { courseName, courseDuration, batchTimings, trainer, trainee } = req.body
     console.log(req.body,"eeeeeeeeee");
     
 
@@ -66,26 +69,22 @@ exports.createBatch = async(req)=>{
     const newBatch = new BatchModel({
         batchId,
         batchName,
+        batchTimings,
         courseName,
         courseDuration,
-        batchTimings
+        trainer,
+        trainee
     })
 
     await newBatch.save();
 
-    if (trainers && trainers.length >0) {
-        await StaffModel.updateMany(
-            {_id:{ $in: trainers }},
-            {$addToSet:{assignedBatches: newBatch._id}}
-        )
-    }
+    const newAssignBatch = new AssignedBatchModel({
+        batchId: newBatch._id,
+        trainer,
+        trainee
+    })
 
-    if (trainees && trainees.length >0) {
-        await TraineeModel.updateMany(
-            {_id:{ $in: trainees }},
-            {$addToSet:{assignedBatch: newBatch._id}}
-        )
-    }
+    await newAssignBatch.save()
 
     return newBatch;
 }
@@ -132,6 +131,10 @@ exports.editBatch = async(req)=>{
 
     const updateData = {...req.body}
     const updateBatch =  await BatchModel.findByIdAndUpdate(_id,updateData,
+        {new: true, runValidators: true}
+    )
+
+    const update =  await BatchModel.findOneAndUpdate(_id,updateData,
         {new: true, runValidators: true}
     )
 
