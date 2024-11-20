@@ -10,8 +10,6 @@ const jwt = require('jsonwebtoken');
 
 exports.loginByEmailAndLogId = async(req)=>{
     const { email,role, password, latitude,longitude,} = req.body
-
-    console.log(req.body,"req.body");
     const user = await Auth.findOne({email});
     if (!user) {
         throw new ApiError(httpStatus.UNAUTHORIZED, {message:"Invalid credantials",status:false,});
@@ -44,26 +42,37 @@ exports.loginByEmailAndLogId = async(req)=>{
         
       }
 
-      const exitingAttendance = await AttendanceModel({
-        user: user._id,
-        date: today,
-      })
+      const attendance = await AttendanceModel.findOne({user: user._id,date: today})
 
-      const attendance = new AttendanceModel({
-        user: user._id,
-        date: today,
-        checkIn: now,
-        status: workStart > now ? "Late" : "Present",
-        islate: now > workStart,
-        location:{
-          latitude: latitude,
-          longitude: longitude,
-        },
-        comments: "User logged in successfully.",
-      })
+      if (attendance) {
+        attendance.checkIn = now;
+        attendance.location = {
+            latitude: latitude,
+            longitude: longitude,
+        };
+        attendance.islate = now > workStart;
+        attendance.status = workStart > now ? "Late" : "Present";
+        attendance.comments = "User logged in again. Check-in time updated.";
+        await attendance.save();
+      }else{
+        
+        const newAttendance = new AttendanceModel({
+          user: user._id,
+          date: today,
+          checkIn: now,
+          status: workStart > now ? "Late" : "Present",
+          islate: now > workStart,
+          location:{
+            latitude: latitude,
+            longitude: longitude,
+          },
+          comments: "User logged in successfully.",
+        })
 
-      await attendance.save();
-      await exitingAttendance.save();
+        await newAttendance.save();
+      }
+
+      
 
       const token = jwt.sign(
         {id:user._id, role:user.role},
