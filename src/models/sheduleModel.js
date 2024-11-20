@@ -9,18 +9,21 @@ const scheduleSchema = new mongoose.Schema({
         ref: 'Batch',
         required: true,
     },
-    trainerId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Staff',
-        required: true,
-    },
+    // trainer: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Staff',
+    //     required: true,
+    // },
     // traineeId: {
     //     type: mongoose.Schema.Types.ObjectId,
     //     ref: 'Trainee',
     //     required: true,
     // },
-    subject: schemaFields.requiredAndString,
-    batchTimings: schemaFields.StringWithEnumAndRequired([
+    subject: schemaFields.StringWithEnumAndRequired([
+        'Html/Css','Javascript','Bootstrap','Jquery','React.js','Node.js/Mongodb','Python',
+        'Php','Figma'
+    ]),
+    classTimings: schemaFields.StringWithEnumAndRequired([
         '10 am to 11 am',
         '11 am to 12 pm',
         '10 am to 12 pm',

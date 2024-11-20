@@ -131,13 +131,15 @@ exports.getTraineeId = async(req)=>{
 
 exports.editTrainee = async(req)=>{
     const { authId } = req
-    const { traineeId } = req.params
+    const { _id } = req.params
 
-    if (!traineeId) {
+    if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Trainee id required"});
      }
   
-     const trainee = await TraineeModel.findById(traineeId);
+     const trainee = await TraineeModel.findById(_id);
+     const auth = await Auth.findOne({accountId:_id});
+     
      if (!trainee) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Trainee not found"});
      }
@@ -146,7 +148,7 @@ exports.editTrainee = async(req)=>{
 
      if (req.file) {
         const fileExtension = req.file.originalname.split('.').pop();
-        const fileName = `${traineeId}-${Date.now()}.${fileExtension}`
+        const fileName = `${_id}-${Date.now()}.${fileExtension}`
         const profilePic = await uploadCloud(`trainee-Profile${fileName}`,req.file)
         updateData.profilePic = profilePic;
      }
@@ -155,24 +157,27 @@ exports.editTrainee = async(req)=>{
         {new: true, runValidators: true}
      )
 
-     const updateAuth = await Auth.findByIdAndUpdate({accoutId:traineeId},updateData,
+     const updateAuth = await Auth.findOneAndUpdate({accountId:_id},updateData,
         {new: true, runValidators: true}
      )
+
+     console.log("UpdateAurth",updateAuth);
+     
 
      return updateTrainee;
 }
 
 
 exports.deleteTrainee = async(req)=>{
-    const { authId } = req._id
+    const { authId } = req
     const { _id } = req.user
 
-    if (!traineeId) {
+    if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Trainee id required"});
      }
 
-     const trainee = await TraineeModel.findById(traineeId);
-     const auth = await Auth.findById(authId);
+     const trainee = await TraineeModel.findById(_id);
+     const auth = await Auth.findById({accountId:_id});
 
      if (!trainee) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Trainer not found"});
@@ -182,6 +187,6 @@ exports.deleteTrainee = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Auth not found"});
      }
   
-     await TraineeModel.findByIdAndDelete(traineeId);
-     await Auth.findByIdAndDelete(authId);
+     await TraineeModel.findByIdAndDelete(_id);
+     await Auth.findOneAndDelete({accountId: _id});
 }

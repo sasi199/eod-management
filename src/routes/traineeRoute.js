@@ -21,7 +21,7 @@ Router.route('/createTrainee').post(checkSuperAdmin,uploads.fields([
 
 Router.route('/getTraineeAll').get(traineeController.getTraineeAll);
 Router.route('/getTraineeId/:_id').get(traineeController.getTraineeId);
-Router.route('/editTrainee/:traineeId').put(uploads.single('profilePic'),traineeController.editTrainee);
+Router.route('/editTrainee/:_id').put(uploads.single('profilePic'),traineeController.editTrainee);
 Router.route('/deleteTrainee/:_id').delete(traineeController.deleteTrainee);
 
 
