@@ -45,15 +45,16 @@ exports.loginByEmailAndLogId = async(req)=>{
       }
 
       const exitingAttendance = await AttendanceModel({
-        createdby: user._id,
+        user: user._id,
         date: today,
       })
 
       const attendance = new AttendanceModel({
-        createdBy: user._id,
+        user: user._id,
         date: today,
-        checkIn: workStart > now ? workStart : now,
+        checkIn: now,
         status: workStart > now ? "Late" : "Present",
+        islate: now > workStart,
         location:{
           latitude: latitude,
           longitude: longitude,
@@ -74,7 +75,11 @@ exports.loginByEmailAndLogId = async(req)=>{
 
 
 exports.getAttendance = async(req)=>{
-  const attendance = await AttendanceModel.find()
+  const attendance = await AttendanceModel.find().populate({
+    path:'user',
+    select:'fullName profilePic',
+  });
+
   if (!attendance) {
     throw new ApiError(httpStatus.BAD_REQUEST, {message:"Attendance not found password"});
   }

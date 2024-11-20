@@ -6,6 +6,12 @@ const attendanceSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     date: schemaFields.requiredAndDate,
     checkIn: schemaFields.requiredAndDate,
+    user: {
+        type: String,
+        ref: 'Auth',
+        required: true,
+    },
+    
     checkOut:{
         type: Date,
         required: false,
@@ -25,7 +31,7 @@ const attendanceSchema = new mongoose.Schema({
     },
     islate: schemaFields.BooleanWithDefault,
     comments: {...schemaFields.requiredAndString},
-    createdBy:schemaFields.UUIDIdReference('superAdmin'),
+    // createdBy:schemaFields.UUIDIdReference('superAdmin'),
     permission:{
         type: String,
         enum: ["write"],
@@ -35,14 +41,14 @@ const attendanceSchema = new mongoose.Schema({
     },
 },{timestamps:true, collection: "Attendance"});
 
-attendanceSchema.pre('save', function (next) {
-    if (this.createdBy.role === 'superAdmin') {
-        this.permission = 'full-access';
-    } else {
-        this.permission = 'write';
-    }
-    next();
-});
+// attendanceSchema.pre('save', function (next) {
+//     if (this.createdBy.role === 'superAdmin') {
+//         this.permission = 'full-access';
+//     } else {
+//         this.permission = 'write';
+//     }
+//     next();
+// });
 
 const AttendanceModel = mongoose.model('Attendance',attendanceSchema);
 
