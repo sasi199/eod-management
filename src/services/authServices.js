@@ -90,13 +90,16 @@ exports.getAttendance = async(req)=>{
 
 
 exports.logoutUser = async (req) => {
-  const { userId } = req.body;
+  const { userId } = req.params;
   const now = new Date();
 
-  const today = new Date().toISOString().slice(0, 10);
+  // const today = new Date().toISOString().slice(0, 10);
+  const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+  const endOfDay = new Date(now.setHours(23, 59, 59, 999));
+
   const attendance = await AttendanceModel.findOne({
-    createdBy: userId,
-    date: today,
+    user:userId,
+    date:{ $gte: startOfDay, $lte: endOfDay},
   })
 
   if (!attendance) {
