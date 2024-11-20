@@ -50,3 +50,17 @@ export const GetBatches = async ()=>{
   const res= await interceptors.get('/v1/batch/getBatchAll')
   return res;
 }
+
+//Edit batches
+
+export const EditBatches= async  (id,data)=>{
+  const res= await interceptors.put(`/v1/batch/editBatch/${id}`,data)
+  return res;
+}
+
+//delete Batches
+
+export const DeleteBatches = async (id)=>{
+  const res = await interceptors.delete(`/v1/batch/deleteBatch/${id}`)
+  return res;
+}

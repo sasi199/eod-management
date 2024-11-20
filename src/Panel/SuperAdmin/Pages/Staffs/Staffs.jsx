@@ -21,7 +21,7 @@ const Staffs = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-
+  const[showIsTrainer,setShowIsTrainer]=useState(false);
   const [staffs, setStaffs] = useState([]);
   const [isCardModalVisible, setIsCardModalVisible] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
@@ -41,6 +41,7 @@ const Staffs = () => {
     role: "",
     password: "",
     profilePic: "",
+    isTrainer:"",
   });
 
   useEffect(() => {
@@ -77,6 +78,10 @@ const Staffs = () => {
     setIsCardModalVisible(false);
   };
 
+  const handleRoleChange = (value)=>{
+    setShowIsTrainer(value === "Employee")
+  }
+
   const handleAddStaff = async (values) => {
     const formData = new FormData();
     formData.append("fullName", values.fullName);
@@ -91,6 +96,7 @@ const Staffs = () => {
     formData.append("hybrid", values.hybrid);
     formData.append("role", values.role);
     formData.append("password", values.password);
+    formData.append("isTrainer", values.isTrainer);
     console.log(values);
 
     if (values.profilePic && values.profilePic.file) {
@@ -337,13 +343,15 @@ const Staffs = () => {
             rules={[{ required: true, message: "Please select role" }]}
             className="col-span-1"
           >
-            <Select className="w-full">
+            <Select className="w-full" onChange={handleRoleChange}>
               <Option value="Admin">Admin</Option>
               <Option value="HR">HR</Option>
               <Option value="Coordinator">Coordinator</Option>
               <Option value="Employee">Employee</Option>
             </Select>
           </Form.Item>
+
+        
 
           <Form.Item
             label="Qualification"
@@ -394,7 +402,7 @@ const Staffs = () => {
             label="Profile Picture"
             name="profilePic"
             valuePropName="file"
-            className="col-span-2"
+            className="col-span-1"
           >
             <Upload
               beforeUpload={handleProfilePicUpload}
@@ -405,6 +413,19 @@ const Staffs = () => {
               </Button>
             </Upload>
           </Form.Item>
+          {showIsTrainer && (
+        <Form.Item
+          label="IsTrainer"
+          name="isTrainer"
+          rules={[{ required: true, message: "Please select yes or no" }]}
+          className="col-span-1"
+        >
+          <Select className="w-full">
+            <Option value="Yes">Yes</Option>
+            <Option value="No">No</Option>
+          </Select>
+        </Form.Item>
+      )}
 
           <Form.Item className="col-span-2">
             <Button type="primary" htmlType="submit" className="w-full">

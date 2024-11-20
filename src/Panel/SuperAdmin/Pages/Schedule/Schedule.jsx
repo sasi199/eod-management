@@ -12,8 +12,11 @@ const Schedule = () => {
       name: "Batch A",
       students: 30,
       course: "Full Stack Developer",
-      date: "2024-01-01",
-      timetable: [],
+      date: "2024-11-01",
+      timetable: [
+        { subject: "React", instructor: "VIGNESH", time: "10:00 AM" },
+        { subject: "Node.js ", instructor: "Gopal", time: "2:00 PM" },
+      ],
     },
     {
       id: 2,
@@ -21,7 +24,10 @@ const Schedule = () => {
       students: 25,
       course: "Digital Marketing",
       date: "2024-02-01",
-      timetable: [],
+      timetable: [
+        { subject: "PHP", instructor: "ASHOK", time: "9:30 AM" },
+        { subject: "Communication", instructor: "Magimai", time: "1:00 PM" },
+      ],
     },
     {
       id: 3,
@@ -29,7 +35,10 @@ const Schedule = () => {
       students: 20,
       course: "Full Stack Developer",
       date: "2024-03-01",
-      timetable: [],
+      timetable: [
+        { subject: "JavaScript Advanced", instructor: "Chris Evans", time: "11:00 AM" },
+        { subject: "Database Design", instructor: "Robert Downey", time: "3:00 PM" },
+      ],
     },
   ]);
 
@@ -125,8 +134,6 @@ const Schedule = () => {
         title="Add New Schedule"
         visible={isBatchModalOpen}
         onCancel={() => setIsBatchModalOpen(false)}
-        // onOk={handleAddBatch}
-        // okText="Add Schedule"
         footer={null}
       >
         <Input
@@ -156,7 +163,10 @@ const Schedule = () => {
           onChange={(date) => setNewBatch({ ...newBatch, date })}
           className="w-full"
         />
-        <button className="w-full bg-orange-500 text-white hover:bg-orange-600 py-1 mt-4 rounded-lg  text-lg">
+        <button
+          onClick={handleAddBatch}
+          className="w-full bg-orange-500 text-white hover:bg-orange-600 py-1 mt-4 rounded-lg text-lg"
+        >
           Add Schedule
         </button>
       </Modal>
