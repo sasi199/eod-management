@@ -63,6 +63,7 @@ exports.loginByEmailAndLogId = async(req)=>{
       })
 
       await attendance.save();
+      await exitingAttendance.save();
 
       const token = jwt.sign(
         {id:user._id, role:user.role},
@@ -91,8 +92,6 @@ exports.getAttendance = async(req)=>{
 
 exports.logoutUser = async (req) => {
   const { authId } = req;
-  console.log(authId,"gopiiiiiiiii");
-  
   const now = new Date();
 
   // const today = new Date().toISOString().slice(0, 10);
