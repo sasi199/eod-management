@@ -6,7 +6,7 @@ const traineeSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     logId: schemaFields.requiredAndString,
     batch:{
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref:"Batch",
         required: true
     },
@@ -22,10 +22,10 @@ const traineeSchema = new mongoose.Schema({
     resumeUpload: schemaFields.requiredAndString,
     isActive: schemaFields.BooleanWithDefault,
     hybrid: schemaFields.StringWithEnumAndRequired(['Online','WFH']),
-    assignedBatch:{
-        type: String,
-        ref: 'Batch'
-    },
+    // assignedBatch:{
+    //     type: String,
+    //     ref: 'Batch'
+    // },
     // designation:schemaFields.requiredAndString,
     qualification:schemaFields.requiredAndString,
     experience: schemaFields.StringWithEnumAndRequired(['0 to 1', '1 to 3', '3 to 5', '5+']),

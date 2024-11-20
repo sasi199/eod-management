@@ -19,10 +19,10 @@ Router.route('/createTrainee').post(checkSuperAdmin,uploads.fields([
     {name:'profilePic', maxCount:1},
     {name:'resumeUpload', maxCount:1}]),traineeController.createTrainee);
 
-Router.route('/getTrainees').get(traineeController.getTraineeAll);
-Router.route('/getTraineeId').get(traineeController.getTraineeId);
-Router.route('/editTrainee').put(uploads.single('profilePic'),traineeController.editTrainee);
-Router.route('/deleteTrainee').delete(traineeController.deleteTrainee);
+Router.route('/getTraineeAll').get(traineeController.getTraineeAll);
+Router.route('/getTraineeId/:_id').get(traineeController.getTraineeId);
+Router.route('/editTrainee/:traineeId').put(uploads.single('profilePic'),traineeController.editTrainee);
+Router.route('/deleteTrainee/:_id').delete(traineeController.deleteTrainee);
 
 
 module.exports = Router;

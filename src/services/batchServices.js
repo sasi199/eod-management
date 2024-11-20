@@ -72,8 +72,6 @@ exports.createBatch = async(req)=>{
         batchTimings,
         courseName,
         courseDuration,
-        trainer,
-        trainee
     })
 
     await newBatch.save();

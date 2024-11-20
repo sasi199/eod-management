@@ -24,7 +24,7 @@ const generateTraineeLogId = async () => {
 
 exports.createTrainee = async(req)=>{
     const { email, fullName, password,role,hybrid,batch} = req.body
-    // console.log(req.body);
+    console.log(req.body);
 
     const existingTrainee = await TraineeModel.findOne({email})
     if (existingTrainee) {
@@ -48,7 +48,9 @@ exports.createTrainee = async(req)=>{
    }
 
 
-   const existingBatch  = await BatchModel.findById(batch)
+   const existingBatch  = await BatchModel.findOne({batchName:batch})
+   console.log(existingBatch,"bigils");
+   
    if (!existingBatch) {
     throw new ApiError(httpStatus.BAD_REQUEST, { message: "Batch does not exist" });
    } 
@@ -66,11 +68,15 @@ exports.createTrainee = async(req)=>{
     password: hashedPassword
    })
 
-   const assignedBatch = new AssignedBatchModel({
-    batchId: batch,
-    trainee: newTrainee._id,
-   })
+   const assignedBatch = await AssignedBatchModel.findOneAndUpdate(
+    { batchId: existingBatch._id },
+    { trainee: newTrainee._id },
+    { new: true, runValidators: true }
+);
 
+
+  console.log(assignedBatch,"tharun");
+   
    const newAuth = new Auth({
     traineeId: newTrainee._id,
     email,
@@ -85,7 +91,7 @@ exports.createTrainee = async(req)=>{
    
    await newTrainee.save();
    await newAuth.save();
-   await assignedBatch.save();
+//    await assignedBatch.save();
 
    return newTrainee;
     
@@ -103,16 +109,20 @@ exports.getTraineeAll = async(req)=>{
 
 
 exports.getTraineeId = async(req)=>{
-    const {authId} = req._id;
-    const {traineeId} = req.user;
+    const {authId} = req;
+    const {_id} = req.params;
+    console.log(_id,"sssss");
+    
 
-    if (traineeId) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainer Id required"});
+    if (!_id) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainee Id required"});
     }
 
-    const trainee = await TraineeModel.findById(traineeId)
+    const trainee = await TraineeModel.findOne({_id})
+    console.log(trainee,"uuuuuu");
+    
     if (trainee) {
-        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Triner not found"});
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Trainee not found"});
     }
 
     return trainee;
@@ -120,14 +130,14 @@ exports.getTraineeId = async(req)=>{
 
 
 exports.editTrainee = async(req)=>{
-    const { authId } = req._id
-    const { traineeId } = req.user
+    const { authId } = req
+    const { traineeId } = req.params
 
     if (!traineeId) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Trainee id required"});
      }
   
-     const trainee = await TraineeModel.findById(trainerId);
+     const trainee = await TraineeModel.findById(traineeId);
      if (!trainee) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Trainee not found"});
      }
@@ -135,15 +145,17 @@ exports.editTrainee = async(req)=>{
      const updateData = {...req.body}
 
      if (req.file) {
-        const profilePic = await uploadCloud('adminProfile', req.file);
+        const fileExtension = req.file.originalname.split('.').pop();
+        const fileName = `${traineeId}-${Date.now()}.${fileExtension}`
+        const profilePic = await uploadCloud(`trainee-Profile${fileName}`,req.file)
         updateData.profilePic = profilePic;
      }
 
-     const updateTrainee = await TraineeModel.findByIdAndUpdate(traineeId,updateData,
+     const updateTrainee = await TraineeModel.findByIdAndUpdate(_id,updateData,
         {new: true, runValidators: true}
      )
 
-     const updateAuth = await Auth.findByIdAndUpdate(authId,updateData,
+     const updateAuth = await Auth.findByIdAndUpdate({accoutId:traineeId},updateData,
         {new: true, runValidators: true}
      )
 
@@ -153,7 +165,7 @@ exports.editTrainee = async(req)=>{
 
 exports.deleteTrainee = async(req)=>{
     const { authId } = req._id
-    const { traineeId } = req.user
+    const { _id } = req.user
 
     if (!traineeId) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Trainee id required"});
