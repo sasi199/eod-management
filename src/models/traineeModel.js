@@ -5,6 +5,11 @@ const schemaFields = require('../utils/schemaFieldUtils');
 const traineeSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     logId: schemaFields.requiredAndString,
+    batch:{
+        type:String,
+        ref:"Batch",
+        required: true
+    },
     password : schemaFields.requiredAndString,
     fullName: schemaFields.requiredAndString,
     email: schemaFields.requireStringAndUnique,

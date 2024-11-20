@@ -6,6 +6,7 @@ const validator = require('validator');
 const uploadCloud = require("../utils/uploadCloud");
 const TraineeDetailsModel = require("../models/traineeDetails");
 const utils = require("../utils/utils");
+const AssignedBatchModel = require("../models/assignedBatchesModel");
 
 
 
@@ -21,7 +22,7 @@ const generateTraineeLogId = async () => {
 
 
 exports.createTrainee = async(req)=>{
-    const { email, fullName, password,role,hybrid} = req.body
+    const { email, fullName, password,role,hybrid,batch} = req.body
     // console.log(req.body);
 
     const existingTrainee = await TraineeModel.findOne({email})
@@ -54,7 +55,13 @@ exports.createTrainee = async(req)=>{
     logId,
     profilePic,
     resumeUpload,
+    batch,
     password: hashedPassword
+   })
+
+   const assignedBatch = new AssignedBatchModel({
+    batch,
+    trainee: newTrainee._id,
    })
 
    const newAuth = new Auth({
@@ -69,6 +76,7 @@ exports.createTrainee = async(req)=>{
    
    await newTrainee.save();
    await newAuth.save();
+   await assignedBatch.save();
 
    return newTrainee;
     

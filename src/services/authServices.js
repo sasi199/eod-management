@@ -42,7 +42,7 @@ exports.loginByEmailAndLogId = async(req)=>{
         
       }
 
-      const attendance = await AttendanceModel.findOne({user: user._id,date: today})
+      const attendance = await AttendanceModel.findOne({user: user._id})
 
       if (attendance) {
         attendance.checkIn = now;
@@ -55,7 +55,7 @@ exports.loginByEmailAndLogId = async(req)=>{
         attendance.comments = "User logged in again. Check-in time updated.";
         await attendance.save();
       }else{
-        
+
         const newAttendance = new AttendanceModel({
           user: user._id,
           date: today,
