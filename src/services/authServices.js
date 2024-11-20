@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 
 
 exports.loginByEmailAndLogId = async(req)=>{
-    const { email,role, logId, password, latitude,longitude,} = req.body
+    const { email,role, password, latitude,longitude,} = req.body
 
     console.log(req.body,"req.body");
     const user = await Auth.findOne({email});
@@ -73,6 +73,16 @@ exports.loginByEmailAndLogId = async(req)=>{
 }
 
 
+exports.getAttendance = async(req)=>{
+  const attendance = await AttendanceModel.find()
+  if (!attendance) {
+    throw new ApiError(httpStatus.BAD_REQUEST, {message:"Attendance not found password"});
+  }
+
+  return attendance;
+}
+
+
 
 exports.logoutUser = async (req) => {
   const { userId } = req.body;
@@ -102,7 +112,7 @@ exports.logoutUser = async (req) => {
 
 
 exports.authCreation = async(req)=>{
-    const { email,logId,password,role} = req.body
+    const { email,logId,password,role,profilePic} = req.body
     let auth = await Auth.findOne({email});
     if (auth) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"User already exist",status:false,field:"email"});

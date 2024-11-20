@@ -5,6 +5,8 @@ const Router = express.Router();
 
 
 Router.route('/login').post(auth.authLogin);
+Router.route('/getAttendance').get(auth.getAttendance);
+Router.route('/logout').get(auth.logoutUser);
 
 Router.route('/createAuth').post(auth.authCreation);
 

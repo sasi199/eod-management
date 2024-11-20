@@ -7,13 +7,12 @@ const authSchema = new mongoose.Schema(
   {
     _id: schemaFields.idWithV4UUID,
     email: schemaFields.requireStringAndUnique,
+    fullName: schemaFields.requiredAndString,
     logId: schemaFields.requiredAndString,
     password: schemaFields.requiredAndString,
+    profilePic: schemaFields.requiredAndString,
     accountId:{
       type: String
-    },
-    fullName: {
-      type: String,
     },
     hybrid: schemaFields.StringWithEnum(['Online','Offline','WFH']),
     role: {
@@ -32,15 +31,15 @@ const authSchema = new mongoose.Schema(
     // traineeId: {
     //   type: String,
     // },
-    dob: {
-      type: String,
-    },
+    // dob: {
+    //   type: String,
+    // },
     // adminId: {
     //   type: String,
     // },
-    batch_id: {
-      type: String
-    },
+    // batch_id: {
+    //   type: String
+    // },
     // trainerId:{
     //     type:String
     // },
@@ -51,8 +50,7 @@ const authSchema = new mongoose.Schema(
     active: {
       type: Boolean,
       default: true,
-    },
-    profile: String,
+    }
   },
   { timestamps: true,collection:"Auth" }
 );

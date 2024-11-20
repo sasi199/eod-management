@@ -78,6 +78,8 @@ exports.createStaff = async(req)=>{
     const newAuth = new Auth({
         accountId: newStaff._id,
         email,
+        fullName,
+        profilePic,
         logId,
         hybrid,
         password:hashedPassword,
