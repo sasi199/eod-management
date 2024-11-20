@@ -6,7 +6,7 @@ const traineeSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     logId: schemaFields.requiredAndString,
     batch:{
-        type:String,
+        type: mongoose.Schema.Types.ObjectId,
         ref:"Batch",
         required: true
     },

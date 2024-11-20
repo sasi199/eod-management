@@ -7,6 +7,7 @@ const uploadCloud = require("../utils/uploadCloud");
 const TraineeDetailsModel = require("../models/traineeDetails");
 const utils = require("../utils/utils");
 const AssignedBatchModel = require("../models/assignedBatchesModel");
+const BatchModel = require("../models/batchModel");
 
 
 
@@ -46,6 +47,12 @@ exports.createTrainee = async(req)=>{
       resumeUpload = await uploadCloud('resume-file', req.files['resumeUpload'][0])      
    }
 
+
+   const existingBatch  = await BatchModel.findById(batch)
+   if (!existingBatch) {
+    throw new ApiError(httpStatus.BAD_REQUEST, { message: "Batch does not exist" });
+   } 
+
    const logId = await generateTraineeLogId();
 
    const hashedPassword = await utils.hashPassword(password)
@@ -60,13 +67,15 @@ exports.createTrainee = async(req)=>{
    })
 
    const assignedBatch = new AssignedBatchModel({
-    batch,
+    batchId: batch,
     trainee: newTrainee._id,
    })
 
    const newAuth = new Auth({
     traineeId: newTrainee._id,
     email,
+    profilePic,
+    fullName,
     logId,
     role,
     hybrid,
