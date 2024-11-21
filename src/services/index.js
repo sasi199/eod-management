@@ -79,3 +79,12 @@ export const GetAttendance= async ()=>{
   const res =await interceptors.get('/v1/auth/getAttendance')
   return res;
 }
+
+
+
+//add Trainee
+
+export const AddTrainee= async (data)=>{
+  const res = await interceptors.post('/v1/trainee/createTrainee',data)
+  return res;
+}

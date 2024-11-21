@@ -1,6 +1,16 @@
 import React, { useState } from "react";
 import DataTable from "react-data-table-component";
-import { Modal, Form, Input, Button, DatePicker, Radio, Upload } from "antd";
+import {
+  Modal,
+  Form,
+  Input,
+  Button,
+  DatePicker,
+  Upload,
+  Select,
+  Row,
+  Col,
+} from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 
 const Trainee = () => {
@@ -104,70 +114,214 @@ const Trainee = () => {
         footer={null}
         centered
       >
-        <Form
-          layout="vertical"
-          onFinish={handleFormSubmit}
-          initialValues={{
-            gender: "Male",
-            hybrid: "Online",
-          }}
-        >
-          <Form.Item
-            label="Full Name"
-            name="fullName"
-            rules={[{ required: true, message: "Please enter the full name!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Email"
-            name="email"
-            rules={[{ required: true, message: "Please enter the email!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Date of Birth"
-            name="dob"
-            rules={[{ required: true, message: "Please select the date of birth!" }]}
-          >
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item
-            label="Phone Number"
-            name="phoneNumber"
-            rules={[{ required: true, message: "Please enter the phone number!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Gender"
-            name="gender"
-            rules={[{ required: true, message: "Please select the gender!" }]}
-          >
-            <Radio.Group>
-              <Radio value="Male">Male</Radio>
-              <Radio value="Female">Female</Radio>
-            </Radio.Group>
-          </Form.Item>
-          <Form.Item label="Profile Picture" name="profilePic">
-            <Upload>
-              <Button icon={<UploadOutlined />}>Upload</Button>
-            </Upload>
-          </Form.Item>
-          <Form.Item
-            label="Current Address"
-            name="currentAddress"
-            rules={[{ required: true, message: "Please enter the current address!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item label="Hybrid" name="hybrid">
-            <Radio.Group>
-              <Radio value="Online">Online</Radio>
-              <Radio value="Offline">Offline</Radio>
-            </Radio.Group>
-          </Form.Item>
+        <Form layout="vertical" onFinish={handleFormSubmit}>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Full Name"
+                name="fullName"
+                rules={[
+                  { required: true, message: "Please enter the full name!" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[{ required: true, message: "Please enter the email!" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Date of Birth"
+                name="dob"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select the date of birth!",
+                  },
+                ]}
+              >
+                <DatePicker style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Phone Number"
+                name="phoneNumber"
+                rules={[
+                  { required: true, message: "Please enter the phone number!" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Gender"
+                name="gender"
+                rules={[
+                  { required: true, message: "Please enter the gender!" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Hybrid"
+                name="hybrid"
+                rules={[
+                  { required: true, message: "Please select the hybrid mode!" },
+                ]}
+              >
+                <Select>
+                  <Select.Option value="Online">Online</Select.Option>
+                  <Select.Option value="Offline">Offline</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Profile Picture" name="profilePic">
+                <Upload>
+                  <Button icon={<UploadOutlined />}>Upload</Button>
+                </Upload>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              {" "}
+              <Form.Item label="Batch" name="batch">
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Current Address"
+                name="currentAddress"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter the current address!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Permanent Address" name="permanentAddress">
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Father's Name" name="fatherName">
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Mother's Name" name="motherName">
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* Additional Fields */}
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Contact Number" name="contact">
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Guardian Name" name="guardian">
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Account Holder Name" name="accountHolderName">
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Account Number" name="accountNumber">
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Bank Name" name="bankName">
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="IFSC Code" name="ifscCode">
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Branch" name="branch">
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Resume Upload" name="resumeUpload">
+                <Upload>
+                  <Button icon={<UploadOutlined />}>Upload</Button>
+                </Upload>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Experience" name="experience">
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Qualification" name="qualification">
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Role" name="role">
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Password" name="password">
+                <Input.Password />
+              </Form.Item>
+            </Col>
+          </Row>
+
           <Form.Item>
             <Button type="primary" htmlType="submit" className="w-full">
               Submit
