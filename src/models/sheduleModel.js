@@ -4,21 +4,16 @@ const schemaFields = require("../utils/schemaFieldUtils");
 
 const scheduleSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
-    batchId:{
-        type: mongoose.Schema.Types.ObjectId,
+    batch:{
+        type: String,
         ref: 'Batch',
         required: true,
     },
-    // trainer: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Staff',
-    //     required: true,
-    // },
-    // traineeId: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Trainee',
-    //     required: true,
-    // },
+    trainer:{
+        type: String,
+        ref: 'AssignedBatch',
+        required: true,
+    },
     subject: schemaFields.StringWithEnumAndRequired([
         'Html/Css','Javascript','Bootstrap','Jquery','React.js','Node.js/Mongodb','Python',
         'Php','Figma'

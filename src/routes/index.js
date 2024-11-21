@@ -8,6 +8,7 @@ const staffRouter = require("../routes/staffRoute");
 const traineeRouter = require("../routes/traineeRoute");
 const batchRouter = require("../routes/batchRoute");
 const taskRouter = require("../routes/taskRoute");
+const scheduleRouter = require("../routes/scheduleRoute");
 
 
 
@@ -43,6 +44,10 @@ const Routes = [
   {
     path: "/task",
     route: taskRouter,
+  },
+  {
+    path: "/schedule",
+    route: scheduleRouter,
   },
 
 
