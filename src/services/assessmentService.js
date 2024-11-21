@@ -1,5 +1,7 @@
 const AssessmentModel = require("../models/assessmentModel");
 const BatchModel = require("../models/batchModel");
+const ApiError = require("../utils/apiError");
+const httpStatus = require('http-status');
 
 
 
@@ -40,4 +42,39 @@ exports.createAssessment = async(req)=>{
             );
         }
     });
+
+    const newAssessment = new AssessmentModel({
+        ...req.body,
+        batch: batchExists._id,
+        questions
+    })
+
+    await newAssessment.save();
+    return newAssessment;
+}
+
+
+exports.getAssessmentAll = async(req)=>{
+    const assessment = await AssessmentModel.find({});
+    if (!assessment) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Assessments not found");
+    }
+    return assessment;
+}
+
+
+exports.getAssessmentId = async(req)=>{
+    const {authId} = req;
+    const { _id } = req.params;
+
+    if (!_id) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Assessment _id required");
+    }
+
+    const assessment = await AssessmentModel.findOne(_id)
+    if (!assessment) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Assessment not found");
+        
+    }
+    
 }

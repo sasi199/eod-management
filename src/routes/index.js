@@ -9,6 +9,7 @@ const traineeRouter = require("../routes/traineeRoute");
 const batchRouter = require("../routes/batchRoute");
 const taskRouter = require("../routes/taskRoute");
 const scheduleRouter = require("../routes/scheduleRoute");
+const assessmentRouter = require("../routes/assessmentRoute");
 
 
 
@@ -48,6 +49,10 @@ const Routes = [
   {
     path: "/schedule",
     route: scheduleRouter,
+  },
+  {
+    path: "/assessment",
+    route: assessmentRouter,
   },
 
 
