@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const schemaFields = require("../utils/schemaFieldUtils");
+const { string } = require('joi');
 
 
 const reportSchema = new mongoose.Schema({
@@ -7,14 +8,25 @@ const reportSchema = new mongoose.Schema({
     title: schemaFields.requiredAndString,
     content: schemaFields.requiredAndString,
     reporter: { 
-        type: mongoose.Schema.Types.ObjectId, 
+        type: String, 
         ref: 'Auth', 
         required: true 
     },
     reportTo: { 
-        type: mongoose.Schema.Types.ObjectId, 
+        type: String, 
         ref: 'Auth', 
         required: true 
+    },
+    status: {
+        type: String,
+        enum: ["unRead", "Readed",],
+        default: "unRead",
+    },
+    replay:{
+        type: String
+    },
+    reviewedAt: {
+        type: Date,
     },
 
 },{timestamps:true, collection:"Report"});
