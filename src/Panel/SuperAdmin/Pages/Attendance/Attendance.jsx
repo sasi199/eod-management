@@ -1,31 +1,41 @@
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import { FaEye } from "react-icons/fa";
+import { GetAttendance } from "../../../../services";
 
 const Attendance = () => {
   const todayDate = new Date().toISOString().split("T")[0];
 
-  const [attendanceData, setAttendanceData] = useState([
-    { id: 1, name: "John Doe", status: "Present", wfo: "WFO", remarks: "", role: "HR", date: "2024-11-11" },
-    { id: 2, name: "Gopi", status: "Absent", wfo: "WFO", remarks: "", role: "HR", date: "2024-11-10" },
-    { id: 3, name: "Jane Smith", status: "Absent", wfo: "WFH", remarks: "", role: "Coordinator", date: "2024-11-11" },
-    { id: 4, name: "Mark Johnson", status: "Present", wfo: "Leave", remarks: "", role: "Trainer", date: "2024-11-11" },
-    { id: 5, name: "Alice Brown", status: "Present", wfo: "WFO", remarks: "", role: "Trainee", date: "2024-11-11" },
-    { id: 6, name: "Bob White", status: "Absent", wfo: "WFH", remarks: "", role: "Admin", date: "2024-11-11" },
-  ]);
-
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [roles, setRoles] = useState([]); // Added the state for roles
   const [selectedRole, setSelectedRole] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState(todayDate);
 
+  // Fetch attendance data from the API
   useEffect(() => {
-    // Add dummy data for today's date if none exists
-    const newEntries = [
-      { id: 7, name: "David Miller", status: "Present", wfo: "WFO", remarks: "", role: "Admin", date: todayDate },
-      { id: 8, name: "Emma Watson", status: "Absent", wfo: "WFH", remarks: "", role: "Coordinator", date: todayDate },
-    ];
-    setAttendanceData((prevData) => [...prevData, ...newEntries]);
-  }, [todayDate]);
+    const fetchAttendanceData = async () => {
+      try {
+        const res = await GetAttendance();
+        if (res?.data?.data) {
+          setAttendanceData(res.data.data);
+          console.log(res.data.data); 
+
+          
+          const extractedRoles = [
+            ...new Set(res.data.data.map((item) => item.user?.role)),
+          ];
+          setRoles(extractedRoles);
+        } else {
+          console.error("Invalid response structure:", res);
+        }
+      } catch (error) {
+        console.error("Error fetching attendance data:", error);
+      }
+    };
+
+    fetchAttendanceData();
+  }, []);
 
   const handleRoleChange = (e) => setSelectedRole(e.target.value);
   const handleSearchChange = (e) => setSearchQuery(e.target.value);
@@ -34,15 +44,21 @@ const Attendance = () => {
   const handleToggleStatus = (id) => {
     setAttendanceData((prevData) =>
       prevData.map((item) =>
-        item.id === id ? { ...item, status: item.status === "Present" ? "Absent" : "Present" } : item
+        item._id === id
+          ? { ...item, status: item.status === "Present" ? "Absent" : "Present" }
+          : item
       )
     );
   };
 
-  const filteredData = attendanceData.filter((item) => {
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesDate = selectedDate ? item.date === selectedDate : true;
-    const matchesRole = selectedRole ? item.role === selectedRole : true;
+  const filteredData = (attendanceData || []).filter((item) => {
+    const matchesSearch = item.user?.fullName
+      ?.toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesDate = selectedDate
+      ? new Date(item.date).toISOString().split("T")[0] === selectedDate
+      : true;
+    const matchesRole = selectedRole ? item.user?.role === selectedRole : true;
     return matchesSearch && matchesDate && matchesRole;
   });
 
@@ -54,55 +70,59 @@ const Attendance = () => {
       center: true,
     },
     {
-      name: "ID",
-      selector: (row) => row.id,
+      name: "Profile",
+      selector: (row) => (
+       
+          <img
+            src={row.user?.profilePic || "/placeholder.jpg"} 
+            alt="Profile Pic"
+            className="w-10 h-10 rounded-full"
+          />
+      ),
       sortable: true,
       center: true,
     },
     {
       name: "Name",
-      selector: (row) => row.name,
+      selector: (row) => (
+        <p className="text-sm">{row.user?.fullName || "N/A"}</p> 
+      ),
       sortable: true,
       center: true,
     },
     {
-      name: "Status",
+      name: "Role",
+      selector: (row) => (
+        <p className="text-sm">{row.user?.role || "N/A"}</p> 
+      ),
+      sortable: true,
       center: true,
+    },
+    {
+      name: "Present / Absent",
       selector: (row) => (
         <label className="inline-flex relative items-center cursor-pointer">
           <input
             type="checkbox"
             checked={row.status === "Present"}
-            onChange={() => handleToggleStatus(row.id)}
+            onChange={() => handleToggleStatus(row._id)}
             className="sr-only peer"
           />
           <span className="w-11 h-6 bg-gray-200 peer-checked:bg-orange-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-checked:after:bg-white peer-checked:after:ring-0 rounded-full after:content-[''] after:absolute after:left-2 after:top-1 after:bg-white after:border-gray-300 after:rounded-full after:h-4 after:w-4 after:transition-all"></span>
         </label>
       ),
       sortable: true,
+      center: true,
     },
     {
-      name: "Work Mode",
-      selector: (row) => (
-        <select value={row.wfo} className="p-2 border border-gray-300 rounded">
-          <option value="WFO">WFO</option>
-          <option value="WFH">WFH</option>
-          <option value="Leave">Leave</option>
-        </select>
-      ),
+      name: "Check-In Time",
+      selector: (row) => new Date(row.checkIn).toLocaleTimeString(),
       sortable: true,
       center: true,
     },
     {
-      name: "Remarks",
-      selector: (row) => (
-        <input
-          type="text"
-          value={row.remarks}
-          placeholder="Enter remarks"
-          className="p-2 border border-gray-300 rounded"
-        />
-      ),
+      name: "Check-Out Time",
+      selector: (row) => new Date(row.checkOut).toLocaleTimeString(),
       sortable: true,
       center: true,
     },
@@ -130,39 +150,39 @@ const Attendance = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="flex justify-around items-center">
+      <div className="flex justify-around items-center mb-4">
         <select
           value={selectedRole}
           onChange={handleRoleChange}
-          className="mb-4 py-2 px-4 border border-gray-300 rounded-lg"
+          className="py-2 px-4 border border-gray-300 rounded-lg"
         >
           <option value="">Select Role</option>
-          <option value="HR">HR</option>
-          <option value="Coordinator">Coordinator</option>
-          <option value="Trainer">Trainer</option>
-          <option value="Trainee">Trainee</option>
-          <option value="Admin">Admin</option>
+          {roles.map((role, index) => (
+            <option key={index} value={role}>
+              {role}
+            </option>
+          ))}
         </select>
         <input
           type="text"
           value={searchQuery}
           onChange={handleSearchChange}
           placeholder="Search by name"
-          className="mb-4 p-2 border border-gray-300 rounded-lg"
+          className="p-2 border border-gray-300 rounded-lg"
         />
         <input
           type="date"
           value={selectedDate}
           onChange={handleDateChange}
-          className="mb-4 p-2 border border-gray-300 rounded-lg"
+          className="p-2 border border-gray-300 rounded-lg"
         />
       </div>
-      {!selectedRole && (
-        <div className="text-center text-red-500 font-semibold mt-32">
+      {!selectedRole && attendanceData.length === 0 && (
+        <div className="text-center text-red-500 font-semibold mt-4">
           Please choose a role to view the attendance data.
         </div>
       )}
-      {selectedRole && (
+      {selectedRole && attendanceData.length > 0 && (
         <DataTable
           columns={columns}
           data={filteredData}

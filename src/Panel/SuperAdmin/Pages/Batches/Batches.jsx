@@ -373,6 +373,18 @@ const Batches = () => {
       ),
     },
   ];
+  const customStyles = {
+       
+        headCells: {
+          style: {
+            backgroundColor: '#ff9800',  
+            color: '#ffffff',             
+        fontSize: '16px',
+        paddingRight: '0px'
+          }
+        },
+      
+      };
 
   return (
     <div className="p-4">
@@ -389,6 +401,7 @@ const Batches = () => {
       <DataTable
         columns={columns}
         data={batches}
+        customStyles={customStyles}
         pagination
         highlightOnHover
         className="border rounded shadow-sm"

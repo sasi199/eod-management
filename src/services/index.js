@@ -12,6 +12,13 @@ export const login = async (data)=>{
   return res;
 }
 
+//logout
+
+export const logout = async ()=>{
+  const res = await interceptors.post("/v1/auth/logOut",)
+return res;
+}
+
 //staffs
 
 //add staffs
@@ -62,5 +69,13 @@ export const EditBatches= async  (id,data)=>{
 
 export const DeleteBatches = async (id)=>{
   const res = await interceptors.delete(`/v1/batch/deleteBatch/${id}`)
+  return res;
+}
+
+
+//superAdmin Attendance
+
+export const GetAttendance= async ()=>{
+  const res =await interceptors.get('/v1/auth/getAttendance')
   return res;
 }

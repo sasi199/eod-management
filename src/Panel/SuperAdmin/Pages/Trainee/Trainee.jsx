@@ -1,122 +1,181 @@
-import React, { useState } from 'react';
-import DataTable from 'react-data-table-component';
-
-
-const batches = [
-  { id: 1, name: '21 Feb Batch' },
-  { id: 2, name: '1 March Batch' },
-];
-
-const studentsData = {
-  1: [ 
-    { id: 1, name: 'John Doe', email: 'john@example.com', status: 'Active' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', status: 'Inactive' },
-  ],
-  2: [ 
-    { id: 3, name: 'Bob Brown', email: 'bob@example.com', status: 'Active' },
-    { id: 4, name: 'Alice White', email: 'alice@example.com', status: 'Active' },
-  ],
-};
+import React, { useState } from "react";
+import DataTable from "react-data-table-component";
+import { Modal, Form, Input, Button, DatePicker, Radio, Upload } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 
 const Trainee = () => {
-  const [selectedBatch, setSelectedBatch] = useState(null);
-  const [showDetails, setShowDetails] = useState(false); 
+  const [batchFilter, setBatchFilter] = useState("");
+  const [nameFilter, setNameFilter] = useState("");
+  const [students, setStudents] = useState([
+    { id: 1, name: "John Doe", batch: "Batch A" },
+    { id: 2, name: "Jane Smith", batch: "Batch B" },
+    { id: 3, name: "Samuel Green", batch: "Batch A" },
+    { id: 4, name: "Emily Johnson", batch: "Batch C" },
+  ]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
- 
+  const handleAddStudent = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleFormSubmit = (values) => {
+    console.log("Form Values:", values);
+    setIsModalVisible(false);
+    const newStudent = {
+      id: students.length + 1,
+      name: values.fullName,
+      batch: "Batch A", // Default batch
+    };
+    setStudents([...students, newStudent]);
+  };
+
+  const filteredData = students.filter(
+    (student) =>
+      (batchFilter ? student.batch === batchFilter : true) &&
+      (nameFilter
+        ? student.name.toLowerCase().includes(nameFilter.toLowerCase())
+        : true)
+  );
+
   const columns = [
-    {
-      name: 'Name',
-      selector: row => row.name,
-      sortable: true,
-    },
-    {
-      name: 'Email',
-      selector: row => row.email,
-      sortable: true,
-    },
-    {
-      name: 'Status',
-      selector: row => row.status,
-      sortable: true,
-    },
+    { name: "ID", selector: (row) => row.id, sortable: true },
+    { name: "Name", selector: (row) => row.name, sortable: true },
+    { name: "Batch", selector: (row) => row.batch, sortable: true },
   ];
 
- 
-  const handleBatchClick = (batchId) => {
-    setSelectedBatch(batchId);
-    setShowDetails(true); 
+  const customStyles = {
+    headCells: {
+      style: {
+        backgroundColor: "#ff9800",
+        color: "#ffffff",
+        fontSize: "16px",
+        paddingRight: "0px",
+      },
+    },
   };
 
   return (
-    <div className="p-4">
- 
-      {!showDetails ? (
-        <>
-          <h2 className="text-3xl font-semibold text-center mb-6">Select a Batch</h2>
-
-    
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {batches.map(batch => (
-              <div
-                key={batch.id}
-                onClick={() => handleBatchClick(batch.id)}
-                className="cursor-pointer p-6 bg-gradient-to-r from-orange-400 via-yellow-500 to-orange-600 rounded-lg shadow-lg text-white hover:scale-105 transition-all duration-300"
-              >
-                <div className="text-2xl font-semibold">{batch.name}</div>
-              </div>
-            ))}
-          </div>
-        </>
-      ) : (
-        
-        <div className="space-y-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-3xl font-semibold text-center">Students in {batches.find(batch => batch.id === selectedBatch).name}</h3>
-          <button
-            onClick={() => setShowDetails(false)}
-            className="text-lg text-orange-600 hover:text-orange-800"
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex gap-4">
+          <select
+            className="border px-4 py-2 rounded"
+            value={batchFilter}
+            onChange={(e) => setBatchFilter(e.target.value)}
           >
-            Back to Batches
-          </button>
-        </div>
-
-       
-        <div className="">
-          <DataTable
-            columns={columns}
-            data={studentsData[selectedBatch]}
-            pagination
-            
-            
-            noDataComponent="No students available"
-            customStyles={{
-              rows: {
-                style: {
-                  minHeight: '40px',
-                  fontSize: '16px', 
-                },
-              },
-              headCells: {
-                style: {
-                  backgroundColor: '#f9fafb',
-                  color: '#4a4a4a',
-                  fontWeight: 'bold',
-                  fontSize: '18px', 
-                },
-              },
-              cells: {
-                style: {
-                  paddingLeft: '20px',
-                  paddingRight: '20px',
-                  fontSize: '16px', 
-                },
-              },
-            }}
+            <option value="">All Batches</option>
+            <option value="Batch A">Batch A</option>
+            <option value="Batch B">Batch B</option>
+            <option value="Batch C">Batch C</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Filter by Name"
+            className="border px-4 py-2 rounded"
+            value={nameFilter}
+            onChange={(e) => setNameFilter(e.target.value)}
           />
         </div>
+        <button
+          onClick={handleAddStudent}
+          className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+        >
+          Add Student
+        </button>
       </div>
-    )}
-  </div>
+
+      <DataTable
+        columns={columns}
+        data={filteredData}
+        customStyles={customStyles}
+        pagination
+        highlightOnHover
+        className="border rounded"
+      />
+
+      <Modal
+        title="Add Student"
+        visible={isModalVisible}
+        onCancel={handleModalCancel}
+        footer={null}
+        centered
+      >
+        <Form
+          layout="vertical"
+          onFinish={handleFormSubmit}
+          initialValues={{
+            gender: "Male",
+            hybrid: "Online",
+          }}
+        >
+          <Form.Item
+            label="Full Name"
+            name="fullName"
+            rules={[{ required: true, message: "Please enter the full name!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[{ required: true, message: "Please enter the email!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Date of Birth"
+            name="dob"
+            rules={[{ required: true, message: "Please select the date of birth!" }]}
+          >
+            <DatePicker style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item
+            label="Phone Number"
+            name="phoneNumber"
+            rules={[{ required: true, message: "Please enter the phone number!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Gender"
+            name="gender"
+            rules={[{ required: true, message: "Please select the gender!" }]}
+          >
+            <Radio.Group>
+              <Radio value="Male">Male</Radio>
+              <Radio value="Female">Female</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item label="Profile Picture" name="profilePic">
+            <Upload>
+              <Button icon={<UploadOutlined />}>Upload</Button>
+            </Upload>
+          </Form.Item>
+          <Form.Item
+            label="Current Address"
+            name="currentAddress"
+            rules={[{ required: true, message: "Please enter the current address!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item label="Hybrid" name="hybrid">
+            <Radio.Group>
+              <Radio value="Online">Online</Radio>
+              <Radio value="Offline">Offline</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" className="w-full">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
   );
 };
 

@@ -32,7 +32,7 @@ import TrainerSyllabus from "../Panel/Trainer/Pages/Syllabus/TrainerSyllabus";
 import TrainerAttendance from "../Panel/Trainer/Pages/Attendance/TrainerAttendance";
 import TrainerAttendace from "../Panel/Trainer/Pages/Attendance/TrainerAttendance";
 import TrainerAssessment from "../Panel/Trainer/Pages/Assessment/TrainerAssessment";
-import CreatePage from "../Panel/Trainer/Pages/Assessment/CreateAssessment";
+// import CreatePage from "../Panel/Trainer/Pages/Assessment/CreateAssessment";
 import Login from "../components/login";
 
 
@@ -171,10 +171,10 @@ export const pages = [
         path: "attendance",
         element: <TrainerAttendace />,
       },
-      {
-        path: "attendance/create",
-        element: <CreatePage />,
-      },
+      // {
+      //   path: "attendance/create",
+      //   element: <CreatePage />,
+      // },
       {
         path: "notifications",
         element: <TrainerNotificaitons />,

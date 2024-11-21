@@ -3,23 +3,15 @@ import { IoIosAdd } from "react-icons/io";
 import { Modal, Form, Input, Button } from "antd";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import Sidebar from "./Sidebar";
+import { MdOutlineFileUpload } from "react-icons/md";
+import { FaLink } from "react-icons/fa";
 
 // const Navbar = () => (
 //   <div className="w-full bg-blue-600 text-white p-4">
 //     <h1 className="text-lg font-semibold">Trainer Assessment</h1>
 //   </div>
 // );
-
-const Sidebar = () => (
-  <div className="w-1/4 border-l border-gray-300 p-4 h-[600px]">
-    <ul className="space-y-4">
-      <li className="cursor-pointer">Dashboard</li>
-      <li className="cursor-pointer">Assignments</li>
-      <li className="cursor-pointer">Quizzes</li>
-      <li className="cursor-pointer">Materials</li>
-    </ul>
-  </div>
-);
 
 const TrainerAssessment = () => {
   const [selectedBatch, setSelectedBatch] = useState(null);
@@ -30,9 +22,21 @@ const TrainerAssessment = () => {
   const [title, setTitle] = useState("");
 
   const batches = [
-    { name: "March 31", studentCount: 30, image: "https://via.placeholder.com/150" },
-    { name: "April 22", studentCount: 25, image: "https://via.placeholder.com/150" },
-    { name: "May 15", studentCount: 20, image: "https://via.placeholder.com/150" },
+    {
+      name: "March 31",
+      studentCount: 30,
+      image: "https://via.placeholder.com/150",
+    },
+    {
+      name: "April 22",
+      studentCount: 25,
+      image: "https://via.placeholder.com/150",
+    },
+    {
+      name: "May 15",
+      studentCount: 20,
+      image: "https://via.placeholder.com/150",
+    },
   ];
 
   const handleBatchSelect = (batch) => {
@@ -62,7 +66,9 @@ const TrainerAssessment = () => {
     <div className="px-4 relative">
       {selectedBatch ? (
         <div>
-          <h2 className="text-xl font-semibold mb-4">Selected Batch: {selectedBatch.name}</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Selected Batch: {selectedBatch.name}
+          </h2>
           <button
             className="mt-4 flex items-center gap-2 bg-blue-500 text-white px-3 py-1 rounded-2xl hover:bg-blue-600 transition-colors duration-300"
             onClick={toggleDropdown}
@@ -73,7 +79,9 @@ const TrainerAssessment = () => {
 
           <div
             className={`bg-white border border-gray-200 rounded-lg shadow-md w-32 py-3 absolute z-10 transition-all duration-300 ${
-              isDropdownOpen ? "opacity-100 translate-y-4" : "opacity-0 -translate-y-1"
+              isDropdownOpen
+                ? "opacity-100 translate-y-4"
+                : "opacity-0 -translate-y-1"
             }`}
             style={{
               top: "85%",
@@ -116,7 +124,9 @@ const TrainerAssessment = () => {
               />
               <div className="text-left p-2">
                 <h2 className="text-xl font-semibold">{batch.name}</h2>
-                <p className="text-gray-600 mt-2">Total Students: {batch.studentCount}</p>
+                <p className="text-gray-600 mt-2">
+                  Total Students: {batch.studentCount}
+                </p>
                 <button
                   className="mt-4 bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors duration-300"
                   onClick={() => handleBatchSelect(batch)}
@@ -133,22 +143,26 @@ const TrainerAssessment = () => {
         visible={isModalVisible}
         onCancel={closeModal}
         footer={null}
-        width="100%" 
+        width="100%"
         bodyStyle={{
-          height: "100vh", 
+          height: "90vh",
           padding: "0",
         }}
         centered
       >
-         <div className="w-full border-b border-gray-300 text-white p-4 ">
-      <h1 className="text-2xl font-semibold text-gray-600">{modalContent}</h1>
-      </div>
-       
-        <div className="flex h-full ">
+        <div className="w-full border-b border-orange-300 text-white p-4 ">
+          <h1 className="text-2xl font-semibold text-gray-600">
+            {modalContent}
+          </h1>
+        </div>
+
+        <div className="flex  ">
           <div className="flex-1 p-8 overflow-y-auto bg-gray-100 ">
-           
-            <Form layout="vertical" className="border p-6 bg-white rounded-xl" onFinish={() => {}}>
-              
+            <Form
+              layout="vertical"
+              className="border p-6 bg-white rounded-xl"
+              onFinish={() => {}}
+            >
               <Form.Item label="Title">
                 <Input
                   type="text"
@@ -159,8 +173,7 @@ const TrainerAssessment = () => {
                 />
               </Form.Item>
 
-              
-              <Form.Item label="Content" >
+              <Form.Item label="Content">
                 <ReactQuill
                   value={editorContent}
                   onChange={handleEditorChange}
@@ -168,26 +181,27 @@ const TrainerAssessment = () => {
                   placeholder="Start writing here..."
                 />
               </Form.Item>
-              </Form>
+            </Form>
 
-              <div className="flex gap-4 mt-8">
-                {/* <Button className="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
-                  Google Drive
-                </Button >
-                <Button className="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
-                  YouTube
-                </Button> */}
-                {/* <Button className="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
-                  Create from Drive
-                </Button> */}
-                <Button className="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
-                  Upload
-                </Button>
-                <Button className="bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
-                  Link
-                </Button>
+            <div className=" flex justify-center items-center gap-8 mt-8 bg-white rounded-xl border-gray-300">
+              <div className="flex flex-col items-center  py-4 gap-2">
+                <div className="flex items-center justify-center bg-white border border-gray-300 w-14 h-14 rounded-full">
+                  <MdOutlineFileUpload size={28} />
+                </div>
+
+                <Button>Upload</Button>
               </div>
-              {/* <Form.Item>
+              <div className="flex flex-col items-center  py-4 gap-2">
+
+              <div className="flex items-center justify-center bg-white border border-gray-300 w-14 h-14 rounded-full">
+                <FaLink size={24}/>
+              </div>
+              <Button >
+                Link
+              </Button>
+            </div>
+            </div>
+            {/* <Form.Item>
                 <Button type="primary" htmlType="submit" className="mt-4">
                   Submit
                 </Button>

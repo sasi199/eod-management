@@ -1,11 +1,50 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { FaTachometerAlt, FaClipboardList, FaBook, FaUserShield, FaChalkboardTeacher, FaUserGraduate, FaUsers, FaChevronDown, FaBell, FaComment, FaCalendarAlt, FaFileAlt, FaTasks, FaComments } from 'react-icons/fa';
 import { MdAssignment } from 'react-icons/md';
 import logo from '../../assets/Login/NavbarLogo.png'
+import { logout } from '../../services';
+import { data } from 'autoprefixer';
 
 const Navbar = () => {
   const location = useLocation();
+  const [dropdown, setDropdown] = useState(false);
+
+  const toggleDropdown = () => {
+    setDropdown((prev) => !prev);
+  };
+
+  const handleLogout = async () => {
+    console.log("out");
+    try {
+      const res = await logout();
+      console.log(res);
+  
+      
+      localStorage.removeItem("token");
+      window.location.href = "/login"; 
+    } catch (error) {
+      console.error('Error logging out:', error.message);
+    }
+    
+    setDropdown(false); // Assuming this closes a dropdown
+  };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".dropdown-container")) {
+        setDropdown(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
+
+
+
 
   const pageNames = {
     '/trainersidebar/dashboard': 'Dashboard',
@@ -25,11 +64,24 @@ const Navbar = () => {
       <div className="flex items-center gap-4">
         <span className="font-semibold text-orange-600">{user.name}</span>
 
-        <img
-          src={user.profileImage}
-          alt={user.name}
-          className="w-8 h-8 rounded-full"
-        />
+        <div className="relative dropdown-container">
+          <img
+            src={user.profileImage}
+            alt={user.name}
+            className="w-8 h-8 rounded-full"
+            onClick={toggleDropdown}
+          />
+          {dropdown && (
+            <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded shadow-md">
+              <button
+                onClick={handleLogout}
+                className="w-full px-4 py-2 text-left text-sm text-orange-600 "
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
