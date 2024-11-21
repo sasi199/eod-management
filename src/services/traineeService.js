@@ -41,8 +41,6 @@ exports.createTrainee = async(req)=>{
 
     let profilePic,resumeUpload;
    if (req.files['profilePic']) {
-      const fileExtension = req.files['profilePic'][0].originalname.split('.').pop();
-      const fileName = `${Date.now()}.${fileExtension}`
       profilePic = await uploadCloud('tarineeProfile', req.files['profilePic'][0])
 
 

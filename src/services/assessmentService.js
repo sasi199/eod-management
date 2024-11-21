@@ -76,5 +76,46 @@ exports.getAssessmentId = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, "Assessment not found");
         
     }
+
+}
+
+
+exports.editAssessment = async(req)=>{
+    const {authId} = req;
+    const { _id } = req.params;
+
+    if (_id) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Assessment _id required")
+    }
+
+    const assessment = await AssessmentModel.findOne(_id);
+    if (!assessment) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Assessment not  found");
+    }
+
+    const updateData = {...req.body};
+
+    const updateAssessment = await AssessmentModel.findByIdAndUpdate(_id,updateData,
+        {new:true,runValidators:true}
+    )
+
+    return updateAssessment;
+}
+
+
+exports.deleteAssessment = async(req)=>{
+    const {authId} = req;
+    const { _id } = req.params;
+
+    if (_id) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Assessment _id required")
+    }
+
+    const assessment = await AssessmentModel.findOne(_id);
+    if (!assessment) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Assessment not  found");
+    }
+
+    await AssessmentModel.findByIdAndDelete(_id);
     
 }
