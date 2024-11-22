@@ -40,13 +40,13 @@ const Login = () => {
               console.log("User Role:", role);
   
               if (role === "Super Admin") {
-                navigate("/sidebar");
+                navigate("/sidebar/dashboard");
               } else if (role === "Admin") {
                 navigate("/admin");
               } else if (role === "Employee") {
-                navigate("/trainersidebar");
+                navigate("/trainersidebar/dashboard");
               } else if (role === "Trainee") {
-                navigate("/traineesidebar");
+                navigate("/traineesidebar/dashboard");
               } else {
                 navigate("/");
               }

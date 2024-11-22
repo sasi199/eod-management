@@ -163,13 +163,13 @@ const Sidebar = () => {
             >
               <FaUsers />
               Staffs
-              <FaChevronDown
+              {/* <FaChevronDown
                 className={`${
                   isStaffDropdownOpen ? "transform rotate-180" : ""
                 } ml-auto transition-transform`}
-              />
+              /> */}
             </Link>
-
+{/* 
             {isStaffDropdownOpen && (
               <div className="ml-8 mt-2 space-y-2">
                 <Link
@@ -178,9 +178,9 @@ const Sidebar = () => {
                 >
                   <FaUserGraduate />
                   Trainer
-                </Link>
-              </div>
-            )}
+                </Link> */}
+              {/* </div> */}
+            {/* )} */}
           </div>
 
           <Link
@@ -205,7 +205,7 @@ const Sidebar = () => {
             Task
           </Link>
           <Link
-            to="/sidebar/assessment"
+            to="/sidebar/SuperAssessment"
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
           >
             <GiNotebook />

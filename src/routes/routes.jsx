@@ -34,6 +34,7 @@ import TrainerAttendace from "../Panel/Trainer/Pages/Attendance/TrainerAttendanc
 import TrainerAssessment from "../Panel/Trainer/Pages/Assessment/TrainerAssessment";
 // import CreatePage from "../Panel/Trainer/Pages/Assessment/CreateAssessment";
 import Login from "../components/login";
+import SuperAssessment from "../Panel/SuperAdmin/Pages/Assessment/TrainerAssessment";
 
 
 
@@ -88,6 +89,10 @@ export const pages = [
       {
         path: "notifications",
         element: <Notifications />,
+      },
+      {
+        path: "SuperAssessment",
+        element: <SuperAssessment />,
       },
       {
         path: "schedule",
