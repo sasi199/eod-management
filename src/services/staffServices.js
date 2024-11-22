@@ -94,7 +94,7 @@ exports.createStaff = async(req)=>{
 
 
 exports.getStaffAll = async(req)=>{
-    const staff = await StaffModel.find()
+    const staff = await StaffModel.find({})
     if (!staff) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Staff not found"});
      }

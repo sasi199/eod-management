@@ -17,6 +17,10 @@ const taskSchema = new mongoose.Schema(
         title: schemaFields.requiredAndString,
         description: { type: String, trim: true },
         dueDate: schemaFields.DateWithDefault,
+        projectId:{
+            type: String,
+            ref: "Project"
+        },
         priority: schemaFields.StringWithEnumAndDefault(
             ['high', 'medium', 'low', 'normal'],
             'normal'
@@ -45,7 +49,7 @@ const taskSchema = new mongoose.Schema(
     },
     {
         timestamps: true,
-        collection: 'Tasks',
+        collection: 'Task',
     }
 );
 

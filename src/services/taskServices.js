@@ -1,14 +1,20 @@
 const TaskModel = require("../models/taskModel");
 const httpStatus = require('http-status');
 const ApiError = require("../utils/apiError");
+const ProjectModel = require("../models/projectModel");
 
 
 
 exports.createTask = async(req)=>{
-    const { title,assignees } = req.body;
+    const { title, description, assignees, dueDate, priority} = req.body;
+    const { projectId }  = req.params;
 
-    if (!title) {
-        throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Trainee already exist'}); 
+    const project = await ProjectModel.findOne(projectId)
+    console.log("vfdsesfg",project);
+    
+    
+    if (!project) {
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Project not found'}); 
     }
 
     assignees.forEach((assignee) => {
@@ -18,7 +24,8 @@ exports.createTask = async(req)=>{
     });
 
     const newTask = new TaskModel({
-        ...req.body
+        ...req.body,
+        projectId: project
     })
 
     await newTask.save();
