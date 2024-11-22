@@ -88,3 +88,10 @@ export const AddTrainee= async (data)=>{
   const res = await interceptors.post('/v1/trainee/createTrainee',data)
   return res;
 }
+
+//get trainee
+
+export const GetTrainee = async ()=>{
+  const res = await interceptors.get('/v1/trainee/getTraineeAll')
+  return res;
+}

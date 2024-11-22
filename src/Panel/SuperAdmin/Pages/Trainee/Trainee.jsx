@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import {
   Modal,
@@ -10,19 +10,37 @@ import {
   Select,
   Row,
   Col,
+message
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import { AddTrainee, GetTrainee } from "../../../../services";
+import { FaEdit, FaEye, FaTrash } from "react-icons/fa"; 
 
 const Trainee = () => {
   const [batchFilter, setBatchFilter] = useState("");
   const [nameFilter, setNameFilter] = useState("");
-  const [students, setStudents] = useState([
-    { id: 1, name: "John Doe", batch: "Batch A" },
-    { id: 2, name: "Jane Smith", batch: "Batch B" },
-    { id: 3, name: "Samuel Green", batch: "Batch A" },
-    { id: 4, name: "Emily Johnson", batch: "Batch C" },
-  ]);
+  const [students, setStudents] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+const [form] = Form.useForm();
+
+useEffect(() => {
+  const fetchTrainees = async () => {
+    try {
+    
+      const response = await GetTrainee();
+      setStudents(response?.data.data); 
+      console.log(response.data.data)
+     
+    } catch (error) {
+      message.error("Failed to fetch trainees.");
+    
+    }
+  };
+
+  fetchTrainees();
+}, []);
+
+
 
   const handleAddStudent = () => {
     setIsModalVisible(true);
@@ -32,15 +50,32 @@ const Trainee = () => {
     setIsModalVisible(false);
   };
 
-  const handleFormSubmit = (values) => {
-    console.log("Form Values:", values);
-    setIsModalVisible(false);
-    const newStudent = {
-      id: students.length + 1,
-      name: values.fullName,
-      batch: "Batch A", // Default batch
-    };
-    setStudents([...students, newStudent]);
+  const handleFormSubmit = async (values) => {
+    try {
+      // Create FormData object
+      const formData = new FormData();
+      Object.keys(values).forEach((key) => {
+        if (key === "profilePic" || key === "resumeUpload") {
+          if (values[key] && values[key].file) {
+            formData.append(key, values[key].file.originFileObj);
+          
+          }
+        } else {
+          formData.append(key, values[key]);
+        }
+      });
+      console.log(values);
+
+      await AddTrainee(formData);
+      
+      setStudents([...students]);
+
+      message.success("Trainee added successfully!");
+      setIsModalVisible(false);
+      form.resetFields();
+    } catch (error) {
+      message.error("Failed to add trainee!");
+    }
   };
 
   const filteredData = students.filter(
@@ -52,8 +87,10 @@ const Trainee = () => {
   );
 
   const columns = [
-    { name: "ID", selector: (row) => row.id, sortable: true },
-    { name: "Name", selector: (row) => row.name, sortable: true },
+
+    { name: "Profile", selector: (row) => row.profilePic, sortable: true },
+    { name: "Name", selector: (row) => row.fullName, sortable: true },
+    { name: "", selector: (row) => row.n, sortable: true },
     { name: "Batch", selector: (row) => row.batch, sortable: true },
   ];
 
@@ -103,7 +140,7 @@ const Trainee = () => {
         data={filteredData}
         customStyles={customStyles}
         pagination
-        highlightOnHover
+       
         className="border rounded"
       />
 
@@ -114,7 +151,7 @@ const Trainee = () => {
         footer={null}
         centered
       >
-        <Form layout="vertical" onFinish={handleFormSubmit}>
+        <Form layout="vertical" onFinish={handleFormSubmit} form={form}>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -179,7 +216,7 @@ const Trainee = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
+            <Form.Item
                 label="Hybrid"
                 name="hybrid"
                 rules={[
@@ -188,7 +225,7 @@ const Trainee = () => {
               >
                 <Select>
                   <Select.Option value="Online">Online</Select.Option>
-                  <Select.Option value="Offline">Offline</Select.Option>
+                  <Select.Option value="WFH">WFH</Select.Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -299,8 +336,19 @@ const Trainee = () => {
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label="Experience" name="experience">
-                <Input />
+            <Form.Item
+                label="Experience"
+                name="experience"
+                rules={[
+                  { required: true, message: "Please select the experience!" },
+                ]}
+              >
+                <Select>
+                  <Select.Option value="0 to 1">0 to 1</Select.Option>
+                  <Select.Option value="1 to 3">1 to 3</Select.Option>
+                  <Select.Option value="3 to 5">3 to 5</Select.Option>
+                  <Select.Option value="5+">5+</Select.Option>
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -311,8 +359,19 @@ const Trainee = () => {
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label="Role" name="role">
-                <Input />
+            <Form.Item
+                label="Role"
+                name="role"
+                rules={[
+                  { required: true, message: "Please select the role!" },
+                ]}
+              >
+                <Select>
+                  <Select.Option value="Admin">Admin</Select.Option>
+                  <Select.Option value="SuperAdmin">SuperAdmin</Select.Option>
+                  <Select.Option value="Trainer">Trainer</Select.Option>
+                  <Select.Option value="Trainee">Trainee</Select.Option>
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
