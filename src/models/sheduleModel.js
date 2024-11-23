@@ -11,7 +11,7 @@ const scheduleSchema = new mongoose.Schema({
     },
     trainer:{
         type: String,
-        ref: 'AssignedBatch',
+        ref: 'Staff',
         required: true,
     },
     subject: schemaFields.StringWithEnumAndRequired([
@@ -37,6 +37,10 @@ const scheduleSchema = new mongoose.Schema({
         enum: ['scheduled', 'completed', 'canceled'],
         default: 'scheduled',
     },
+    stage: {
+        type: String,
+        enum: ['not started','started','completed']
+    }
 
 },{timestamps:true,collection:'Schedule'})
 

@@ -21,10 +21,6 @@ const batchSchema = new mongoose.Schema({
     trainer: [{
         type: String,
         ref: 'Staff'
-    }],
-    schedule: [{
-        type: String,
-        ref: 'Schedule'
     }]
 }, { timestamps: true, collection: "Batch" });
 
