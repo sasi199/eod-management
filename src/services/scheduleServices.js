@@ -14,6 +14,17 @@ exports.createSchedule = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "batch not found"});
     }
 
+    const existingSchedule = await ScheduleModel.findOne({
+        batch,
+        date,
+        classTimings,
+        trainer
+      });
+
+      if (existingSchedule) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message: `A schedule already exists for batch "${batchExists.name}" on ${date} at ${classTimings}`});
+      }
+
     const newSchedule = new ScheduleModel({
         ...req.body,
         batch:batches._id
