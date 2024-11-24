@@ -35,6 +35,12 @@ import TrainerAssessment from "../Panel/Trainer/Pages/Assessment/TrainerAssessme
 // import CreatePage from "../Panel/Trainer/Pages/Assessment/CreateAssessment";
 import Login from "../components/login";
 import SuperAssessment from "../Panel/SuperAdmin/Pages/Assessment/TrainerAssessment";
+import SuperReports from "../Panel/SuperAdmin/Pages/Report/SuperReport";
+import Task from "../Panel/SuperAdmin/Pages/Task/Task";
+import EOD from "../Panel/SuperAdmin/Pages/Task/EOD";
+import Course from "../Panel/SuperAdmin/Pages/Course/Course";
+import TraineeTask from "../Panel/Trainer/Pages/Task/Task";
+import TrainerTask from "../Panel/Trainer/Pages/Task/Task";
 
 
 
@@ -61,6 +67,10 @@ export const pages = [
       {
         path: "batches",
         element: <Batches />,
+      },
+      {
+        path: "courses",
+        element: <Course/>,
       },
 
    
@@ -90,6 +100,11 @@ export const pages = [
         path: "notifications",
         element: <Notifications />,
       },
+    
+      {
+        path: "task/eod",
+        element: <EOD/>,
+      },
       {
         path: "SuperAssessment",
         element: <SuperAssessment />,
@@ -98,6 +113,12 @@ export const pages = [
         path: "schedule",
         element: <Schedule />,
       },
+      {
+        path: "report",
+        element: <SuperReports />,
+      },
+    
+
     ],
   },
 
@@ -121,10 +142,7 @@ export const pages = [
         path: "notifications",
         element: <TraineeNotificaitons />,
       },
-      // {
-      //   path: "assessment",
-      //   element: <TraineeAssessment />,
-      // },
+    
       {
         path: "attendance",
         element: <Attendance />,
@@ -158,6 +176,10 @@ export const pages = [
       {
         path: "chat",
         element: <TrainerChat />,
+      },
+      {
+        path: "task",
+        element: <TrainerTask />,
       },
 
       {

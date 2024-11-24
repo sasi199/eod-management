@@ -4,11 +4,11 @@ import { FaTachometerAlt, FaClipboardList, FaBook, FaUserShield, FaChalkboardTea
 import { MdAssignment } from 'react-icons/md';
 import logo from '../../assets/Login/NavbarLogo.png'
 import { logout } from '../../services';
-import { data } from 'autoprefixer';
-
+import {Modal, Input, Select, Button} from 'antd'
 const Navbar = () => {
   const location = useLocation();
   const [dropdown, setDropdown] = useState(false);
+ 
 
   const toggleDropdown = () => {
     setDropdown((prev) => !prev);
@@ -22,7 +22,7 @@ const Navbar = () => {
   
       
       localStorage.removeItem("token");
-      window.location.href = "/login"; 
+      window.location.href = "/"; 
     } catch (error) {
       console.error('Error logging out:', error.message);
     }
@@ -46,6 +46,8 @@ const Navbar = () => {
 
 
 
+
+
   const pageNames = {
     '/trainersidebar/dashboard': 'Dashboard',
    
@@ -56,6 +58,8 @@ const Navbar = () => {
     name: 'Trainer', 
     profileImage: 'https://via.placeholder.com/150', 
   };
+
+  
 
   return (
     <div className="bg-white shadow-md p-4 flex items-center justify-between">
@@ -89,10 +93,41 @@ const Navbar = () => {
 
 const TrainerSidebar = () => {
   const [isStaffDropdownOpen, setIsStaffDropdownOpen] = useState(false);
-
+  const[isTaskView,setIsTaskView]=useState(false);
+  const[isModalVisible, setIsModalVisible]=useState(false);
+  const[projectName, setProjectName]=useState('');
+  const[selectedMembers, setSelectedMembers]=useState([]);
   const toggleStaffDropdown = () => {
     setIsStaffDropdownOpen(!isStaffDropdownOpen);
   };
+
+  const teamMembers = [
+    { id: 1, name: 'John Doe' },
+    { id: 2, name: 'Jane Smith' },
+    { id: 3, name: 'Jim Brown' },
+    { id: 4, name: 'Lucy Green' },
+    { id: 5, name: 'Mark White' },
+  ];
+
+
+  const toggleTaskView=()=>{
+    setIsTaskView(!isTaskView);
+  };
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    console.log('Project Name:', projectName);
+    console.log('Selected Members:', selectedMembers);
+    setIsModalVisible(false); 
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);  
+  };
+
 
   return (
     <div className="flex h-screen">
@@ -103,7 +138,8 @@ const TrainerSidebar = () => {
     <img src={logo} alt="" className='w-16  ' />
         <h2 className="text-2xl font-semibold mb-8 text-center">Why Global Services</h2>
         </div>
-        <div className="space-y-4">
+
+      {!isTaskView ? (<div className="space-y-4">
           <Link 
             to="/trainersidebar/dashboard" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
@@ -117,7 +153,8 @@ const TrainerSidebar = () => {
             My Batches
           </Link>
           <Link 
-            to="/trainersidebar/myBatch" 
+            to="/trainersidebar/task" 
+            onClick={toggleTaskView}
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
             <FaTasks />
             Task
@@ -160,17 +197,85 @@ const TrainerSidebar = () => {
           </Link>
           
           
-        </div>
-      </div>
+        </div>):(
+             <div className="space-y-4">
+             <button
+               onClick={toggleTaskView}
+               className="flex items-center gap-4 w-full text-lg font-semibold py-2 px-4 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+             >
+               ← Go Back
+             </button>
+             <div className="flex items-center gap-4   p-3 mt-4">
+  
+  <input
+    type="text"
+    placeholder="Search"
+    className="flex-1 text-sm text-gray-700 placeholder-white bg-transparent border border-white rounded-md py-2 px-3 outline-none focus:ring-2 focus:ring-orange-600"
+  />
 
-      <div className="flex-1 h-screen ml-64 py-1  ">
-        <Navbar />
-        <div className="mt-4">
-          <Outlet />
-        </div>
-      </div>
-    </div>
-  );
-};
+  <button
+    onClick={showModal}
+    className="flex items-center gap-2 bg-white text-orange-500 text-md font-semibold py-1 px-2 rounded-md hover:bg-white hover:text-orange-600 hover:border hover:border-orange-600 transition-all duration-200"
+  >
+    Add Project
+  </button>
+</div>
 
-export default TrainerSidebar;
+           </div>
+         )}
+       </div>
+ 
+       <div className="flex-1 h-screen ml-64 py-1">
+         <Navbar />
+         <div className="mt-4">
+           <Outlet />
+         </div>
+       </div>
+ 
+       <Modal
+         title="Create New Project"
+         visible={isModalVisible}
+         onOk={handleOk}
+         onCancel={handleCancel}
+         footer={null}
+       >
+         <div className="space-y-4">
+           <div>
+             <label className="block text-sm font-semibold mb-2">Project Name</label>
+             <Input
+               value={projectName}
+               onChange={(e) => setProjectName(e.target.value)}
+               placeholder="Enter project name"
+             />
+           </div>
+ 
+           <div>
+             <label className="block text-sm font-semibold mb-2">Select Team Members</label>
+             <Select
+               mode="multiple"
+               style={{ width: '100%' }}
+               value={selectedMembers}
+               onChange={setSelectedMembers}
+               placeholder="Select members"
+             >
+               {teamMembers.map((member) => (
+                 <Option key={member.id} value={member.id}>
+                   {member.name}
+                 </Option>
+               ))}
+             </Select>
+           </div>
+ 
+           <div className="flex justify-end gap-4 mt-4">
+             <Button onClick={handleCancel}>Cancel</Button>
+             <Button type="primary" onClick={handleOk}>
+               Create Project
+             </Button>
+           </div>
+         </div>
+       </Modal>
+     </div>
+   );
+ };
+ 
+ export default TrainerSidebar;   

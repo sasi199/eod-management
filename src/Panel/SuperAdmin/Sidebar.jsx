@@ -59,7 +59,7 @@ const Navbar = () => {
   
       
       localStorage.removeItem("token");
-      window.location.href = "/login"; // Redirect to login page
+      window.location.href = "/"; // Redirect to login page
     // } catch (error) {
     //   console.error('Error logging out:', error.message);
     // }
@@ -78,6 +78,11 @@ const Navbar = () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
+
+
+
+
 
   return (
     <div className="bg-white shadow-md p-4 flex items-center justify-between">
@@ -117,6 +122,12 @@ const Sidebar = () => {
     setIsStaffDropdownOpen(!isStaffDropdownOpen);
   };
 
+  const[isTaskView,setIsTaskView]=useState(false);
+
+  const toggleTaskVIew= ()=>{
+    setIsTaskView(!isTaskView);
+  };
+
   return (
     <div className="flex h-screen">
       <div
@@ -130,6 +141,8 @@ const Sidebar = () => {
             Why Global Services
           </h2>
         </div>
+
+        {!isTaskView ? (
         <div className="space-y-4">
           <Link
             to="/sidebar/dashboard"
@@ -199,6 +212,7 @@ const Sidebar = () => {
           </Link>
           <Link
             to="/sidebar/task"
+            onClick={toggleTaskVIew}
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
           >
             <MdAssignment />
@@ -233,13 +247,68 @@ const Sidebar = () => {
             Schedule
           </Link>
           <Link
-            to="/sidebar/reports"
+            to="/sidebar/report"
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
           >
             <FaFileAlt />
             Reports
           </Link>
         </div>
+        ):(
+          <div className="space-y-4 ">
+          <button
+            onClick={toggleTaskVIew}
+            className="flex items-center gap-4 w-full text-lg font-semibold py-2 px-4 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+          >
+            ← Go Back
+          </button>
+          <div className="mt-4 ">
+            <Link
+              to="/sidebar/task/eod"
+              className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              EOD Management
+            </Link>
+            <Link
+              to="sidebar/task/hire-expert"
+              className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              Hire an Expert 
+            </Link>
+            <Link
+              to="sidebar/task/project-analysis"
+              className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              Project Analysis
+            </Link>
+            <Link
+              to="sidebar/task/project-analysis"
+              className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              Anil
+            </Link>
+            <Link
+              to="sidebar/task/project-analysis"
+              className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              HRMS
+            </Link>
+            <Link
+              to="/tasks/project-analysis"
+              className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+             CRM
+            </Link>
+            <Link
+              to="/tasks/project-analysis"
+              className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+             EOD
+            </Link>
+          </div>
+        </div>
+
+        )}
       </div>
 
       <div className="flex-1 h-screen ml-64 py-1  ">
