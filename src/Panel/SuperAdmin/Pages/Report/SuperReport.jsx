@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import DataTable from 'react-data-table-component';
-import { FaEye, FaEdit, FaTrash } from 'react-icons/fa';
-import { Button, Modal, Form, Select, Input, Avatar } from 'antd';
+import React, { useEffect, useState } from "react";
+import DataTable from "react-data-table-component";
+import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
+import { Button, Modal, Form, Select, Input, Avatar } from "antd";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -9,8 +9,8 @@ const { TextArea } = Input;
 const SuperReports = () => {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reports, setReports] = useState([
-    { id: 1, report: 'Report 1', status: 'Pending' },
-    { id: 2, report: 'Report 2', status: 'Reviewed' },
+    { id: 1, report: "Report 1", status: "Pending" },
+    { id: 2, report: "Report 2", status: "Reviewed" },
   ]);
   const [selectedPerson, setSelectedPerson] = useState(null);
 
@@ -20,21 +20,52 @@ const SuperReports = () => {
 
   const closeModal = () => {
     setIsReportOpen(false);
-    setSelectedPerson(null); 
+    setSelectedPerson(null);
   };
 
-  
+  // const FetchReports = () => {
+  //   fetch
+  //     .then((res) => {
+  //       console.log(res.data);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err, "error fetching reports");
+  //     });
+  // };
+
+  useEffect(() => {
+    // FetchReports();
+  }, []);
+
   const columns = [
-    { name: 'S.No', selector: (row, index) => index + 1, center: true },
-    { name: 'Report', selector: row => row.report, sortable: true, center: true },
-    { name: 'Status', selector: row => row.status, sortable: true, center: true },
+    { name: "S.No", selector: (row, index) => index + 1, center: true },
     {
-      name: 'Actions',
-      cell: row => (
+      name: "Report",
+      selector: (row) => row.report,
+      sortable: true,
+      center: true,
+    },
+    {
+      name: "Status",
+      selector: (row) => row.status,
+      sortable: true,
+      center: true,
+    },
+    {
+      name: "Actions",
+      cell: (row) => (
         <div className="flex text-xl gap-4">
-          <FaEye className="text-blue-500 cursor-pointer" title="View Report" onClick={openModal} />
+          <FaEye
+            className="text-blue-500 cursor-pointer"
+            title="View Report"
+            onClick={showModal}
+          />
           {/* <FaEdit className="text-green-500 cursor-pointer" title="Edit Report" onClick={() => handleEdit(row)} /> */}
-          <FaTrash className="text-red-500 cursor-pointer" title="Delete Report" onClick={() => handleDelete(row.id)} />
+          <FaTrash
+            className="text-red-500 cursor-pointer"
+            title="Delete Report"
+            onClick={() => handleDelete(row.id)}
+          />
         </div>
       ),
       center: true,
@@ -44,52 +75,53 @@ const SuperReports = () => {
   const customStyles = {
     headCells: {
       style: {
-        backgroundColor: '#ff9800',
-        color: '#ffffff',
-        fontSize: '16px',
-        paddingRight: '0px'
-      }
+        backgroundColor: "#ff9800",
+        color: "#ffffff",
+        fontSize: "16px",
+        paddingRight: "0px",
+      },
     },
   };
 
-  
   const handleView = (report) => {
-    console.log('Viewing report:', report);
+    console.log("Viewing report:", report);
   };
 
   const handleEdit = (report) => {
-    console.log('Editing report:', report);
+    console.log("Editing report:", report);
   };
 
   const handleDelete = (id) => {
-    setReports(prevReports => prevReports.filter(report => report.id !== id));
+    setReports((prevReports) =>
+      prevReports.filter((report) => report.id !== id)
+    );
   };
 
   const handleFormSubmit = (values) => {
-    console.log('Form values:', values);
+    console.log("Form values:", values);
     closeModal();
   };
 
   const personOptions = {
     hr: [
-      { name: 'HR 1', image: 'https://via.placeholder.com/24' },
-      { name: 'HR 2', image: 'https://via.placeholder.com/24' },
-      { name: 'HR 3', image: 'https://via.placeholder.com/24' },
+      { name: "HR 1", image: "https://via.placeholder.com/24" },
+      { name: "HR 2", image: "https://via.placeholder.com/24" },
+      { name: "HR 3", image: "https://via.placeholder.com/24" },
     ],
     coordinator: [
-      { name: 'Coordinator 1', image: 'https://via.placeholder.com/24' },
-      { name: 'Coordinator 2', image: 'https://via.placeholder.com/24' },
-      { name: 'Coordinator 3', image: 'https://via.placeholder.com/24' },
+      { name: "Coordinator 1", image: "https://via.placeholder.com/24" },
+      { name: "Coordinator 2", image: "https://via.placeholder.com/24" },
+      { name: "Coordinator 3", image: "https://via.placeholder.com/24" },
     ],
     admin: [
-      { name: 'Admin 1', image: 'https://via.placeholder.com/24' },
-      { name: 'Admin 2', image: 'https://via.placeholder.com/24' },
-      { name: 'Admin 3', image: 'https://via.placeholder.com/24' },
+      { name: "Admin 1", image: "https://via.placeholder.com/24" },
+      { name: "Admin 2", image: "https://via.placeholder.com/24" },
+      { name: "Admin 3", image: "https://via.placeholder.com/24" },
     ],
     trainer: [
-      { name: 'Trainer 1', image: 'https://via.placeholder.com/24' },
-      { name: 'Trainer 2', image: 'https://via.placeholder.com/24' },
-      { name: 'Trainer 3', image: 'https://via.placeholder.com/24' },
+      { name: "Trainer 1", image: "https://via.placeholder.com/24" },
+      { name: "Trainer 2", image: "https://via.placeholder.com/24" },
+      { name: "Trainer 3", image: "https://via.placeholder.com/24" },
     ],
   };
 
@@ -121,11 +153,13 @@ const SuperReports = () => {
           <Form.Item
             label="Reported To"
             name="reportedPerson"
-            rules={[{ required: true, message: 'Please select the reported person!' }]}
+            rules={[
+              { required: true, message: "Please select the reported person!" },
+            ]}
           >
             <Select
               placeholder="Select person"
-              onChange={value => setSelectedPerson(value)}
+              onChange={(value) => setSelectedPerson(value)}
             >
               <Option value="hr">HR</Option>
               <Option value="coordinator">Coordinator</Option>
@@ -136,13 +170,23 @@ const SuperReports = () => {
 
           {selectedPerson && (
             <Form.Item
-              label={`Select ${selectedPerson.charAt(0).toUpperCase() + selectedPerson.slice(1)}`}
+              label={`Select ${
+                selectedPerson.charAt(0).toUpperCase() + selectedPerson.slice(1)
+              }`}
               name={`${selectedPerson}Name`}
-              rules={[{ required: true, message: `Please select a ${selectedPerson}!` }]}
+              rules={[
+                {
+                  required: true,
+                  message: `Please select a ${selectedPerson}!`,
+                },
+              ]}
             >
               <Select placeholder={`Select ${selectedPerson}`}>
                 {personOptions[selectedPerson].map((person, index) => (
-                  <Option key={index} value={person.name}><Avatar src={person.image} size={32} className='mr-2' />{person.name}</Option>
+                  <Option key={index} value={person.name}>
+                    <Avatar src={person.image} size={32} className="mr-2" />
+                    {person.name}
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
@@ -151,7 +195,9 @@ const SuperReports = () => {
           <Form.Item
             label="Report"
             name="reportContent"
-            rules={[{ required: true, message: 'Please enter the report content!' }]}
+            rules={[
+              { required: true, message: "Please enter the report content!" },
+            ]}
           >
             <TextArea rows={4} placeholder="Type your report here" />
           </Form.Item>
