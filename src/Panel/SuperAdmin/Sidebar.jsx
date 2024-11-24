@@ -54,16 +54,15 @@ const Navbar = () => {
   const handleLogout = async () => {
     console.log("out");
     // try {
-      const res = await logout();
-      console.log(res.data);
-  
-      
-      localStorage.removeItem("token");
-      window.location.href = "/"; // Redirect to login page
+    const res = await logout();
+    console.log(res.data);
+
+    localStorage.removeItem("token");
+    window.location.href = "/"; // Redirect to login page
     // } catch (error) {
     //   console.error('Error logging out:', error.message);
     // }
-    
+
     setDropdown(false); // Assuming this closes a dropdown
   };
   useEffect(() => {
@@ -78,11 +77,6 @@ const Navbar = () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
-
-
-
-
-
 
   return (
     <div className="bg-white shadow-md p-4 flex items-center justify-between">
@@ -122,9 +116,9 @@ const Sidebar = () => {
     setIsStaffDropdownOpen(!isStaffDropdownOpen);
   };
 
-  const[isTaskView,setIsTaskView]=useState(false);
+  const [isTaskView, setIsTaskView] = useState(false);
 
-  const toggleTaskVIew= ()=>{
+  const toggleTaskVIew = () => {
     setIsTaskView(!isTaskView);
   };
 
@@ -143,46 +137,46 @@ const Sidebar = () => {
         </div>
 
         {!isTaskView ? (
-        <div className="space-y-4">
-          <Link
-            to="/sidebar/dashboard"
-            className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-          >
-            <FaTachometerAlt />
-            Dashboard
-          </Link>
-
-          <Link
-            to="/sidebar/batches"
-            className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-          >
-            <FaClipboardList />
-            Batches
-          </Link>
-
-          <Link
-            to="/sidebar/courses"
-            className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-          >
-            <FaBook />
-            Courses
-          </Link>
-
-          <div>
+          <div className="space-y-4">
             <Link
-              to="/sidebar/staffs"
-              onClick={toggleStaffDropdown}
-              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 w-full rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+              to="/sidebar/dashboard"
+              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
             >
-              <FaUsers />
-              Staffs
-              {/* <FaChevronDown
+              <FaTachometerAlt />
+              Dashboard
+            </Link>
+
+            <Link
+              to="/sidebar/batches"
+              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              <FaClipboardList />
+              Batches
+            </Link>
+
+            <Link
+              to="/sidebar/courses"
+              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              <FaBook />
+              Courses
+            </Link>
+
+            <div>
+              <Link
+                to="/sidebar/staffs"
+                onClick={toggleStaffDropdown}
+                className="flex items-center gap-4 px-4 text-lg font-semibold py-2 w-full rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+              >
+                <FaUsers />
+                Staffs
+                {/* <FaChevronDown
                 className={`${
                   isStaffDropdownOpen ? "transform rotate-180" : ""
                 } ml-auto transition-transform`}
               /> */}
-            </Link>
-{/* 
+              </Link>
+              {/* 
             {isStaffDropdownOpen && (
               <div className="ml-8 mt-2 space-y-2">
                 <Link
@@ -193,121 +187,120 @@ const Sidebar = () => {
                   Trainer
                 </Link> */}
               {/* </div> */}
-            {/* )} */}
-          </div>
+              {/* )} */}
+            </div>
 
-          <Link
-            to="/sidebar/trainee"
-            className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-          >
-            <FaUserGraduate />
-            Trainee
-          </Link>
-          <Link
-            to="/sidebar/attendance"
-            className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-          >
-            <SlCalender />
-            Attendance
-          </Link>
-          <Link
-            to="/sidebar/task"
-            onClick={toggleTaskVIew}
-            className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-          >
-            <MdAssignment />
-            Task
-          </Link>
-          <Link
-            to="/sidebar/SuperAssessment"
-            className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-          >
-            <GiNotebook />
-            Assessment
-          </Link>
-          <Link
-            to="/sidebar/notifications"
-            className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-          >
-            <FaBell />
-            Notifications
-          </Link>
-          <Link
-            to="/sidebar/chat"
-            className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-          >
-            <FaComment />
-            Chat
-          </Link>
-          <Link
-            to="/sidebar/schedule"
-            className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-          >
-            <FaCalendarAlt />
-            Schedule
-          </Link>
-          <Link
-            to="/sidebar/report"
-            className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-          >
-            <FaFileAlt />
-            Reports
-          </Link>
-        </div>
-        ):(
+            <Link
+              to="/sidebar/trainee"
+              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              <FaUserGraduate />
+              Trainee
+            </Link>
+            <Link
+              to="/sidebar/attendance"
+              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              <SlCalender />
+              Attendance
+            </Link>
+            <Link
+              to="/sidebar/task"
+              onClick={toggleTaskVIew}
+              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              <MdAssignment />
+              Task
+            </Link>
+            <Link
+              to="/sidebar/SuperAssessment"
+              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              <GiNotebook />
+              Assessment
+            </Link>
+            <Link
+              to="/sidebar/notifications"
+              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              <FaBell />
+              Notifications
+            </Link>
+            <Link
+              to="/sidebar/chat"
+              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              <FaComment />
+              Chat
+            </Link>
+            <Link
+              to="/sidebar/schedule"
+              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              <FaCalendarAlt />
+              Schedule
+            </Link>
+            <Link
+              to="/sidebar/report"
+              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            >
+              <FaFileAlt />
+              Reports
+            </Link>
+          </div>
+        ) : (
           <div className="space-y-4 ">
-          <button
-            onClick={toggleTaskVIew}
-            className="flex items-center gap-4 w-full text-lg font-semibold py-2 px-4 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-          >
-            ← Go Back
-          </button>
-          <div className="mt-4 ">
-            <Link
-              to="/sidebar/task/eod"
-              className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+            <button
+              onClick={toggleTaskVIew}
+              className="flex items-center gap-4 w-full text-lg font-semibold py-2 px-4 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
             >
-              EOD Management
-            </Link>
-            <Link
-              to="sidebar/task/hire-expert"
-              className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
-              Hire an Expert 
-            </Link>
-            <Link
-              to="sidebar/task/project-analysis"
-              className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
-              Project Analysis
-            </Link>
-            <Link
-              to="sidebar/task/project-analysis"
-              className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
-              Anil
-            </Link>
-            <Link
-              to="sidebar/task/project-analysis"
-              className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
-              HRMS
-            </Link>
-            <Link
-              to="/tasks/project-analysis"
-              className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
-             CRM
-            </Link>
-            <Link
-              to="/tasks/project-analysis"
-              className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
-             EOD
-            </Link>
+              ← Go Back
+            </button>
+            <div className="mt-4 ">
+              <Link
+                to="/sidebar/task/eod"
+                className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+              >
+                EOD Management
+              </Link>
+              <Link
+                to="sidebar/task/hire-expert"
+                className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+              >
+                Hire an Expert
+              </Link>
+              <Link
+                to="sidebar/task/project-analysis"
+                className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+              >
+                Project Analysis
+              </Link>
+              <Link
+                to="sidebar/task/project-analysis"
+                className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+              >
+                Anil
+              </Link>
+              <Link
+                to="sidebar/task/project-analysis"
+                className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+              >
+                HRMS
+              </Link>
+              <Link
+                to="/tasks/project-analysis"
+                className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+              >
+                CRM
+              </Link>
+              <Link
+                to="/tasks/project-analysis"
+                className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+              >
+                EOD
+              </Link>
+            </div>
           </div>
-        </div>
-
         )}
       </div>
 

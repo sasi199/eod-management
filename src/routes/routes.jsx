@@ -42,8 +42,6 @@ import Course from "../Panel/SuperAdmin/Pages/Course/Course";
 import TraineeTask from "../Panel/Trainer/Pages/Task/Task";
 import TrainerTask from "../Panel/Trainer/Pages/Task/Task";
 
-
-
 // export default pages;
 
 export const pages = [
@@ -70,10 +68,9 @@ export const pages = [
       },
       {
         path: "courses",
-        element: <Course/>,
+        element: <Course />,
       },
 
-   
       {
         path: "staffs",
         element: <Staffs />,
@@ -100,10 +97,14 @@ export const pages = [
         path: "notifications",
         element: <Notifications />,
       },
-    
+
       {
         path: "task/eod",
-        element: <EOD/>,
+        element: <EOD />,
+      },
+      {
+        path: "task",
+        element: <Task />,
       },
       {
         path: "SuperAssessment",
@@ -117,8 +118,6 @@ export const pages = [
         path: "report",
         element: <SuperReports />,
       },
-    
-
     ],
   },
 
@@ -142,7 +141,7 @@ export const pages = [
         path: "notifications",
         element: <TraineeNotificaitons />,
       },
-    
+
       {
         path: "attendance",
         element: <Attendance />,
@@ -167,7 +166,7 @@ export const pages = [
   {
     title: "TrainerSidebar",
     path: "/trainersidebar",
-    element: <TrainerSidebar/>,
+    element: <TrainerSidebar />,
     children: [
       {
         path: "dashboard",
