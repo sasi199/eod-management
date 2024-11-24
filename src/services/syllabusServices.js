@@ -88,11 +88,14 @@ exports.editSyllabus = async(req)=>{
 exports.deleteSyllabus = async(req)=>{
 
     const { _id } = req.params;
-    if (_id) {
+    console.log("gaahajja",req.params);
+    
+    if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Syllabus id required"}); 
     }
 
     const syllabus = await SyllabusModel.findById(_id);
+    console.log("gaahajja",syllabus);
     if (!syllabus) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Syllabus not found"}); 
     }

@@ -6,7 +6,6 @@ const httpStatus = require('http-status');
 
 
 exports.createReport = async(req)=>{
-    const { _id } = req.params
     const {title, content, reportTo } = req.body
 
     const reportedToUser = await Auth.findOne({accountId:reportTo});
