@@ -22,5 +22,5 @@ exports.editSyllabus = catchAsync(async(req,res)=>{
 })
 exports.deleteSyllabus = catchAsync(async(req,res)=>{
     const response = await syllabusServices.deleteSyllabus(req);
-    res.status(200).json({status:true, message:"Task created succesfully", data: response})
+    res.status(200).json({status:true, message:"Syllabus deleted succesfully", data: response})
 })

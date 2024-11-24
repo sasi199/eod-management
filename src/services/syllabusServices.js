@@ -100,6 +100,6 @@ exports.deleteSyllabus = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Syllabus not found"}); 
     }
 
-    await SyllabusModel.findByIdAndUpdate(_id);
+    await SyllabusModel.findByIdAndDelete(_id);
 
 }
