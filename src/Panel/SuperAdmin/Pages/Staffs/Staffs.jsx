@@ -156,7 +156,7 @@ const Staffs = () => {
     editFormData.append("experience", editStaff.experience);
     editFormData.append("hybrid", editStaff.hybrid);
     editFormData.append("role", editStaff.role);
-    editFormData.append("password", editStaff.password);
+    // editFormData.append("password", editStaff.password);
 
     if (values.profilePic && values.profilePic.file) {
       editFormData.append("profilePic", values.profilePic.file);
@@ -476,6 +476,10 @@ const Staffs = () => {
                   {selectedStaff.email}
                 </p>
                 <p>
+                  <span className="font-semibold">Dob:</span>{" "}
+                  {selectedStaff.dob}
+                </p>
+                <p>
                   <span className="font-semibold">Phone:</span>{" "}
                   {selectedStaff.phoneNumber}
                 </p>
@@ -542,7 +546,7 @@ const Staffs = () => {
               />
             </Form.Item>
 
-            <Form.Item
+            {/* <Form.Item
               label="Password"
               // name="password"
               rules={[{ required: true, message: "Please enter password" }]}
@@ -555,7 +559,7 @@ const Staffs = () => {
                   SetEditStaff({ ...editStaff, password: e.target.value })
                 }
               />
-            </Form.Item>
+            </Form.Item> */}
 
             <Form.Item
               label="Gender"

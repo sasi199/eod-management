@@ -10,37 +10,32 @@ import {
   Select,
   Row,
   Col,
-message
+  message,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { AddTrainee, GetTrainee } from "../../../../services";
-import { FaEdit, FaEye, FaTrash } from "react-icons/fa"; 
+import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 
 const Trainee = () => {
   const [batchFilter, setBatchFilter] = useState("");
   const [nameFilter, setNameFilter] = useState("");
   const [students, setStudents] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-const [form] = Form.useForm();
+  const [form] = Form.useForm();
 
-useEffect(() => {
-  const fetchTrainees = async () => {
-    try {
-    
-      const response = await GetTrainee();
-      setStudents(response?.data.data); 
-      console.log(response.data.data)
-     
-    } catch (error) {
-      message.error("Failed to fetch trainees.");
-    
-    }
-  };
+  useEffect(() => {
+    const fetchTrainees = async () => {
+      try {
+        const response = await GetTrainee();
+        setStudents(response?.data.data);
+        console.log(response.data.data);
+      } catch (error) {
+        message.error("Failed to fetch trainees.");
+      }
+    };
 
-  fetchTrainees();
-}, []);
-
-
+    fetchTrainees();
+  }, []);
 
   const handleAddStudent = () => {
     setIsModalVisible(true);
@@ -58,7 +53,6 @@ useEffect(() => {
         if (key === "profilePic" || key === "resumeUpload") {
           if (values[key] && values[key].file) {
             formData.append(key, values[key].file.originFileObj);
-          
           }
         } else {
           formData.append(key, values[key]);
@@ -67,7 +61,7 @@ useEffect(() => {
       console.log(values);
 
       await AddTrainee(formData);
-      
+
       setStudents([...students]);
 
       message.success("Trainee added successfully!");
@@ -87,8 +81,11 @@ useEffect(() => {
   );
 
   const columns = [
-
-    { name: "Profile", selector: (row) => row.profilePic, sortable: true },
+    {
+      name: "Profile",
+      selector: (row) => <img src={row.profilePic} alt="profile pic" />,
+      sortable: true,
+    },
     { name: "Name", selector: (row) => row.fullName, sortable: true },
     { name: "", selector: (row) => row.n, sortable: true },
     { name: "Batch", selector: (row) => row.batch, sortable: true },
@@ -140,7 +137,6 @@ useEffect(() => {
         data={filteredData}
         customStyles={customStyles}
         pagination
-       
         className="border rounded"
       />
 
@@ -216,7 +212,7 @@ useEffect(() => {
               </Form.Item>
             </Col>
             <Col span={12}>
-            <Form.Item
+              <Form.Item
                 label="Hybrid"
                 name="hybrid"
                 rules={[
@@ -336,7 +332,7 @@ useEffect(() => {
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-            <Form.Item
+              <Form.Item
                 label="Experience"
                 name="experience"
                 rules={[
@@ -359,12 +355,10 @@ useEffect(() => {
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-            <Form.Item
+              <Form.Item
                 label="Role"
                 name="role"
-                rules={[
-                  { required: true, message: "Please select the role!" },
-                ]}
+                rules={[{ required: true, message: "Please select the role!" }]}
               >
                 <Select>
                   <Select.Option value="Admin">Admin</Select.Option>

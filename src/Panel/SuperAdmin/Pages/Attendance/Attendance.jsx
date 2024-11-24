@@ -19,9 +19,8 @@ const Attendance = () => {
         const res = await GetAttendance();
         if (res?.data?.data) {
           setAttendanceData(res.data.data);
-          console.log(res.data.data); 
+          console.log(res.data.data);
 
-          
           const extractedRoles = [
             ...new Set(res.data.data.map((item) => item.user?.role)),
           ];
@@ -45,7 +44,10 @@ const Attendance = () => {
     setAttendanceData((prevData) =>
       prevData.map((item) =>
         item._id === id
-          ? { ...item, status: item.status === "Present" ? "Absent" : "Present" }
+          ? {
+              ...item,
+              status: item.status === "Present" ? "Absent" : "Present",
+            }
           : item
       )
     );
@@ -62,6 +64,19 @@ const Attendance = () => {
     return matchesSearch && matchesDate && matchesRole;
   });
 
+  const convert12HoursFormat = (time) => {
+    if (time.includes("AM") || time.includes("PM")) {
+      return time;
+    }
+    const converted = new Date(time).toLocaleTimeString();
+
+    const [hour, minute, sec] = converted.split(":");
+
+    const period = hour >= 12 ? "PM" : "AM";
+    const formattedHour = hour % 12 || 12;
+    return `${formattedHour}:${minute} ${period}`;
+  };
+
   const columns = [
     {
       name: "S.No",
@@ -72,12 +87,11 @@ const Attendance = () => {
     {
       name: "Profile",
       selector: (row) => (
-       
-          <img
-            src={row.user?.profilePic || "/placeholder.jpg"} 
-            alt="Profile Pic"
-            className="w-10 h-10 rounded-full"
-          />
+        <img
+          src={row.user?.profilePic || "/placeholder.jpg"}
+          alt="Profile Pic"
+          className="w-10 h-10 rounded-full"
+        />
       ),
       sortable: true,
       center: true,
@@ -85,44 +99,64 @@ const Attendance = () => {
     {
       name: "Name",
       selector: (row) => (
-        <p className="text-sm">{row.user?.fullName || "N/A"}</p> 
+        <p className="text-sm">{row.user?.fullName || "N/A"}</p>
       ),
       sortable: true,
       center: true,
     },
     {
       name: "Role",
-      selector: (row) => (
-        <p className="text-sm">{row.user?.role || "N/A"}</p> 
-      ),
+      selector: (row) => <p className="text-sm">{row.user?.role || "N/A"}</p>,
       sortable: true,
       center: true,
     },
     {
-      name: "Present / Absent",
-      selector: (row) => (
-        <label className="inline-flex relative items-center cursor-pointer">
-          <input
-            type="checkbox"
-            checked={row.status === "Present"}
-            onChange={() => handleToggleStatus(row._id)}
-            className="sr-only peer"
-          />
-          <span className="w-11 h-6 bg-gray-200 peer-checked:bg-orange-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-checked:after:bg-white peer-checked:after:ring-0 rounded-full after:content-[''] after:absolute after:left-2 after:top-1 after:bg-white after:border-gray-300 after:rounded-full after:h-4 after:w-4 after:transition-all"></span>
-        </label>
-      ),
+      name: "Attendence",
+      // selector: (row) => (
+      //   <label className="inline-flex relative items-center cursor-pointer">
+      //     <input
+      //       type="checkbox"
+      //       checked={row.status === "Present"}
+      //       onChange={() => handleToggleStatus(row._id)}
+      //       className="sr-only peer"
+      //     />
+      //     <span className="w-11 h-6 bg-gray-200 peer-checked:bg-orange-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-checked:after:bg-white peer-checked:after:ring-0 rounded-full after:content-[''] after:absolute after:left-2 after:top-1 after:bg-white after:border-gray-300 after:rounded-full after:h-4 after:w-4 after:transition-all"></span>
+      //   </label>
+      // ),
+      selector: (row) =>
+        row.status === "Present" ? (
+          <span className="font-bold capitalize text-green-600">
+            {row.status}{" "}
+          </span>
+        ) : (
+          <span className="font-bold capitalize text-red-600">
+            {row.status}{" "}
+          </span>
+        ),
       sortable: true,
       center: true,
     },
     {
-      name: "Check-In Time",
-      selector: (row) => new Date(row.checkIn).toLocaleTimeString(),
+      name: "Late",
+      selector: (row) =>
+        row.islate === true ? (
+          <span className="text-yellow-600 font-bold capitalize">Late</span>
+        ) : (
+          <span></span>
+        ),
+      center: true,
+      sortable: true,
+    },
+    {
+      name: "Check-In",
+      // selector: (row) => new Date(row.checkIn).toLocaleTimeString(),
+      selector: (row) => <span>{convert12HoursFormat(row.checkIn)}</span>,
       sortable: true,
       center: true,
     },
     {
-      name: "Check-Out Time",
-      selector: (row) => new Date(row.checkOut).toLocaleTimeString(),
+      name: "Check-Out",
+      selector: (row) => <span>{convert12HoursFormat(row.checkOut)}</span>,
       sortable: true,
       center: true,
     },
