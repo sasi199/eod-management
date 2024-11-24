@@ -54,7 +54,7 @@ exports.getSyllabusId = async(req)=>{
 
 exports.editSyllabus = async(req)=>{
     const { _id } = req.params;
-    if (_id) {
+    if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Syllabus id required"}); 
     }
 

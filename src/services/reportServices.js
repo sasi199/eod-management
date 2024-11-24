@@ -17,8 +17,7 @@ exports.createReport = async(req)=>{
 
     const newReport = new ReportModel({
         ...req.body,
-        reportTo: reportedToUser._id,
-        reporter: _id 
+        reportTo: reportedToUser._id
     })
 
     await newReport.save();
@@ -26,7 +25,10 @@ exports.createReport = async(req)=>{
 }
 
 exports.getReportAll = async(req)=>{
-    const report = await ReportModel.find({})
+    const report = await ReportModel.find().populate({
+        path:'reportTo',
+        select:'fullName profilePic role'
+    })
     if (!report) {
         throw new ApiError(httpStatus.BAD_REQUEST, "Report not found")
     }
