@@ -32,7 +32,7 @@ exports.createSyllabus = async(req)=>{
 exports.getSyllabusAll = async(req)=>{
     const syllabus = await SyllabusModel.find({});
     if (!syllabus) {
-        c
+        throw new ApiError(httpStatus.BAD_REQUEST, {message: "Syllabus not found"});
     }
     return syllabus;
 }

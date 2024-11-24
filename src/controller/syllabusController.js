@@ -5,12 +5,12 @@ const catchAsync = require("../utils/catchAsync");
 
 exports.createSyllabus = catchAsync(async(req,res)=>{
     const response = await syllabusServices.createSyllabus(req);
-    res.status(200).json({status:true, message:"Task created succesfully", data: response})
+    res.status(200).json({status:true, message:"Syllabus created succesfully", data: response})
 })
 
 exports.getSyllabusAll = catchAsync(async(req,res)=>{
     const response = await syllabusServices.getSyllabusAll(req);
-    res.status(200).json({status:true, message:"Task created succesfully", data: response})
+    res.status(200).json({status:true, message:"Syllabus get succesfully", data: response})
 })
 exports.getSyllabusId = catchAsync(async(req,res)=>{
     const response = await syllabusServices.getSyllabusId(req);
