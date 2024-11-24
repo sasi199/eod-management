@@ -63,7 +63,7 @@ exports.editSyllabus = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Syllabus not found"}); 
     }
 
-    const updateData = req.body;
+    const updateData = {...req.body};
 
     let uploadFile;
     if (req.file) {
