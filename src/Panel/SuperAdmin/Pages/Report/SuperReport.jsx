@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import { Button, Modal, Form, Select, Input, Avatar } from "antd";
+import { GetReportAll } from "../../../../services";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -9,10 +10,29 @@ const { TextArea } = Input;
 const SuperReports = () => {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reports, setReports] = useState([
-    { id: 1, report: "Report 1", status: "Pending" },
-    { id: 2, report: "Report 2", status: "Reviewed" },
+   
   ]);
   const [selectedPerson, setSelectedPerson] = useState(null);
+
+  useEffect(() => {
+        const fetchReportsData = async () => {
+          try {
+            const response = await GetReportAll(); 
+            if (response.data) {
+              setReports(response.data.data);
+              console.log(response.data.data); 
+            }
+          } catch (error) {
+            console.error('Error fetching staff data:', error);
+            notification.error({
+              message: 'Error fetching staff data',
+             
+            });
+          }
+        };
+        fetchReportsData();
+      }, []);
+
 
   const showModal = () => {
     setIsReportOpen(true);
@@ -41,13 +61,13 @@ const SuperReports = () => {
     { name: "S.No", selector: (row, index) => index + 1, center: true },
     {
       name: "Report",
-      selector: (row) => row.report,
+      selector: (row) => row.reporter,
       sortable: true,
       center: true,
     },
     {
       name: "Status",
-      selector: (row) => row.status,
+      selector: (row) => row.title,
       sortable: true,
       center: true,
     },
@@ -128,7 +148,7 @@ const SuperReports = () => {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Trainee Reports</h2>
+        <h2 className="text-xl font-semibold">Reports</h2>
         {/* <Button className='bg-orange-500 text-white' onClick={showModal}>
           Add Report
         </Button> */}

@@ -175,3 +175,8 @@ export const GetReportAll = async () => {
   const res = await interceptors.get("/report/getReportAll");
   return res;
 };
+
+export const EditReport = async(id,data)=>{
+  const res = await interceptors.put(`report/editReport/${id}`,data);
+  return res;
+}

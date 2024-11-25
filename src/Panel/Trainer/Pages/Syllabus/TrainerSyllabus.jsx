@@ -57,10 +57,10 @@ const TrainerSyllabus = () => {
               </h2>
               <div className="relative h-64 w-full">
                 {syllabus.uploadFile ? (
-                  <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                  // <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                     <Viewer
-                      fileUrl={syllabus.uploadFile}
-                      initialPage={1}
+                      fileUrl={syllabus.course}
+                      initialPage={0}
                       theme={{
                         theme: "light",
                       }}
@@ -72,7 +72,7 @@ const TrainerSyllabus = () => {
                         height: "100%",
                       }}
                     />
-                  </Worker>
+                  // </Worker>
                 ) : (
                   <div className="flex items-center justify-center h-full">
                     <p className="text-red-500 font-medium">No PDF available</p>

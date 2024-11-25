@@ -65,18 +65,37 @@ const Attendance = () => {
   });
 
   const convert12HoursFormat = (time) => {
+    // Ensure time is a valid string before attempting to use 'includes'
+    if (!time || typeof time !== 'string') {
+      return 'Invalid Time'; // Return a fallback value if the time is invalid
+    }
+  
+    // If time already includes AM/PM, return it as is
     if (time.includes("AM") || time.includes("PM")) {
       return time;
     }
-    const converted = new Date(time).toLocaleTimeString();
-
-    const [hour, minute, sec] = converted.split(":");
-
-    const period = hour >= 12 ? "PM" : "AM";
-    const formattedHour = hour % 12 || 12;
-    return `${formattedHour}:${minute} ${period}`;
+  
+    // Create a Date object from the time and convert it to a string in HH:MM:SS format
+    const date = new Date(time);
+    if (isNaN(date.getTime())) {
+      return 'Invalid Time'; // Return a fallback value if the Date is invalid
+    }
+  
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+  
+    // Determine AM/PM period
+    const period = hours >= 12 ? "PM" : "AM";
+  
+    // Convert hours to 12-hour format
+    const formattedHour = hours % 12 || 12; // Convert 0 to 12 (for midnight)
+    
+    // Add leading zero to minutes if necessary
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+  
+    return `${formattedHour}:${formattedMinutes} ${period}`;
   };
-
+  
   const columns = [
     {
       name: "S.No",

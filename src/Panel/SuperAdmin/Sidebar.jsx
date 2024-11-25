@@ -40,6 +40,7 @@ const Navbar = () => {
   };
 
   const currentPageName = pageNames[location.pathname] || "Page";
+  const isActive = (path) => location.pathname === path;
   const user = {
     name: "Super Admin",
     profileImage: "https://via.placeholder.com/150",
@@ -122,6 +123,12 @@ const Sidebar = () => {
     setIsTaskView(!isTaskView);
   };
 
+  const isActive = (path) => {
+    const location = useLocation();
+    return location.pathname.startsWith(path);
+  };
+
+
   return (
     <div className="flex h-screen">
       <div
@@ -140,24 +147,33 @@ const Sidebar = () => {
           <div className="space-y-4">
             <Link
               to="/sidebar/dashboard"
-              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
+              className={`flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
+                isActive("/sidebar/dashboard")
+                  ? "bg-white text-orange-600"
+                  : "text-white hover:bg-white hover:text-orange-600"
+              }`}            >
               <FaTachometerAlt />
               Dashboard
             </Link>
 
             <Link
               to="/sidebar/batches"
-              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
+              className={`flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
+                isActive("/sidebar/batches")
+                  ? "bg-white text-orange-600"
+                  : "text-white hover:bg-white hover:text-orange-600"
+              }`}              >
               <FaClipboardList />
               Batches
             </Link>
 
             <Link
               to="/sidebar/courses"
-              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
+              className={`flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
+                isActive("/sidebar/courses")
+                  ? "bg-white text-orange-600"
+                  : "text-white hover:bg-white hover:text-orange-600"
+              }`}              >
               <FaBook />
               Courses
             </Link>
@@ -166,8 +182,11 @@ const Sidebar = () => {
               <Link
                 to="/sidebar/staffs"
                 onClick={toggleStaffDropdown}
-                className="flex items-center gap-4 px-4 text-lg font-semibold py-2 w-full rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-              >
+                className={`flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
+                  isActive("/sidebar/staffs")
+                    ? "bg-white text-orange-600"
+                    : "text-white hover:bg-white hover:text-orange-600"
+                }`}                >
                 <FaUsers />
                 Staffs
                 {/* <FaChevronDown
@@ -192,58 +211,82 @@ const Sidebar = () => {
 
             <Link
               to="/sidebar/trainee"
-              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
+              className={`flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
+                isActive("/sidebar/trainee")
+                  ? "bg-white text-orange-600"
+                  : "text-white hover:bg-white hover:text-orange-600"
+              }`}              >
               <FaUserGraduate />
               Trainee
             </Link>
             <Link
               to="/sidebar/attendance"
-              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
+              className={`flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
+                isActive("/sidebar/attendance")
+                  ? "bg-white text-orange-600"
+                  : "text-white hover:bg-white hover:text-orange-600"
+              }`}              >
               <SlCalender />
               Attendance
             </Link>
             <Link
               to="/sidebar/task"
               onClick={toggleTaskVIew}
-              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
+              className={`flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
+                isActive("/sidebar/task")
+                  ? "bg-white text-orange-600"
+                  : "text-white hover:bg-white hover:text-orange-600"
+              }`}              >
               <MdAssignment />
               Task
             </Link>
             <Link
               to="/sidebar/SuperAssessment"
-              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
+              className={`flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
+                isActive("/sidebar/SuperAssessment")
+                  ? "bg-white text-orange-600"
+                  : "text-white hover:bg-white hover:text-orange-600"
+              }`}              >
               <GiNotebook />
               Assessment
             </Link>
             <Link
               to="/sidebar/notifications"
-              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
+              className={`flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
+                isActive("/sidebar/notifications")
+                  ? "bg-white text-orange-600"
+                  : "text-white hover:bg-white hover:text-orange-600"
+              }`}              >
               <FaBell />
               Notifications
             </Link>
             <Link
               to="/sidebar/chat"
-              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
+              className={`flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
+                isActive("/sidebar/chat")
+                  ? "bg-white text-orange-600"
+                  : "text-white hover:bg-white hover:text-orange-600"
+              }`}              >
               <FaComment />
               Chat
             </Link>
             <Link
               to="/sidebar/schedule"
-              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
+              className={`flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
+                isActive("/sidebar/schedule")
+                  ? "bg-white text-orange-600"
+                  : "text-white hover:bg-white hover:text-orange-600"
+              }`}              >
               <FaCalendarAlt />
               Schedule
             </Link>
             <Link
               to="/sidebar/report"
-              className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-            >
+              className={`flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
+                isActive("/sidebar/report")
+                  ? "bg-white text-orange-600"
+                  : "text-white hover:bg-white hover:text-orange-600"
+              }`}              >
               <FaFileAlt />
               Reports
             </Link>
@@ -259,46 +302,17 @@ const Sidebar = () => {
             <div className="mt-4 ">
               <Link
                 to="/sidebar/task/eod"
-                className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-              >
+                className={`flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
+                  isActive("/sidebar/task/eod")
+                    ? "bg-white text-orange-600"
+                    : "text-white hover:bg-white hover:text-orange-600"
+                }`}                >
                 EOD Management
               </Link>
-              <Link
-                to="sidebar/task/hire-expert"
-                className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-              >
-                Hire an Expert
-              </Link>
-              <Link
-                to="sidebar/task/project-analysis"
-                className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-              >
-                Project Analysis
-              </Link>
-              <Link
-                to="sidebar/task/project-analysis"
-                className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-              >
-                Anil
-              </Link>
-              <Link
-                to="sidebar/task/project-analysis"
-                className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-              >
-                HRMS
-              </Link>
-              <Link
-                to="/tasks/project-analysis"
-                className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-              >
-                CRM
-              </Link>
-              <Link
-                to="/tasks/project-analysis"
-                className="flex items-center gap-4 px-4 text-sm font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
-              >
-                EOD
-              </Link>
+             
+             
+            
+             
             </div>
           </div>
         )}
