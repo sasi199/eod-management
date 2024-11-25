@@ -88,7 +88,6 @@ exports.deleteReport = async(req)=>{
 
 exports.replayReport = async(req)=>{
     const { _id } = req.params;
-    console.log(_id,"amaakak");
     
     const { replay } = req.body;
 

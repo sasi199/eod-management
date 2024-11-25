@@ -25,19 +25,21 @@ exports.createTask = async(req)=>{
     await newTask.save();
 
         const assigneeId = await Auth.findOne({accountId:assignees})
+        console.log(assigneeId,"asssaaa");
+        
         if (!assigneeId) {
-            console.error(`Assignee with accountId not found.`);
+            throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Assignee not found'});
         }
         const notification = new NotificationModel({
             title: "Alert",
             content: `You have been assigned a new task: ${title}`,
-            recipientId: assigneeId.accountId,
+            recipientId: assigneeId,
             status: "Unread",
         });
 
         await notification.save();
 
-        const socketId = req.io.connectedUsers[assignees];
+        const socketId = req.io.connectedUsers;
         if (socketId) {
             req.io.to(socketId).emit("taskNotification", {
                 taskId: newTask._id,
@@ -78,18 +80,20 @@ exports.getTaskId = async(req)=>{
 }
 
 exports.editTask = async(req)=>{
-    const { taskId } = req.params;
-    if (!taskId) {
+    const { _id } = req.params;
+    if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task Id required"});
     }
 
     const updateData = {...req.body}
-    const task = await TaskModel.findById(taskId)
+    const task = await TaskModel.findById(_id)
+    console.log(task,'kakakakak');
+    
     if (!task) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task not found"});
     }
 
-    const updateTask = await TaskModel(taskId,updateData,
+    const updateTask = await TaskModel.findByIdAndUpdate(_id,updateData,
         { new:true,runValidators:true }
     )
 
