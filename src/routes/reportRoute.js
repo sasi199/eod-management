@@ -10,7 +10,7 @@ Router.route('/getReport/:_id').get(reportController.getReportId);
 Router.route('/editReport/:_id').put(reportController.editReport);
 Router.route('/deleteReport/:_id').delete(reportController.deleteReport);
 
-Router.route('/replayReport/:_id').delete(reportController.replayReport);
+Router.route('/replayReport/:_id').post(reportController.replayReport);
 
 
 module.exports = Router;

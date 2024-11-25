@@ -1,34 +1,20 @@
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
-const schemaFields = {
-    idWithV4UUID: { type: String, default: uuidv4 },
-    requiredAndString: { type: String, required: true, trim: true },
-    DateWithDefault: { type: Date, default: Date.now },
-    StringWithEnumAndDefault: (enumValues, defaultValue) => ({
-        type: String,
-        enum: enumValues,
-        default: defaultValue,
-    }),
-};
+const schemaFields = require("../utils/schemaFieldUtils");
 
 const taskSchema = new mongoose.Schema(
     {
         _id: schemaFields.idWithV4UUID,
         title: schemaFields.requiredAndString,
-        description: { type: String, trim: true },
+        description: {
+            type: String
+        },
         dueDate: schemaFields.DateWithDefault,
         projectId:{
             type: String,
             ref: "Project"
         },
-        priority: schemaFields.StringWithEnumAndDefault(
-            ['high', 'medium', 'low', 'normal'],
-            'normal'
-        ),
-        status: schemaFields.StringWithEnumAndDefault(
-            ['todo', 'in progress', 'completed'],
-            'todo'
-        ),
+        priority: schemaFields.StringWithEnumAndDefault(['high', 'medium', 'low', 'normal'],'normal'),
+        status: schemaFields.StringWithEnumAndDefault(['todo', 'in progress', 'completed'],'todo'),
         activities: [
             {
                 type: schemaFields.StringWithEnumAndDefault(
@@ -41,8 +27,8 @@ const taskSchema = new mongoose.Schema(
         ],
         assignees: [
             {
-                userId: { type: String, required: true },
-                assignedAt: { type: Date, default: Date.now },
+                type: String,
+                ref: 'Auth'
             },
         ],
         tags: [{ type: String, trim: true }],

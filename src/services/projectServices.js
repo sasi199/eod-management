@@ -67,7 +67,7 @@ exports.editProject = async(req)=>{
 exports.deleteProject = async(req)=>{
     const { _id } = req.params
     
-    if (_id) {
+    if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Batch id required"});
     }
 
@@ -76,7 +76,7 @@ exports.deleteProject = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Batch not found"});
     }
 
-    const deleteProject = await ProjectModel.findByIdAndDelete(_id)
+    await ProjectModel.findByIdAndDelete(_id)
 }
 
 

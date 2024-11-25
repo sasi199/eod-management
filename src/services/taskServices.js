@@ -24,21 +24,20 @@ exports.createTask = async(req)=>{
 
     await newTask.save();
 
-    for (const assignee of assignees) {
         const assigneeId = await Auth.findOne({accountId:assignees})
         if (!assigneeId) {
-            console.error(`Assignee with accountId ${assignee} not found.`);
+            console.error(`Assignee with accountId not found.`);
         }
         const notification = new NotificationModel({
             title: "Alert",
             content: `You have been assigned a new task: ${title}`,
-            recipientId: assignee.userId,
+            recipientId: assigneeId.accountId,
             status: "Unread",
         });
 
         await notification.save();
 
-        const socketId = req.io.connectedUsers[assignee.userId];
+        const socketId = req.io.connectedUsers[assignees];
         if (socketId) {
             req.io.to(socketId).emit("taskNotification", {
                 taskId: newTask._id,
@@ -48,7 +47,7 @@ exports.createTask = async(req)=>{
                 createdAt: notification.createdAt,
             });
         }
-    }
+    
 
     req.io.emit("dashboardUpdate", { message: "Task created", task: newTask });
 

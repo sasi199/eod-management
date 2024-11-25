@@ -88,13 +88,17 @@ exports.deleteReport = async(req)=>{
 
 exports.replayReport = async(req)=>{
     const { _id } = req.params;
+    console.log(_id,"amaakak");
+    
     const { replay } = req.body;
 
-    if (_id) {
+    if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, "Report id Required") 
     }
 
-    const report = await ReportModel.findOne(_id);
+    const report = await ReportModel.findOne({_id});
+    console.log(report,"ahsgsjsj");
+    
     if (!report) {
         throw new ApiError(httpStatus.BAD_REQUEST, "Report not found")
     }
