@@ -39,15 +39,15 @@ exports.createTrainee = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email"});
     }
 
-    let profilePic,resumeUpload;
-   if (req.files['profilePic']) {
-      profilePic = await uploadCloud('tarineeProfile', req.files['profilePic'][0])
-
-
-   }
-   if (req.files['resumeUpload']) {
-      resumeUpload = await uploadCloud('resume-file', req.files['resumeUpload'][0])      
-   }
+    let profilePic;
+    if (req.file) {
+        const fileExtension = req.file.originalname.split('.').pop();
+        const fileName = `${Date.now()}.${fileExtension}`
+        profilePic = await uploadCloud(`trainee-Profile/${fileName}`,req.file)
+    }
+//    if (req.files['resumeUpload']) {
+//       resumeUpload = await uploadCloud('resume-file', req.files['resumeUpload'][0])      
+//    }
 
 
    const existingBatch  = await BatchModel.findOne({batchName:batch})

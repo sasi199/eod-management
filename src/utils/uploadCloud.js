@@ -5,11 +5,13 @@ const ApiError = require('./apiError');
 const httpStatus = require('http-status');
 
 const uploadCloud = async (Key,Body,Bucket = 'facesync', ACL = 'public-read') => {
+  const ContentType = mime.lookup(Key) || 'application/octet-stream';
   const params = {
     Bucket,
     Key: `/EOD-management/${Key}`,
     Body:Body.buffer,
     ACL,
+    ContentType
   };
   // console.log(params)
   const spacesEndpoint = new AWS.Endpoint(config.cloudCred.awsEndPoint);

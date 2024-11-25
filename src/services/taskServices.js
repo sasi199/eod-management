@@ -2,6 +2,7 @@ const TaskModel = require("../models/taskModel");
 const httpStatus = require('http-status');
 const ApiError = require("../utils/apiError");
 const ProjectModel = require("../models/projectModel");
+const NotificationModel = require("../models/notificationModel");
 
 
 
@@ -28,6 +29,31 @@ exports.createTask = async(req)=>{
     })
 
     await newTask.save();
+
+    for (const assignee of assignees) {
+        const notification = new NotificationModel({
+            title: "Alert",
+            content: `You have been assigned a new task: ${title}`,
+            recipientId: assignee.userId,
+            status: "Unread",
+        });
+
+        await notification.save();
+
+        const socketId = req.io.connectedUsers[assignee.userId];
+        if (socketId) {
+            req.io.to(socketId).emit("taskNotification", {
+                taskId: newTask._id,
+                title: notification.title,
+                content: notification.content,
+                status: notification.status,
+                createdAt: notification.createdAt,
+            });
+        }
+    }
+
+    req.io.emit("dashboardUpdate", { message: "Task created", task: newTask });
+
     return newTask;
 
 }
@@ -56,11 +82,11 @@ exports.getTaskId = async(req)=>{
 
 exports.editTask = async(req)=>{
     const { taskId } = req.params;
-    if (taskId) {
+    if (!taskId) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task Id required"});
     }
 
-    const updateData = req.body
+    const updateData = {...req.body}
     const task = await TaskModel.findById(taskId)
     if (!task) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task not found"});
@@ -71,6 +97,7 @@ exports.editTask = async(req)=>{
     )
 
     await updateTask.save();
+    req.io.emit("dashboardUpdate", { message: "Task updated", task: updateTask });
 
     return updateTask;
 
@@ -85,4 +112,6 @@ exports.deleteTask = async(req)=>{
     }
 
     await TaskModel.findByIdAndDelete();
+    req.io.emit("dashboardUpdate", { message: "Task deleted", taskId });
+
 }

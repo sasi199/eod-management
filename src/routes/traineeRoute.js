@@ -15,10 +15,7 @@ const checkSuperAdmin = (req,res,next)=>{
 Router.use(verifyAuthToken);
 
 
-Router.route('/createTrainee').post(checkSuperAdmin,uploads.fields([
-    {name:'profilePic', maxCount:1},
-    {name:'resumeUpload', maxCount:1}]),traineeController.createTrainee);
-
+Router.route('/createTrainee').post(checkSuperAdmin,uploads.single('profilePic'),traineeController.createTrainee);
 Router.route('/getTraineeAll').get(traineeController.getTraineeAll);
 Router.route('/getTraineeId/:_id').get(traineeController.getTraineeId);
 Router.route('/editTrainee/:_id').put(uploads.single('profilePic'),traineeController.editTrainee);
