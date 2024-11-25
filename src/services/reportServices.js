@@ -8,7 +8,7 @@ const httpStatus = require('http-status');
 exports.createReport = async(req)=>{
     const {title, content, reportTo } = req.body
 
-    const reportedToUser = await Auth.findOne({accountId:reportTo});
+    const reportedToUser = await Auth.findOne({fullName:reportTo});
     console.log(reportedToUser,"zzzzz");
     
     if (!reportedToUser) {
