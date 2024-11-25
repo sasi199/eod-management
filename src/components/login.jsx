@@ -39,7 +39,7 @@ const Login = () => {
   
               console.log("User Role:", role);
   
-              if (role === "Super Admin") {
+              if (role === "SuperAdmin") {
                 navigate("/sidebar/dashboard");
               } else if (role === "Admin") {
                 navigate("/admin");
@@ -98,7 +98,7 @@ const Login = () => {
                 onChange={(e) => setRole(e.target.value)}
               >
                 <option value="" disabled>Select Role</option>
-                <option value="Super Admin">Super Admin</option>
+                <option value="SuperAdmin">Super Admin</option>
                 <option value="Admin">Admin</option>
                 <option value="Employee">Employee</option>
                 <option value="Trainee">Trainee</option>

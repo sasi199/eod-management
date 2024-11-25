@@ -182,6 +182,11 @@ export const GetReportAll = async () => {
   return res;
 };
 
+export const EditReport = async(id,data)=>{
+  const res = await interceptors.put(`report/editReport/${id}`,data);
+  return res;
+}
+
 //task
 
 export const CreateTask = async (data) => {

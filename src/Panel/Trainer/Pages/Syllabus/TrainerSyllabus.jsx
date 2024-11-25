@@ -1,103 +1,102 @@
-import React, { useState } from 'react';
-// import jsPDF from 'jspdf';
-// import html2canvas from 'html2canvas';
-import { FaHtml5, FaCss3Alt, FaJs, FaReact, FaNodeJs } from 'react-icons/fa';
-import { SiJquery, SiJavascript } from 'react-icons/si';
+import React, { useEffect, useState } from "react";
+import { GetSyllabus } from "../../../../services";
+import { Worker, Viewer } from "@react-pdf-viewer/core";
+import "@react-pdf-viewer/core/lib/styles/index.css"; 
+
 
 const TrainerSyllabus = () => {
-  const [expandedTopic, setExpandedTopic] = useState(null);
+  const [syllabusList, setSyllabusList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handleDownloadPDF = () => {
-    const syllabusElement = document.getElementById('syllabus-content');
-    html2canvas(syllabusElement, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save('Full-Stack-Web-Development-Roadmap.pdf');
-    });
-  };
+  useEffect(() => {
+    
+    const fetchSyllabus = async () => {
+      try {
+        const response = await GetSyllabus();
+        setSyllabusList(response.data.data); 
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to fetch syllabus data.");
+        setLoading(false);
+      }
+    };
 
-  const topics = [
-    {
-      name: 'HTML',
-      icon: <FaHtml5 className="text-red-600" />,
-      syllabus: 'Basics of HTML, Elements, Attributes, Forms, Semantic HTML',
-    },
-    {
-      name: 'CSS',
-      icon: <FaCss3Alt className="text-blue-600" />,
-      syllabus: 'CSS Syntax, Flexbox, Grid, Responsive Design, Animations',
-    },
-    {
-      name: 'JavaScript',
-      icon: <FaJs className="text-yellow-500" />,
-      syllabus: 'Variables, Functions, DOM Manipulation, Event Handling, ES6+',
-    },
-    {
-      name: 'ES6',
-      icon: <SiJavascript className="text-green-600" />,
-      syllabus: 'Arrow Functions, Destructuring, Spread and Rest Operators, Promises',
-    },
-    {
-      name: 'jQuery',
-      icon: <SiJquery className="text-blue-400" />,
-      syllabus: 'DOM Manipulation, Event Handling, AJAX with jQuery',
-    },
-    {
-      name: 'ReactJS',
-      icon: <FaReact className="text-blue-500" />,
-      syllabus: 'Components, Props, State, Hooks, Routing, Context API',
-    },
-    {
-      name: 'NodeJS',
-      icon: <FaNodeJs className="text-green-600" />,
-      syllabus: 'Server-side JavaScript, Express.js, REST APIs, Middleware',
-    },
-  ];
+    fetchSyllabus();
+  }, []);
 
-  const toggleExpand = (index) => {
-    setExpandedTopic(expandedTopic === index ? null : index);
-  };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center space-x-2">
+        
+        <span>Loading syllabus...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-500 text-center">
+        <h2 className="font-semibold">Error: {error}</h2>
+      </div>
+    );
+  }
 
   return (
-    <div className="px-2 bg-gray-100 min-h-screen">
-      <div className='flex items-center justify-between px-3 mb-4'>
-      <h1 className="text-2xl font-semibold text-center text-orange-500  ">
-        Full-Stack Web Development Roadmap
-      </h1>
-      <button
-        onClick={handleDownloadPDF}
-        className=" px-6 py-2 bg-orange-500 text-white font-semibold rounded-lg hover:bg-primary-dark transition-colors"
-      >
-        Download Syllabus
-      </button>
-      </div>
-      <div id="syllabus-content" className="bg-white p-8 rounded-lg shadow-md">
-     
-        <div className="space-y-6">
-          {topics.map((topic, index) => (
-            <div key={index} className="border-l-4 border-primary pl-4">
-              <div
-                className="flex items-center space-x-3 cursor-pointer"
-                onClick={() => toggleExpand(index)}
-              >
-                <div className="text-3xl">{topic.icon}</div>
-                <h2 className="text-xl font-semibold text-gray-700">
-                  {topic.name}
-                </h2>
+    <div className="p-6 space-y-4">
+      <h1 className="text-2xl font-semibold text-gray-800 mb-4">Trainer Syllabus</h1>
+      {syllabusList.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {syllabusList.map((syllabus) => (
+            <div
+              key={syllabus._id}
+              className="border p-4 rounded-md shadow-lg bg-white hover:shadow-xl transition-all duration-300"
+            >
+              <h2 className="text-lg font-medium text-gray-800 mb-2">
+                {syllabus.courseName} - {syllabus.subjectName}
+              </h2>
+              <div className="relative h-64 w-full">
+                {syllabus.uploadFile ? (
+                  // <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                    <Viewer
+                      fileUrl={syllabus.course}
+                      initialPage={0}
+                      theme={{
+                        theme: "light",
+                      }}
+                      localization={{
+                        noDocumentFound: "PDF cannot be loaded",
+                      }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    />
+                  // </Worker>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-red-500 font-medium">No PDF available</p>
+                  </div>
+                )}
               </div>
-              {expandedTopic === index && (
-                <div className="mt-2 pl-10 pr-4 py-3 bg-gray-50 rounded-lg shadow-inner">
-                  <p className="text-gray-600">{topic.syllabus}</p>
+              {syllabus.uploadFile && (
+                <div className="mt-2">
+                  <a
+                    href={syllabus.uploadFile}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block text-blue-600 hover:underline"
+                  >
+                    Open PDF in New Tab
+                  </a>
                 </div>
               )}
             </div>
           ))}
         </div>
-      </div>
-    
+      ) : (
+        <div className="text-center text-gray-500">No syllabus data available.</div>
+      )}
     </div>
   );
 };
