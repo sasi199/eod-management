@@ -145,9 +145,9 @@ export const DeleteAssessment = async (id) => {
   return res;
 };
 
-// Task
+// Project
 export const CreateProject = async (data) => {
-  const res = await interceptors.post("/project/createProject");
+  const res = await interceptors.post("/project/createProject",data);
   return res;
 };
 
@@ -156,12 +156,18 @@ export const GetProjects = async () => {
   return res;
 };
 
-export const EditProjectId = async (id, data) => {
-  const res = await interceptors.put(`/project/getProjectId/${id}`, data);
+export const GetProjectById = async (id) => {
+  const res = await interceptors.get(`/project/getProjectId/:${id}`);
+  return res;
+}
+
+export const EditProjectId = async (data,_id) => {
+  console.log("data",data,_id)
+  const res = await interceptors.put(`/project/editProject/${_id}`, data);
   return res;
 };
-export const EditProject = async (id, data) => {
-  const res = await interceptors.put(`/project/getProject/${id}`, data);
+export const DeleteProject = async (_id) => {
+  const res = await interceptors.delete(`/project/deleteProject/${_id}`);
   return res;
 };
 
@@ -175,3 +181,22 @@ export const GetReportAll = async () => {
   const res = await interceptors.get("/report/getReportAll");
   return res;
 };
+
+//task
+
+export const CreateTask = async (data) => {
+  const res = await interceptors.post(`/task/createTask/`,data);
+  return res;
+}
+
+export const GetTasksAll = async () => {
+  const res = await interceptors.post(`/getTaskAll`);
+  return res;
+}
+
+export const GetTaskById = async (taskId) => {
+  const res = await interceptors.post(`/getTaskId/${taskId}`);
+  return res;
+}
+
+

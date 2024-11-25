@@ -41,6 +41,7 @@ import EOD from "../Panel/SuperAdmin/Pages/Task/EOD";
 import Course from "../Panel/SuperAdmin/Pages/Course/Course";
 import TraineeTask from "../Panel/Trainer/Pages/Task/Task";
 import TrainerTask from "../Panel/Trainer/Pages/Task/Task";
+import ProjectTask from "../Panel/Trainer/Pages/Task/ProjectTask";
 
 // export default pages;
 
@@ -212,6 +213,10 @@ export const pages = [
       {
         path: "reports",
         element: <TrainerReports />,
+      },
+      {
+        path: "projecttask",
+        element: <ProjectTask />,
       },
     ],
   },

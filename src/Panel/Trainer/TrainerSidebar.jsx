@@ -3,8 +3,10 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { FaTachometerAlt, FaClipboardList, FaBook, FaUserShield, FaChalkboardTeacher, FaUserGraduate, FaUsers, FaChevronDown, FaBell, FaComment, FaCalendarAlt, FaFileAlt, FaTasks, FaComments } from 'react-icons/fa';
 import { MdAssignment } from 'react-icons/md';
 import logo from '../../assets/Login/NavbarLogo.png'
-import { logout } from '../../services';
-import {Modal, Input, Select, Button} from 'antd'
+import { CreateProject, GetProjects, logout } from '../../services';
+import {Modal, Input, Select, Button, message} from 'antd'
+import { FaSquarePlus } from 'react-icons/fa6';
+import Task from '../SuperAdmin/Pages/Task/Task';
 const Navbar = () => {
   const location = useLocation();
   const [dropdown, setDropdown] = useState(false);
@@ -92,14 +94,23 @@ const Navbar = () => {
 };
 
 const TrainerSidebar = () => {
+  const projectInitialState = {
+    projectName:""
+  };
   const [isStaffDropdownOpen, setIsStaffDropdownOpen] = useState(false);
   const[isTaskView,setIsTaskView]=useState(false);
-  const[isModalVisible, setIsModalVisible]=useState(false);
-  const[projectName, setProjectName]=useState('');
+  const[isModalVisible, setIsModalVisible]=useState(false);//project modal
+  const[projectName, setProjectName]=useState(projectInitialState);
+  const [projectData, setProjectData] = useState([]);
   const[selectedMembers, setSelectedMembers]=useState([]);
+
+  const location = useLocation();
+  let isProjectDataFetched =false;
+
   const toggleStaffDropdown = () => {
     setIsStaffDropdownOpen(!isStaffDropdownOpen);
   };
+
 
   const teamMembers = [
     { id: 1, name: 'John Doe' },
@@ -108,25 +119,63 @@ const TrainerSidebar = () => {
     { id: 4, name: 'Lucy Green' },
     { id: 5, name: 'Mark White' },
   ];
-
+ 
 
   const toggleTaskView=()=>{
     setIsTaskView(!isTaskView);
   };
 
-  const showModal = () => {
+  const showProjectModal = () => { //project modal
     setIsModalVisible(true);
   };
+//Projects
 
+  //project fetch 
+  const fetchProjects = () => {
+
+    console.warn("location",location.pathname)
+    GetProjects()
+    .then((res)=>{
+      setProjectData(res.data.data);
+      isProjectDataFetched = true;
+      console.log("fetch project",res)
+    }).catch((err)=>{
+      console.error("err in fetch", err)
+    })
+  }
+
+  //project create
   const handleOk = () => {
     console.log('Project Name:', projectName);
     console.log('Selected Members:', selectedMembers);
-    setIsModalVisible(false); 
+    CreateProject( projectName)
+    .then((res)=>{
+      if(res.data.status){
+       message.success("Project added successfully");
+       setProjectName(projectInitialState);
+      setIsModalVisible(false);
+      fetchProjects();
+      } 
+    }). catch ((error)=>{
+      console.log("err", error)
+    })
+   
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);  
   };
+  
+
+  useEffect(()=>{
+
+
+  if(location.pathname = '/trainersidebar/task' && !isProjectDataFetched){
+    
+    fetchProjects();
+  }
+
+  },[location.pathname])
 
 
   return (
@@ -201,27 +250,53 @@ const TrainerSidebar = () => {
              <div className="space-y-4">
              <button
                onClick={toggleTaskView}
-               className="flex items-center gap-4 w-full text-lg font-semibold py-2 px-4 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
+               className="flex items-center gap-1 w-full text-lg font-semibold py-2 px-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200"
              >
                ← Go Back
              </button>
-             <div className="flex items-center gap-4   p-3 mt-4">
+             <div className="flex items-center gap-2   p-1 mt-4">
   
   <input
     type="text"
     placeholder="Search"
-    className="flex-1 text-sm text-gray-700 placeholder-white bg-transparent border border-white rounded-md py-2 px-3 outline-none focus:ring-2 focus:ring-orange-600"
+    className="flex-1 text-sm text-gray-700 placeholder-white bg-transparent border border-white rounded-md py-1 px-2 outline-none focus:ring-2 focus:ring-orange-600 w-20"
   />
 
-  <button
+  {/* <button
     onClick={showModal}
     className="flex items-center gap-2 bg-white text-orange-500 text-md font-semibold py-1 px-2 rounded-md hover:bg-white hover:text-orange-600 hover:border hover:border-orange-600 transition-all duration-200"
-  >
-    Add Project
-  </button>
+  > */}
+    <FaSquarePlus className='text-3xl cursor-pointer' onClick={showProjectModal}/>
+  {/* </button> */}
 </div>
 
+{/* project list */}
+          { projectData.length > 0 ?(
+            <>
+            <div className='mt-6 '>
+              {projectData.map((project, i)=>{
+                return (
+
+                <ul  key={i} className='mt-2'>
+                  <li className=' py-2 px-3 bg-transparent hover:shadow-lg hover:scale-105 transition-all transform duration-300 hover:bg-orange-400 rounded-lg cursor-pointer list-none'>{project.projectName}</li>
+                </ul> 
+                )
+              })
+
+              }
+
+            </div>
+            </>
+          ):(
+            <>
+            
+            </>
+          )
+
+          }
+
            </div>
+          
          )}
        </div>
  
@@ -243,13 +318,14 @@ const TrainerSidebar = () => {
            <div>
              <label className="block text-sm font-semibold mb-2">Project Name</label>
              <Input
-               value={projectName}
-               onChange={(e) => setProjectName(e.target.value)}
+             name='projectName'
+               value={projectName.projectName}
+               onChange={(e) =>  setProjectName({ ...projectName, projectName: e.target.value })}
                placeholder="Enter project name"
              />
            </div>
  
-           <div>
+           {/* <div>
              <label className="block text-sm font-semibold mb-2">Select Team Members</label>
              <Select
                mode="multiple"
@@ -264,7 +340,7 @@ const TrainerSidebar = () => {
                  </Option>
                ))}
              </Select>
-           </div>
+           </div> */}
  
            <div className="flex justify-end gap-4 mt-4">
              <Button onClick={handleCancel}>Cancel</Button>
@@ -275,7 +351,9 @@ const TrainerSidebar = () => {
          </div>
        </Modal>
      </div>
+     
    );
+   <Task projectData = {projectData} />
  };
  
  export default TrainerSidebar;   
