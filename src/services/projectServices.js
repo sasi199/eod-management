@@ -1,4 +1,5 @@
 const ProjectModel = require("../models/projectModel");
+const TaskModel = require("../models/taskModel");
 const ApiError = require("../utils/apiError");
 const httpStatus = require('http-status');
 
@@ -76,4 +77,20 @@ exports.deleteProject = async(req)=>{
     }
 
     const deleteProject = await ProjectModel.findByIdAndDelete(_id)
+}
+
+
+exports.getTaskByProject = async(req)=>{
+    const { projectId } = req.params;
+    if (!projectId) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Project ID is required" });
+    }
+
+    const task  = await TaskModel.find({projectId});
+    console.log(task,"kskshjhs");
+    
+    if (!task) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "task not found" });
+    }
+    return task;
 }

@@ -27,3 +27,11 @@ exports.deleteReport = catchAsync(async(req,res)=>{
     const response = await reportServices.deleteReport(req);
     res.status(200).json({status: true, message: "Report deleted successfully", data: response})
 })
+
+
+exports.replayReport = catchAsync(async(req,res)=>{
+    const response = await reportServices.replayReport(req);
+    res.status(200).json({status: true, message: "Replay to user successfully", data: response})
+})
+
+

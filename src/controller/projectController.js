@@ -27,3 +27,8 @@ exports.deleteProject = catchAsync(async(req,res)=>{
     const response = await projectServices.deleteProject(req);
     res.status(200).json({status:true, message:'project deleted succesfully',data:response,})
 })
+
+exports.getTaskByProject = catchAsync(async(req,res)=>{
+    const response = await projectServices.getTaskByProject(req);
+    res.status(200).json({status:true, message:'projectByTask get succesfully',data:response,})
+})

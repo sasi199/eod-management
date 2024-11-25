@@ -1,93 +1,36 @@
 const mongoose = require('mongoose');
 const schemaFields = require("../utils/schemaFieldUtils");
 
-const chatSchema = new mongoose.Schema({
+const conversationSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
-    roomId: schemaFields.idWithV4UUID,
-    chatType: schemaFields.StringWithEnumAndRequired(['Group', 'Individual']),
-    participants: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Auth',
-            required: true
-        }
-    ],
-    chatName: {
+    sender: {
         type: String,
-        required: function() { return this.chatType === 'Group'; }
+        ref:'Auth',
+        required: true
     },
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Auth',
+    receiver: {
+        type: String,
+        ref:'Auth',
+        required: true
     },
-    admins: [
+    messages:[
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Auth',
+            type:String,
+            ref:'Message'
         }
-    ],
-    messages: [
-        {
-            sender: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Auth',
-                required: true
-            },
-            messageType: {
-                type: String,
-                enum: ['Text', 'Image', 'File'],
-                default: 'Text'
-            },
-            content: {
-                type: String,
-                required: true
-            },
-            timestamp: {
-                type: Date,
-                default: Date.now
-            },
-            mediaURL: {
-                type: String,
-                required: function() { return this.messageType !== 'Text'; }
-            },
-            fileName: String,
-            fileType: String,
-            fileSize: String,
-            mimeType: String,
-            reaction: String,
-        }
-    ],
-    lastMessage: {
-        type: String
-    },
-    lastMessageUserId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Auth'
-    },
-    messageStatus: [
-        {
-            userId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Auth'
-            },
-            status: {
-                type: String,
-                enum: ['Sent', 'Delivered', 'Read'],
-                default: 'Sent'
-            }
-        }
-    ],
-    active: {
-        type: Boolean,
-        default: true
-    },
-    archive: {
-        type: Boolean,
-        default: false
-    }
+    ]
+},{timestamps:true,collection:'Conversation'});
 
-}, { timestamps: true, collection: 'Chat' });
 
-const ChatModel = mongoose.model('Chat', chatSchema);
+const messageSchema = new mongoose.Schema({
+    text: schemaFields.requiredAndString,
+    imageUrl: schemaFields.requiredAndString,
+    videoUrl: schemaFields.requiredAndString,
+    seen: schemaFields.BooleanWithDefault,
 
-module.exports = ChatModel;
+},{timestamps:true, collection:'Message'})
+
+const ConversationModel = mongoose.model('Conversation',conversationSchema);
+const MessageModel = mongoose.model('Message',messageSchema);
+
+module.exports = {ConversationModel,MessageModel};
