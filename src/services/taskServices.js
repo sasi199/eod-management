@@ -6,10 +6,9 @@ const ProjectModel = require("../models/projectModel");
 
 
 exports.createTask = async(req)=>{
-    const { title, description, assignees, dueDate, priority} = req.body;
-    const { projectId }  = req.params;
+    const { title, description, assignees,projectId, dueDate, priority} = req.body;
 
-    const project = await ProjectModel.findOne(projectId)
+    const project = await ProjectModel.findById(projectId)
     console.log("vfdsesfg",project);
     
     
@@ -25,7 +24,7 @@ exports.createTask = async(req)=>{
 
     const newTask = new TaskModel({
         ...req.body,
-        projectId: project
+        projectId: project._id
     })
 
     await newTask.save();
@@ -34,7 +33,7 @@ exports.createTask = async(req)=>{
 }
 
 exports.getTaskAll = async(req)=>{
-    const task = await TaskModel.find(req);
+    const task = await TaskModel.find({});
     if (!task) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainer not found"});
     }

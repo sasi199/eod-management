@@ -14,11 +14,11 @@ exports.getSyllabusAll = catchAsync(async(req,res)=>{
 })
 exports.getSyllabusId = catchAsync(async(req,res)=>{
     const response = await syllabusServices.getSyllabusId(req);
-    res.status(200).json({status:true, message:"Task created succesfully", data: response})
+    res.status(200).json({status:true, message:"Syllabus get succesfully", data: response})
 })
 exports.editSyllabus = catchAsync(async(req,res)=>{
     const response = await syllabusServices.editSyllabus(req);
-    res.status(200).json({status:true, message:"Task updated succesfully", data: response})
+    res.status(200).json({status:true, message:"Syllabus updated succesfully", data: response})
 })
 exports.deleteSyllabus = catchAsync(async(req,res)=>{
     const response = await syllabusServices.deleteSyllabus(req);
