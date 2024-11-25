@@ -3,6 +3,7 @@ const httpStatus = require('http-status');
 const ApiError = require("../utils/apiError");
 const ProjectModel = require("../models/projectModel");
 const NotificationModel = require("../models/notificationModel");
+const Auth = require("../models/authModel");
 
 
 
@@ -12,16 +13,9 @@ exports.createTask = async(req)=>{
     const project = await ProjectModel.findById(projectId)
     console.log("vfdsesfg",project);
     
-    
     if (!project) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Project not found'}); 
     }
-
-    assignees.forEach((assignee) => {
-        if (!assignee.userId) {
-            throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Each assignee must have userId'});
-        }
-    });
 
     const newTask = new TaskModel({
         ...req.body,
@@ -31,6 +25,10 @@ exports.createTask = async(req)=>{
     await newTask.save();
 
     for (const assignee of assignees) {
+        const assigneeId = await Auth.findOne({accountId:assignees})
+        if (!assigneeId) {
+            console.error(`Assignee with accountId ${assignee} not found.`);
+        }
         const notification = new NotificationModel({
             title: "Alert",
             content: `You have been assigned a new task: ${title}`,

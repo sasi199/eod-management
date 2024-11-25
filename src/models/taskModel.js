@@ -25,7 +25,7 @@ const taskSchema = new mongoose.Schema(
             ['high', 'medium', 'low', 'normal'],
             'normal'
         ),
-        stage: schemaFields.StringWithEnumAndDefault(
+        status: schemaFields.StringWithEnumAndDefault(
             ['todo', 'in progress', 'completed'],
             'todo'
         ),
