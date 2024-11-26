@@ -1,151 +1,161 @@
+const ChatModel = require("../models/chatModel");
+const MessageModel = require("../models/messageModel");
+const ApiError = require("../utils/apiError");
 const httpStatus = require('http-status');
-const ApiError = require('../utils/apiError');
-const ChatModel = require('../models/chatModel');
-
-
+const uploadCloud = require("../utils/uploadCloud");
 
 
 exports.createChat = async(req)=>{
-    const { chatType, participants, createdBy, chatName} = req.body
+    const { authId } = req
+    const { _id } = req.params;
 
-    if (!chatType || !['Group', 'Individual'].includes(chatType)) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid chat type. Must be "Group" or "Individual".');
+    if (!_id) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Recevier id required"});
     }
 
-    if (!participants || !Array.isArray(participants) || participants.length === 0) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Participants must be a non-empty array.');
+    let chat = await ChatModel.findOne({
+        isGroupChat: false,
+        users: { $all: [authId, _id] },
+    }).populate("users", "-password");
+
+    
+    if (chat) {
+        return chat;
     }
 
-    if (chatType === 'Individual') {
-        if (participants.length !== 2 ) {
-            throw new ApiError(httpStatus.BAD_REQUEST, 'Individual chats must have exactly two participants.');
+    chat = new ChatModel({
+        chatName: 'Private Chat',
+        isGroupChat: false,
+        users: [authId, _id],
+    });
+
+    await chat.save();
+    return chat;
+}
+
+
+exports.sendMessage = async(req)=>{
+    const { authId } =req;
+    const { _id } = req.params;
+    const { text } = req.body;
+    
+    if (!_id) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Chat ID is required" });
+    }
+
+    if (!text && !req.files) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Message content cannot be empty" });
+    }
+
+    
+    const chat = await ChatModel.findById(_id);
+    if (!chat) {
+        throw new ApiError(httpStatus.NOT_FOUND, { message: "Chat not found" });
+    }
+
+
+    let imageUrl = null;
+    let videoUrl = null;
+
+    if (req.files) {
+        if (req.files.imageUrl && req.files.imageUrl[0]) {
+            const fileExtension = req.files.imageUrl[0].originalname.split('.').pop();
+            const fileName = `image/${Date.now()}.${fileExtension}`;
+            imageUrl = await uploadCloud(fileName, req.files.imageUrl[0]);
+        }
+
+        if (req.files.videoUrl && req.files.videoUrl[0]) {
+            const fileExtension = req.files.videoUrl[0].originalname.split('.').pop();
+            const fileName = `video/${Date.now()}.${fileExtension}`;
+            videoUrl = await uploadCloud(fileName, req.files.videoUrl[0]);
         }
     }
 
-   const existingChat = await ChatModel.findOne({
-    chatType: 'Individual',
-    participants: {$all: participants, $size: 2}
-   })
 
-   if (existingChat) {
-    throw new ApiError(httpStatus.CONFLICT, 'Chat between these participants already exists.');
-   }
+    const newMessage = new MessageModel({
+        sender: authId,
+        chat: _id,
+        text: text || null,
+        imageUrl: imageUrl || null,
+        videoUrl: videoUrl || null,
+    });
 
-   if (chatType === 'Group') {
-    if (!chatName) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Group chats require a name.');
-    }
+    
+    const savedMessage = await newMessage.save();
 
-    if (!participants.includes(createdBy)) {
-        participants.push(createdBy)
+    
+    chat.latestMessage = savedMessage._id;
+    await chat.save();
 
-    }
+    
+    const populatedMessage = await MessageModel.findById(savedMessage._id).populate('sender','-password').exec();
 
-   }
-
-   const newChat  = new ChatModel({
-    chatType,
-    participants,
-    createdBy,
-    chatName: chatType === 'Group' ? chatName: undefined,
-    roomId,
-    admins: chatType === 'Group' ? [createdBy] : [],
-   })
-
-    await newChat.save();
-
-    return newChat;
+    return populatedMessage;
 }
 
 
 
-exports.getChats = async (userId) => {
-    const chats = await ChatModel.find({ participants: userId })
-        .populate('participants', 'name profilePic')
-        .populate('createdBy', 'name')
-        .sort({ updatedAt: -1 });
+exports.editMessage = async (req) => {
+    const { authId } = req;
+    const { _id } = req.params;
+    const { text } = req.body;
 
-    return chats;
-};
-
-
-
-exports.getChatById = async (chatId) => {
-    const chat = await ChatModel.findById(chatId)
-        .populate('participants', 'name profilePic')
-        .populate('createdBy', 'name')
-        .populate('messages.sender', 'name profilePic');
-
-    if (!chat) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Chat not found.');
+    if (!_id) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Message ID is required" });
     }
 
-    return chat;
-};
-
-
-
-exports.updateChat = async (chatId, updates) => {
-    const chat = await ChatModel.findById(chatId);
-
-    if (!chat) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Chat not found.');
-    }
-
-    if (chat.chatType === 'Individual') {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Cannot update individual chat.');
+    if (!text) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Text content is required for editing the message." });
     }
 
     
-    Object.assign(chat, updates);
-    await chat.save();
+    const message = await MessageModel.findById(_id);
+    if (!message) {
+        throw new ApiError(httpStatus.NOT_FOUND, { message: "Message not found" });
+    }
 
-    return chat;
+    if (message.sender !== authId) {
+        throw new ApiError(httpStatus.FORBIDDEN, { message: "You are not authorized to edit this message." });
+    }
+
+    
+    if (req.files || req.file) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Editing image or video is not allowed." });
+    }
+
+    
+    const updatedMessage = await MessageModel.findByIdAndUpdate(
+        _id,
+        { $set: { text, updatedAt: new Date() } },
+        { new: true }
+    );
+
+    return updatedMessage;
 };
 
 
+exports.deleteMessage = async (req) => {
+    const { authId } = req;
+    const { _id } = req.params;
 
-exports.deleteChat = async (chatId) => {
-    const chat = await ChatModel.findById(chatId);
-
-    if (!chat) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Chat not found.');
+    
+    if (!_id) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Message ID is required" });
     }
 
-    await ChatModel.findByIdAndDelete(chatId);
-
-    return { message: 'Chat deleted successfully.' };
-};
-
-
-
-
-exports.sendMessage = async (chatId, messageData) => {
-    const { sender, messageType, content, mediaURL, fileName, fileType, fileSize, mimeType } = messageData;
-
-    const chat = await ChatModel.findById(chatId);
-
-    if (!chat) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Chat not found.');
+    
+    const message = await MessageModel.findById(_id);
+    if (!message) {
+        throw new ApiError(httpStatus.NOT_FOUND, { message: "Message not found" });
     }
 
-    const newMessage = {
-        sender,
-        messageType,
-        content,
-        mediaURL,
-        fileName,
-        fileType,
-        fileSize,
-        mimeType,
-        timestamp: new Date(),
-    };
+    
+    if (message.sender !== authId) {
+        throw new ApiError(httpStatus.FORBIDDEN, { message: "You are not authorized to delete this message." });
+    }
 
-    chat.messages.push(newMessage);
-    chat.lastMessage = content || (mediaURL ? 'Media sent' : '');
-    chat.lastMessageUserId = sender;
+    await MessageModel.findByIdAndDelete(_id);
 
-    await chat.save();
-    return newMessage;
+    return { message: "Message deleted successfully" };
 };
 

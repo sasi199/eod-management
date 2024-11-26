@@ -4,7 +4,6 @@ const schemaFields = require('../utils/schemaFieldUtils');
 const assessmentSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     assessmentTitle: schemaFields.requiredAndString,
-    assessmentType: schemaFields.StringWithEnumAndRequired(['Quiz', 'Project', 'Presentation']),
     subject: schemaFields.StringWithEnumAndRequired([
         'Html/Css', 'Javascript', 'J-Query', 'React.Js', 'Node.Js/Mongodb', 'Python', 'Figma', 'PHP', 'Flutter'
     ]),
@@ -13,14 +12,13 @@ const assessmentSchema = new mongoose.Schema({
         ref: 'Batch',
         required: true
     },
-    question: [
-        {
-            type: String,
-            ref: 'Question',
-            required: true
-        }
-    ],
-    assessmentDate: schemaFields.requiredAndDate,
+    mediaUrl: schemaFields.requiredAndString,
+    mediaType: {
+        type: String,
+        enum: ['Image', 'PDF', 'Quiz'],
+        required: true
+    },
+    // assessmentDate: schemaFields.requiredAndDate,
     assessmentTiming: schemaFields.requiredAndString,
     attendedMembers: { type: [String], default: [] },
     completedMembers: { type: [String], default: [] },

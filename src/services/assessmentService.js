@@ -8,81 +8,52 @@ const uploadCloud = require("../utils/uploadCloud");
 
 
 exports.createAssessment = async(req)=>{
-    const { assessmentTitle, assessmentType, batch, question }= req.body
+    const { assessmentTitle, assessmentType, batch,mediaType}= req.body
 
     const batchExists = await BatchModel.findOne({batchName:batch})
     if (!batchExists) {
         throw new ApiError(httpStatus.BAD_REQUEST, "Batch not found");
     }
 
-    const { questionType, mediaType, viewStartTime, viewEndTime } = question;
-    let mediaURL;
+    // let mediaUrl;
+    // if (req.file) {
+    //     const fileExtension = req.file.originalname.split('.').pop();
+    //     const fileName = `${Date.now()}.${fileExtension}`;
+    //     mediaUrl = await uploadCloud(`assessment/${fileName}`, req.file);
+
+    let mediaUrl;
 
     
-    if (['Image', 'PDF'].includes(questionType)) {
+    if (['Image', 'PDF'].includes(mediaType)) {
         if (!req.file) {
-            throw new ApiError(httpStatus.BAD_REQUEST, `File is required for question type: ${questionType}`);
+            throw new ApiError(httpStatus.BAD_REQUEST, `File is required for media type: ${mediaType}`);
         }
 
         const fileExtension = req.file.originalname.split('.').pop();
         const fileName = `${Date.now()}.${fileExtension}`;
-        mediaURL = await uploadCloud(`syllabus/${fileName}`, req.file);
+        mediaUrl = await uploadCloud(`assessment/${fileName}`, req.file);
+    }
 
-        if (questionType === 'Text' && mediaURL) {
-            throw new ApiError(httpStatus.BAD_REQUEST, "Media URL should not be provided for text questions");
+    if (mediaType === 'Quiz') {
+        if (!quizLink) {
+            throw new ApiError(httpStatus.BAD_REQUEST, "Quiz link is required for media type: Quiz");
         }
+        mediaUrl = quizLink;
+    }
 
-        const newQuestion = new QuestionModel({
-            assessmentId: null,
-            questionType,
-            mediaURL,
-            mediaType: req.file ? req.file.mimetype : undefined,
-            viewStartTime,
-            viewEndTime
-        });
 
-         await newQuestion.save();
+    if (!mediaUrl) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Media URL could not be processed");
+    }
 
         const newAssessment = new AssessmentModel({
-            assessmentTitle,
-            assessmentType,
+            ...req.body,
+            mediaUrl,
             batch: batchExists._id,
-            question: [newQuestion._id],
         });
 
         await newAssessment.save();
-
-        newQuestion.assessmentId = newAssessment._id;
-        await savedQuestion.save();
         return newAssessment;
-    }
-
-        
-
-    const newAssessment = new AssessmentModel({
-        assessmentTitle,
-            ...req.body,
-            batch: batchExists._id,
-            question: savedQuestion._id,
-    })
-
-     await newAssessment.save();
-
-    const newQuestion = new QuestionModel({
-        assessmentId: null,
-        questionText,
-        questionType,
-        mediaURL,
-        mediaType,
-        viewStartTime,
-        viewEndTime
-    });
-    const savedQuestion = await newQuestion.save();
-
-    savedQuestion.assessmentId = newAssessment._id;
-    await savedQuestion.save();
-
-    return newAssessment;
     
 }
 

@@ -4,10 +4,7 @@ const schemaFields = require('../utils/schemaFieldUtils');
 const questionSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     assessmentId: schemaFields.requiredAndString,
-    questionText: { type: String, required: true },
-    questionType: { type: String, enum: ['Text', 'Image', 'PDF', 'Url'], required: true },
-    mediaURL: { type: String },
-    mediaType: { type: String, enum: ['image/jpeg', 'image/png', 'application/pdf'] },
+    mediaURL: schemaFields.requiredAndString,
     viewStartTime: { type: Date },
     viewEndTime: { type: Date },
 }, { timestamps: true, collection: 'Question' });

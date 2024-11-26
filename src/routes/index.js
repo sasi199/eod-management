@@ -13,6 +13,7 @@ const assessmentRouter = require("../routes/assessmentRoute");
 const reportRouter = require("../routes/reportRoute");
 const projectRouter = require("../routes/projectRoute");
 const syllabusRouter = require("../routes/syllabusRoute");
+const chatRouter = require("../routes/chatRoute");
 
 
 
@@ -68,6 +69,10 @@ const Routes = [
   {
     path: "/syllabus",
     route: syllabusRouter,
+  },
+  {
+    path: "/chat",
+    route: chatRouter,
   },
 
 

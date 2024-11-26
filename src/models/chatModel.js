@@ -1,36 +1,25 @@
-const mongoose = require('mongoose');
-const schemaFields = require("../utils/schemaFieldUtils");
+const mongoose  = require('mongoose');
+const schemaFields = require('../utils/schemaFieldUtils');
 
-const conversationSchema = new mongoose.Schema({
+
+const chatSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
-    sender: {
+    chatName: schemaFields.requiredAndString,
+    isGroupChat: schemaFields.BooleanWithDefault,
+    users:[{
         type: String,
-        ref:'Auth',
-        required: true
-    },
-    receiver: {
+        ref: 'Auth'
+    }],
+    latestMessage:{
         type: String,
-        ref:'Auth',
-        required: true
+        ref: 'Message'
     },
-    messages:[
-        {
-            type:String,
-            ref:'Message'
-        }
-    ]
-},{timestamps:true,collection:'Conversation'});
+    groupAdmin:{
+        type: String,
+        ref: 'Auth'
+    }
+},{timestamps:true,collection:'Chat'});
 
+const ChatModel = mongoose.model('Chat',chatSchema);
 
-const messageSchema = new mongoose.Schema({
-    text: schemaFields.requiredAndString,
-    imageUrl: schemaFields.requiredAndString,
-    videoUrl: schemaFields.requiredAndString,
-    seen: schemaFields.BooleanWithDefault,
-
-},{timestamps:true, collection:'Message'})
-
-const ConversationModel = mongoose.model('Conversation',conversationSchema);
-const MessageModel = mongoose.model('Message',messageSchema);
-
-module.exports = {ConversationModel,MessageModel};
+module.exports = ChatModel;
