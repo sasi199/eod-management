@@ -1,10 +1,14 @@
 import Modal from 'antd/es/modal/Modal';
 import React, { useEffect, useState } from 'react';
 import { CreateProject, DeleteProject, EditProjectId, GetProjects } from '../../../../services';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Input, message } from 'antd';
 import { FaDeleteLeft, FaFolderOpen } from 'react-icons/fa6';
 import { FaEdit } from 'react-icons/fa';
+import ProjectTask from './ProjectTask';
+import { useDispatch } from 'react-redux';
+import { setProjectId, setProjectTitle} from '../../../../Redux/TrainerRedux';
+import { store } from '../../../../Redux/Store';
 
 const TrainerTask = () => {
 
@@ -23,7 +27,17 @@ const TrainerTask = () => {
   const location = useLocation();
   let isProjectDataFetched = false;
 
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
+  const handleProjectId = (project) => {
+   const projectTitle = project.projectName
+  //  console.log("projectId", project._id)
+    dispatch(setProjectId(project._id));
+    dispatch(setProjectTitle(project.projectName));
+    console.log("Updated projectId in Redux:", store.getState().trainer.projectId);
+  console.log("Updated projectTitle in Redux:", store.getState().trainer.projectTitle);
+    // navigate(`projecttask/${projectTitle}`);
+  }
 
    //project fetch 
    const fetchProjects = () => {
@@ -154,6 +168,7 @@ const handleDeleteCancel = () => {
   })
 
   return (
+    <>
     <div>
      {projectData.length >0 ?(
       <>
@@ -168,6 +183,7 @@ const handleDeleteCancel = () => {
           {sortedAlphabeticalProject.map((project, i) => (
            <li
            key={i}
+           onClick={()=>handleProjectId(project)}
            className="py-3 px-4 w-[90%] mx-auto cursor-pointer shadow-lg bg-white rounded-lg hover:shadow-2xl hover:bg-gray-100 hover:scale-105 transition-all transform ease-in-out duration-300"
          >
           <div className='flex items-center gap-3'>
@@ -283,7 +299,10 @@ const handleDeleteCancel = () => {
       <p>Are you sure to delete the project?</p>
     </Modal>
     </div>
+
+    </>
   )
+  
 }
 
 export default TrainerTask
