@@ -15,10 +15,11 @@ const checkSuperAdmin = (req,res,next)=>{
     next();
 }
 
-Router.use(verifyAuthToken);
+// Router.use(verifyAuthToken);
 
-Router.route('/createStaff').post(checkSuperAdmin,uploads.single('profilePic'),staffController.createStaff);
-Router.route('/getStaffAll').get(checkSuperAdmin,staffController.getStaffAll);
+Router.route('/createStaff').post(verifyAuthToken,uploads.single('profilePic'),staffController.createStaff);
+Router.route('/getStaffAll').get(staffController.getStaffAll);
+Router.route('/getFilterStaff').get(staffController.getFilterStaff);
 Router.route('/getStaffId/:_id').get(staffController.getStaffId);
 Router.route('/editStaff/:_id').put(checkSuperAdmin,uploads.single('profilePic'),staffController.editStaff);
 Router.route('/deleteStaff').get(checkSuperAdmin,staffController.deleteStaff);

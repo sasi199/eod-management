@@ -13,6 +13,11 @@ exports.getStaffAll = catchAsync (async(req,res)=>{
     res.status(200).json({status:true, message:'Staffs get succesfully',data:response,})
 })
 
+exports.getFilterStaff = catchAsync (async(req,res)=>{
+    const response = await staffServices.getFilterStaff(req)
+    res.status(200).json({status:true, message:'Staffs filter succesfully',data:response,})
+})
+
 exports.getStaffId = catchAsync (async(req,res)=>{
     const response = await staffServices.getStaffId(req)
     res.status(200).json({status:true, message:'Staff get succesfully',data:response,})

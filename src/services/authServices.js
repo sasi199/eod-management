@@ -108,8 +108,6 @@ exports.logoutUser = async (req) => {
 };
 
 
-
-
 exports.authCreation = async(req)=>{
     const { email,logId,password,role,profilePic} = req.body
     let auth = await Auth.findOne({email});

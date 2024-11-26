@@ -102,6 +102,15 @@ exports.getStaffAll = async(req)=>{
      return staff;
 }
 
+exports.getFilterStaff = async(req)=>{
+    const staff = await StaffModel.find({}).select('_id fullName role profilepic')
+    if (!staff) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Staff not found"});
+    }
+
+    return staff;
+}
+
 exports.getStaffId = async(req)=>{
     const {authId} = req
     console.log(authId,"pppppppp");
