@@ -13,30 +13,19 @@ const assessmentSchema = new mongoose.Schema({
         ref: 'Batch',
         required: true
     },
-    questions: [
+    question: [
         {
-            questionText: {
-                type: String,
-                required: true
-            },
-            questionType: {
-                type: String,
-                enum: ['Text', 'Image', 'PDF', 'Url'],
-                required: true
-            },
-            mediaURL: {
-                type: String,
-                required: function () { return this.questionType !== 'Text'; }
-            },
-            mediaType: {
-                type: String,
-                enum: ['image/jpeg', 'image/png', 'application/pdf'],
-                required: function () { return this.questionType === 'PDF' || this.questionType === 'Image'; }
-            }
+            type: String,
+            ref: 'Question',
+            required: true
         }
     ],
     assessmentDate: schemaFields.requiredAndDate,
     assessmentTiming: schemaFields.requiredAndString,
+    attendedMembers: { type: [String], default: [] },
+    completedMembers: { type: [String], default: [] },
+    marks: { type: Map, of: Number },
+    quizAccessStartTime: { type: Date },
 }, { timestamps: true, collection: "Assessment" });
 
 const AssessmentModel = mongoose.model('Assessment', assessmentSchema);

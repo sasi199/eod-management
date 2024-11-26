@@ -1,7 +1,9 @@
 const AssessmentModel = require("../models/assessmentModel");
 const BatchModel = require("../models/batchModel");
+const QuestionModel = require("../models/quetionsModel");
 const ApiError = require("../utils/apiError");
 const httpStatus = require('http-status');
+const uploadCloud = require("../utils/uploadCloud");
 
 
 
@@ -10,47 +12,52 @@ exports.createAssessment = async(req)=>{
 
     const batchExists = await BatchModel.findOne({batchName:batch})
     if (!batchExists) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Batch not found");
+        
     }
 
-    if (!Array.isArray(questions) || questions.length === 0) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Questions must be a non-empty array");
-    }
-
-    questions.forEach((question, index) => {
-        if (!question.questionText || !question.questionType) {
-            throw new ApiError(
-                httpStatus.BAD_REQUEST,
-                `Question ${index + 1} is missing required fields`
-            );
+    const { questionText, questionType, mediaURL, mediaType, viewStartTime, viewEndTime } = question;
+        if (!questionText || !questionType) {
+            throw new ApiError(httpStatus.BAD_REQUEST, "Question is missing required fields");
         }
 
-        if (question.questionType !== 'Text' && !question.mediaURL) {
-            throw new ApiError(
-                httpStatus.BAD_REQUEST,
-                `Media URL is required for question ${index + 1} with type ${question.questionType}`
-            );
+        if (['Image', 'PDF'].includes(questionType)) {
+            if (req.file) {
+                throw new ApiError(httpStatus.BAD_REQUEST, `File is required for question type: ${questionType}`);
+            }
         }
 
-        if (
-            (question.questionType === 'PDF' || question.questionType === 'Image') &&
-            !question.mediaType
-        ) {
-            throw new ApiError(
-                httpStatus.BAD_REQUEST,
-                `Media type is required for question ${index + 1} with type ${question.questionType}`
-            );
+        const fileUploadResult = await uploadCloud(req.file);
+        mediaURL = fileUploadResult.url;
+
+        if (questionType === 'Text' && mediaURL) {
+            throw new ApiError(httpStatus.BAD_REQUEST, "Media URL should not be provided for text questions");
         }
-    });
 
     const newAssessment = new AssessmentModel({
-        ...req.body,
-        batch: batchExists._id,
-        questions
+        assessmentTitle,
+            ...req.body,
+            batch: batchExists._id,
+            question: savedQuestion._id,
     })
 
-    await newAssessment.save();
+     await newAssessment.save();
+
+    const newQuestion = new QuestionModel({
+        assessmentId: null,
+        questionText,
+        questionType,
+        mediaURL,
+        mediaType,
+        viewStartTime,
+        viewEndTime
+    });
+    const savedQuestion = await newQuestion.save();
+
+    savedQuestion.assessmentId = newAssessment._id;
+    await savedQuestion.save();
+
     return newAssessment;
+    
 }
 
 

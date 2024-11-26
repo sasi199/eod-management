@@ -78,11 +78,13 @@ exports.deleteReport = async(req)=>{
     }
 
     const report = await ReportModel.findById(_id)
+    console.log("report",report);
+    
     if (!report) {
         throw new ApiError(httpStatus.BAD_REQUEST, "Report not found")
     }
 
-    await ReportModel.findByIdAndDelete();
+    await ReportModel.findByIdAndDelete(_id);
 }
 
 
