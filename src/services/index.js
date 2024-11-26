@@ -187,21 +187,44 @@ export const EditReport = async(id,data)=>{
   return res;
 }
 
+//Staff filter
+
+export const GetStaffFilter = async() => {
+  const res = await interceptors.get(`/staff/getFilterStaff`);
+  return res; 
+}
+
+
 //task
 
 export const CreateTask = async (data) => {
-  const res = await interceptors.post(`/task/createTask/`,data);
+  console.log("routes data", data)
+  const res = await interceptors.post(`/task/createTask`,data);
   return res;
 }
 
 export const GetTasksAll = async () => {
-  const res = await interceptors.post(`/getTaskAll`);
+  const res = await interceptors.get(`/task/getTaskAll`);
   return res;
 }
 
 export const GetTaskById = async (taskId) => {
-  const res = await interceptors.post(`/getTaskId/${taskId}`);
+  const res = await interceptors.get(`/task/getTaskId/${taskId}`);
   return res;
 }
 
+export const GetTaskByProjectId = async (projectId) => {
+  const res = await interceptors.get(`/project/getTaskById/${projectId}`);
+  return res;  
+}
+
+export const EditTaskById = async (taskId) => {
+  const res = await interceptors.put(`/task/editTask/${taskId}`);
+  return res;  
+}
+
+export const DeleteTaskById = async (taskId) => {
+  const res = await interceptors.delete(`/task/deleteTask/${taskId}`);
+  return res;  
+}
 
