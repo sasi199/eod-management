@@ -8,30 +8,56 @@ const uploadCloud = require("../utils/uploadCloud");
 
 
 exports.createAssessment = async(req)=>{
-    const { assessmentTitle, assessmentType, batch, questions }= req.body
+    const { assessmentTitle, assessmentType, batch, question }= req.body
 
     const batchExists = await BatchModel.findOne({batchName:batch})
     if (!batchExists) {
-        
+        throw new ApiError(httpStatus.BAD_REQUEST, "Batch not found");
     }
 
-    const { questionText, questionType, mediaURL, mediaType, viewStartTime, viewEndTime } = question;
-        if (!questionText || !questionType) {
-            throw new ApiError(httpStatus.BAD_REQUEST, "Question is missing required fields");
+    const { questionType, mediaType, viewStartTime, viewEndTime } = question;
+    let mediaURL;
+
+    
+    if (['Image', 'PDF'].includes(questionType)) {
+        if (!req.file) {
+            throw new ApiError(httpStatus.BAD_REQUEST, `File is required for question type: ${questionType}`);
         }
 
-        if (['Image', 'PDF'].includes(questionType)) {
-            if (req.file) {
-                throw new ApiError(httpStatus.BAD_REQUEST, `File is required for question type: ${questionType}`);
-            }
-        }
-
-        const fileUploadResult = await uploadCloud(req.file);
-        mediaURL = fileUploadResult.url;
+        const fileExtension = req.file.originalname.split('.').pop();
+        const fileName = `${Date.now()}.${fileExtension}`;
+        mediaURL = await uploadCloud(`syllabus/${fileName}`, req.file);
 
         if (questionType === 'Text' && mediaURL) {
             throw new ApiError(httpStatus.BAD_REQUEST, "Media URL should not be provided for text questions");
         }
+
+        const newQuestion = new QuestionModel({
+            assessmentId: null,
+            questionType,
+            mediaURL,
+            mediaType: req.file ? req.file.mimetype : undefined,
+            viewStartTime,
+            viewEndTime
+        });
+
+         await newQuestion.save();
+
+        const newAssessment = new AssessmentModel({
+            assessmentTitle,
+            assessmentType,
+            batch: batchExists._id,
+            question: [newQuestion._id],
+        });
+
+        await newAssessment.save();
+
+        newQuestion.assessmentId = newAssessment._id;
+        await savedQuestion.save();
+        return newAssessment;
+    }
+
+        
 
     const newAssessment = new AssessmentModel({
         assessmentTitle,
@@ -62,7 +88,7 @@ exports.createAssessment = async(req)=>{
 
 
 exports.getAssessmentAll = async(req)=>{
-    const assessment = await AssessmentModel.find({});
+    const assessment = await AssessmentModel.find({}).populate('quetion');
     if (!assessment) {
         throw new ApiError(httpStatus.BAD_REQUEST, "Assessments not found");
     }

@@ -6,28 +6,18 @@ const uploadCloud = require("../utils/uploadCloud");
 
 
 exports.createSyllabus = async(req)=>{
-    const { assessmentTitle, assessmentType, batch, question } = req.body;
+    const {courseName, subjectName,} = req.body;
     
-    const batchExists = await BatchModel.findOne({ batchName: batch });
-    if (!batchExists) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Batch not found");
+    if (!courseName || !subjectName) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message: "All field wre required"});
     }
 
-    const { questionText, questionType, viewStartTime, viewEndTime } = question;
-    let mediaURL;
-
-    if (!questionText || !questionType) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Question is missing required fields");
-    } if (['Image', 'PDF'].includes(questionType)) {
-        if (!req.file) {
-            throw new ApiError(httpStatus.BAD_REQUEST, `File is required for question type: ${questionType}`);
-        }
+    let uploadFile;
+    if (req.file) {
         const fileExtension = req.file.originalname.split('.').pop();
-        const fileName = `${Date.now()}.${fileExtension}`;
-        mediaURL = await uploadCloud(`syllabus/${fileName}`, req.file);
+        const fileName = `${Date.now()}.${fileExtension}`
+        uploadFile = await uploadCloud(`syllabus/${fileName}`,req.file)
     }
-
-    
 
     const newSyllabus = new SyllabusModel({
         ...req.body,
