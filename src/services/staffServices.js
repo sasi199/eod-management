@@ -103,7 +103,7 @@ exports.getStaffAll = async(req)=>{
 }
 
 exports.getFilterStaff = async(req)=>{
-    const staff = await StaffModel.find({}).select('_id fullName role profilepic')
+    const staff = await StaffModel.find({}).select('_id fullName role profilePic')
     if (!staff) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Staff not found"});
     }
