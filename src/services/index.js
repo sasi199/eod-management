@@ -187,6 +187,10 @@ export const EditReport = async(id,data)=>{
   return res;
 }
 
+export const DeleteReport = async(id)=>{
+  const res = await interceptors.delete(`report/deleteReport/${id}`);
+  return res;
+}
 //Staff filter
 
 export const GetStaffFilter = async() => {
