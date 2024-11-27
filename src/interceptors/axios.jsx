@@ -7,11 +7,10 @@ const apiInstance = axios.create({
 apiInstance.interceptors.request.use(
   (config) => {
     const authToken = localStorage.getItem("authToken");
-    console.log("Token attached to header:", authToken);
 
     if (authToken) {
       config.headers.Authorization = `Bearer ${authToken}`;
-console.log(config);
+
     }
     return config;
   },

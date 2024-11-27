@@ -1,217 +1,320 @@
-import React, { useState } from "react";
-import { IoIosAdd } from "react-icons/io";
-import { Modal, Form, Input, Button } from "antd";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import { MdOutlineFileUpload } from "react-icons/md";
-import { FaLink } from "react-icons/fa";
-import AssessmentSidebar from "./Sidebar";
+import React, { useState } from 'react';
+import DataTable from 'react-data-table-component';
+import { Modal, Form, Input, Select, Upload, Button, DatePicker } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+import moment from 'moment';
 
-// const Navbar = () => (
-//   <div className="w-full bg-blue-600 text-white p-4">
-//     <h1 className="text-lg font-semibold">Trainer Assessment</h1>
-//   </div>
-// );
+const { Option } = Select;
 
-const SuperAssessment = () => {
-  const [selectedBatch, setSelectedBatch] = useState(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalContent, setModalContent] = useState("");
-  const [editorContent, setEditorContent] = useState("");
-  const [title, setTitle] = useState("");
+const TrainerAssessment = () => {
+  const [data, setData] = useState([
+    { id: 1, name: 'Assessment 1', date: '2024-11-27', batch: 'Nov-24-2024' },
+    { id: 2, name: 'Assessment 2', date: '2024-11-20', batch: 'Dec-24-2024' },
+  ]);
+  const [filteredData, setFilteredData] = useState(data);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [form] = Form.useForm();
+  const [selectedAssessment, setSelectedAssessment] = useState(null);
 
-  const batches = [
+  const [filters, setFilters] = useState({ date: null, batch: null });
+
+  const columns = [
+    { name: 'ID', selector: (row) => row.id, sortable: true, center: true },
+    { name: 'Name', selector: (row) => row.name, sortable: true, center: true },
+    { name: 'Date', selector: (row) => row.date, sortable: true, center: true },
+    { name: 'Batch', selector: (row) => row.batch, sortable: true, center: true },
     {
-      name: "March 31",
-      studentCount: 30,
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      name: "April 22",
-      studentCount: 25,
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      name: "May 15",
-      studentCount: 20,
-      image: "https://via.placeholder.com/150",
+      name: 'Actions',
+      center: true,
+      cell: (row) => (
+        <div className="flex space-x-2">
+          <Button onClick={() => handleView(row)} type="link">
+            View
+          </Button>
+          <Button onClick={() => handleEdit(row)} type="link">
+            Edit
+          </Button>
+          <Button onClick={() => handleDelete(row.id)} type="link" danger>
+            Delete
+          </Button>
+        </div>
+      ),
     },
   ];
 
-  const handleBatchSelect = (batch) => {
-    setSelectedBatch(batch);
+  const customStyles = {
+    headCells: {
+      style: {
+        backgroundColor: '#ff9800',
+        color: '#ffffff',
+        fontSize: '16px',
+        paddingRight: '0px',
+      },
+    },
   };
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+  const handleAddAssessment = () => {
+    setIsModalOpen(true);
+    form.resetFields(); // Reset the fields to make sure they are empty
   };
 
-  const openModal = (content) => {
-    setModalContent(content);
-    setIsModalVisible(true);
+  const handleView = (row) => {
+    setSelectedAssessment(row);
+    setIsModalOpen(true); // Show the modal for viewing the assessment
   };
 
-  const closeModal = () => {
-    setIsModalVisible(false);
-    setEditorContent("");
-    setTitle("");
+  const handleEdit = (row) => {
+    setSelectedAssessment(row);
+    form.setFieldsValue({
+      assessmentTitle: row.name,
+      batch: row.batch,
+      assessmentTiming: '2 hours', // You can pre-fill with actual timing
+      subject: 'React.Js', // You can pre-fill with actual subject
+    });
+    setIsEditModalOpen(true); // Open the modal for editing the assessment
   };
 
-  const handleEditorChange = (value) => {
-    setEditorContent(value);
+  const handleFormSubmit = (values) => {
+    if (selectedAssessment) {
+      // Edit existing assessment
+      const updatedData = data.map((assessment) =>
+        assessment.id === selectedAssessment.id
+          ? { ...assessment, name: values.assessmentTitle }
+          : assessment
+      );
+      setData(updatedData);
+    } else {
+      // Add new assessment
+      const newAssessment = {
+        id: data.length + 1,
+        name: values.assessmentTitle,
+        date: new Date().toISOString().split('T')[0],
+        batch: values.batch,
+      };
+      setData([...data, newAssessment]);
+    }
+    setIsModalOpen(false);
+    setIsEditModalOpen(false);
+    form.resetFields();
+  };
+
+  const handleDelete = (id) => {
+    const filteredData = data.filter((assessment) => assessment.id !== id);
+    setData(filteredData);
+  };
+
+  const handleFilterChange = (value, type) => {
+    const updatedFilters = { ...filters, [type]: value };
+    setFilters(updatedFilters);
+    applyFilters(updatedFilters);
+  };
+
+  const applyFilters = (filters) => {
+    let filtered = [...data];
+    if (filters.date) {
+      filtered = filtered.filter((assessment) => moment(assessment.date).isSame(filters.date, 'day'));
+    }
+    if (filters.batch) {
+      filtered = filtered.filter((assessment) => assessment.batch === filters.batch);
+    }
+    setFilteredData(filtered);
   };
 
   return (
-    <div className="px-4 relative">
-      {selectedBatch ? (
-        <div>
-          <h2 className="text-xl font-semibold mb-4">
-            Selected Batch: {selectedBatch.name}
-          </h2>
-          <button
-            className="mt-4 flex items-center gap-2 bg-blue-500 text-white px-3 py-1 rounded-2xl hover:bg-blue-600 transition-colors duration-300"
-            onClick={toggleDropdown}
+    <div className="p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-xl font-semibold">Trainer Assessment</h1>
+        <div className="flex space-x-32">
+          <DatePicker
+            value={filters.date ? moment(filters.date) : null}
+            onChange={(date) => handleFilterChange(date, 'date')}
+            placeholder="Select Date"
+            className="w-40"
+          />
+          <Select
+            value={filters.batch}
+            onChange={(value) => handleFilterChange(value, 'batch')}
+            placeholder="Select Batch"
+            className="w-40"
           >
-            <IoIosAdd className="text-white text-xl" />
-            <span className="text-lg font-medium">Create</span>
-          </button>
-
-          <div
-            className={`bg-white border border-gray-200 rounded-lg shadow-md w-32 py-3 absolute z-10 transition-all duration-300 ${
-              isDropdownOpen
-                ? "opacity-100 translate-y-4"
-                : "opacity-0 -translate-y-1"
-            }`}
-            style={{
-              top: "85%",
-              left: "15px",
-            }}
-          >
-            <ul>
-              <li
-                className="hover:bg-gray-100 p-2 cursor-pointer"
-                onClick={() => openModal("Assignment")}
-              >
-                Assignment
-              </li>
-              <li
-                className="hover:bg-gray-100 p-2 cursor-pointer"
-                onClick={() => openModal("Quiz")}
-              >
-                Quiz
-              </li>
-              <li
-                className="hover:bg-gray-100 p-2 cursor-pointer"
-                onClick={() => openModal("Material")}
-              >
-                Material
-              </li>
-            </ul>
-          </div>
+            <Option value="Nov-24-2024">Nov-24-2024</Option>
+            <Option value="Dec-24-2024">Dec-24-2024</Option>
+          </Select>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {batches.map((batch, index) => (
-            <div
-              key={index}
-              className="bg-white shadow-md border border-gray-200 rounded-lg text-center hover:shadow-lg transition-shadow duration-300"
-            >
-              <img
-                src={batch.image}
-                alt={batch.name}
-                className="w-full h-64 object-cover rounded-md mb-2"
-              />
-              <div className="text-left p-2">
-                <h2 className="text-xl font-semibold">{batch.name}</h2>
-                <p className="text-gray-600 mt-2">
-                  Total Students: {batch.studentCount}
-                </p>
-                <button
-                  className="mt-4 bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors duration-300"
-                  onClick={() => handleBatchSelect(batch)}
-                >
-                  Select Batch
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+        <button
+          onClick={handleAddAssessment}
+          className="bg-orange-500 text-white px-4 py-1 rounded hover:bg-orange-600 transition"
+        >
+          Add Assessment
+        </button>
+      </div>
+      <DataTable
+        columns={columns}
+        data={filteredData}
+        customStyles={customStyles}
+        pagination
+        highlightOnHover
+        className="bg-white rounded shadow-md"
+      />
 
+      {/* Modal for Adding/View Assessment */}
       <Modal
-        visible={isModalVisible}
-        onCancel={closeModal}
+        title={selectedAssessment ? 'View Assessment' : 'Add New Assessment'}
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
         footer={null}
-        width="100%"
-        bodyStyle={{
-          height: "90vh",
-          padding: "0",
-        }}
-        centered
       >
-        <div className="w-full border-b border-orange-300 text-white p-4 ">
-          <h1 className="text-2xl font-semibold text-gray-600">
-            {modalContent}
-          </h1>
-        </div>
-
-        <div className="flex  ">
-          <div className="flex-1 p-8 overflow-y-auto bg-gray-100 ">
-            <Form
-              layout="vertical"
-              className="border p-6 bg-white rounded-xl"
-              onFinish={() => {}}
-            >
-              <Form.Item label="Title">
-                <Input
-                  type="text"
-                  placeholder="Enter Title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="h-12 bord"
-                />
-              </Form.Item>
-
-              <Form.Item label="Content">
-                <ReactQuill
-                  value={editorContent}
-                  onChange={handleEditorChange}
-                  className="h-32 mb-4 "
-                  placeholder="Start writing here..."
-                />
-              </Form.Item>
-            </Form>
-
-            <div className=" flex justify-center items-center gap-8 mt-8 bg-white rounded-xl border-gray-300">
-              <div className="flex flex-col items-center  py-4 gap-2">
-                <div className="flex items-center justify-center bg-white border border-gray-300 w-14 h-14 rounded-full">
-                  <MdOutlineFileUpload size={28} />
-                </div>
-
-                <Button>Upload</Button>
-              </div>
-              <div className="flex flex-col items-center  py-4 gap-2">
-
-              <div className="flex items-center justify-center bg-white border border-gray-300 w-14 h-14 rounded-full">
-                <FaLink size={24}/>
-              </div>
-              <Button >
-                Link
-              </Button>
+        {selectedAssessment ? (
+          <div className="space-y-4">
+            <div>
+              <strong>Assessment Title: </strong>
+              {selectedAssessment.name}
             </div>
+            <div>
+              <strong>Batch: </strong>
+              {selectedAssessment.batch || 'N/A'}
             </div>
-            {/* <Form.Item>
-                <Button type="primary" htmlType="submit" className="mt-4">
-                  Submit
-                </Button>
-              </Form.Item> */}
+            <div>
+              <strong>Assessment Timing: </strong>
+              {selectedAssessment.assessmentTiming || 'N/A'}
+            </div>
+            <div>
+              <strong>Subject: </strong>
+              {selectedAssessment.subject || 'N/A'}
+            </div>
+            <div>
+              <strong>File: </strong>
+              {selectedAssessment.mediaUrl ? (
+                <a href={selectedAssessment.mediaUrl} target="_blank" rel="noopener noreferrer">
+                  View File
+                </a>
+              ) : (
+                'No file uploaded'
+              )}
+            </div>
           </div>
-          <AssessmentSidebar />
-        </div>
+        ) : (
+          <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
+            <Form.Item
+              name="assessmentTitle"
+              label="Assessment Title"
+              rules={[{ required: true, message: 'Please enter the assessment title!' }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="batch"
+              label="Batch"
+              rules={[{ required: true, message: 'Please select the batch!' }]}
+            >
+              <Select>
+                <Option value="Nov-24-2024">Nov-24-2024</Option>
+                <Option value="Dec-24-2024">Dec-24-2024</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="mediaUrl"
+              label="Upload File"
+              valuePropName="fileList"
+              getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
+              rules={[{ required: true, message: 'Please upload a file!' }]}
+            >
+              <Upload beforeUpload={() => false} accept=".pdf">
+                <Button icon={<UploadOutlined />}>Upload File</Button>
+              </Upload>
+            </Form.Item>
+
+            <Form.Item
+              name="assessmentTiming"
+              label="Assessment Timing"
+              rules={[{ required: true, message: 'Please enter the assessment timing!' }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="subject"
+              label="Subject"
+              rules={[{ required: true, message: 'Please enter the subject!' }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item>
+              <Button htmlType="submit" className="w-full bg-orange-500 text-white">
+                Submit
+              </Button>
+            </Form.Item>
+          </Form>
+        )}
+      </Modal>
+
+      {/* Modal for Editing Assessment */}
+      <Modal
+        title="Edit Assessment"
+        open={isEditModalOpen}
+        onCancel={() => setIsEditModalOpen(false)}
+        footer={null}
+      >
+        <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
+          <Form.Item
+            name="assessmentTitle"
+            label="Assessment Title"
+            rules={[{ required: true, message: 'Please enter the assessment title!' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="batch"
+            label="Batch"
+            rules={[{ required: true, message: 'Please select the batch!' }]}
+          >
+            <Select>
+              <Option value="Nov-24-2024">Nov-24-2024</Option>
+              <Option value="Dec-24-2024">Dec-24-2024</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="mediaUrl"
+            label="Upload File"
+            valuePropName="fileList"
+            getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
+          >
+            <Upload beforeUpload={() => false} accept=".pdf">
+              <Button icon={<UploadOutlined />}>Upload File</Button>
+            </Upload>
+          </Form.Item>
+
+          <Form.Item
+            name="assessmentTiming"
+            label="Assessment Timing"
+            rules={[{ required: true, message: 'Please enter the assessment timing!' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="subject"
+            label="Subject"
+            rules={[{ required: true, message: 'Please enter the subject!' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item>
+            <Button htmlType="submit" className="w-full bg-orange-500 text-white">
+              Update
+            </Button>
+          </Form.Item>
+        </Form>
       </Modal>
     </div>
   );
 };
 
-export default SuperAssessment;
+export default TrainerAssessment;

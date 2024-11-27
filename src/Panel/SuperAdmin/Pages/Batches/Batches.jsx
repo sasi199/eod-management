@@ -250,6 +250,8 @@ const Batches = () => {
           id: batch._id,
         }));
         setBatches(mappedBatches);
+        console.log(response.data.data);
+
       } catch (error) {
         console.error("Error fetching batches:", error);
       }
@@ -344,12 +346,12 @@ const Batches = () => {
   };
 
   const columns = [
-    // {
-    //   name: "S.No",
-    //   selector: (row,i) => i+1,
-    //   sortable: true,
-    //   center: true,
-    // },
+    {
+      name: "S.No",
+      selector: (row,i) => i+1,
+      sortable: true,
+      center: true,
+    },
     {
       name: "Batch ID",
       selector: (row) => row.batchId,

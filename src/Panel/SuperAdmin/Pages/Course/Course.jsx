@@ -15,6 +15,7 @@ const { TextArea } = Input;
 
 const Course = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen]=useState(false); 
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [fetchedSyllabus, SetFetchedSyllabus] = useState([]);
@@ -27,6 +28,7 @@ const Course = () => {
     topic: "",
     content: "",
   });
+  const [selectedSyllabus, setSelectedSyllabus] = useState(null);
 
   const [editSyllabusData, SetEditSyllabusData] = useState({
     course: "",
@@ -62,7 +64,14 @@ const Course = () => {
     setSelectedCourse(null);
     setSelectedTopics([]);
     setSubtopics({});
+    setIsViewModalOpen(false);
   };
+
+  const viewModal = (syllabus) => {
+    setSelectedSyllabus(syllabus); // Set the selected syllabus
+    setIsViewModalOpen(true);
+  };
+  
 
   // const handleFormSubmit = (values) => {
   //   const topicsWithContent = selectedTopics.map((topic) => ({
@@ -165,6 +174,12 @@ const Course = () => {
 
   const columns = [
     {
+      name: "S.No",
+      selector: (row,i) => i+1,
+      sortable: true,
+      center: true,
+    },
+    {
       name: "Course",
       selector: (row) => (
         <span className="capitalize">{row.courseName || "N/A"}</span>
@@ -181,11 +196,7 @@ const Course = () => {
       wrap: true,
       center: true,
     },
-    // {
-    //   name: "Detailed Content",
-    //   selector: (row) => row.content,
-    //   wrap: true,
-    // },
+   
     {
       name: "PDF",
       center: true,
@@ -196,7 +207,7 @@ const Course = () => {
       center: true,
       selector: (row) => (
         <div className="flex gap-2">
-          <Button className="border border-green-500 text-green-500 px-2">
+          <Button className="border border-green-500 text-green-500 px-2" onClick={()=>viewModal(row)}>
             <FaEye />
           </Button>
           <Button
@@ -215,6 +226,17 @@ const Course = () => {
       ),
     },
   ];
+
+  const customStyles = {
+    headCells: {
+      style: {
+        backgroundColor: "#ff9800",
+        color: "#ffffff",
+        fontSize: "16px",
+        paddingRight: "0px",
+      },
+    },
+  };
 
   useEffect(() => {
     fetchSyllabus();
@@ -236,9 +258,52 @@ const Course = () => {
         data={fetchedSyllabus}
         pagination
         highlightOnHover
+        customStyles={customStyles}
         striped
         className="border border-gray-300 rounded-md"
       />
+
+<Modal
+        
+        open={isViewModalOpen}
+        onCancel={closeModal}
+        footer={null}
+      >
+        <p className="text-xl font-semibold">View Syllabus</p>
+        {selectedSyllabus ? (
+   <div className="p-4 ">
+   <div className="mb-3">
+     <p className="text-lg font-medium text-gray-600">
+       <span className="font-semibold text-lg">Course:</span> {selectedSyllabus.courseName || "N/A"}
+     </p>
+   </div>
+   <div className="mb-3">
+     <p className="text-lg font-medium text-gray-600">
+       <span className="font-semibold text-lg">Topics:</span> {selectedSyllabus.subjectName || "N/A"}
+     </p>
+   </div>
+   {selectedSyllabus.uploadFile && (
+     <div>
+       <p className="text-lg font-medium text-gray-600">
+         <span className="font-semibold text-lg">PDF:</span>{" "}
+         <a
+           href={selectedSyllabus.uploadFile}
+           target="_blank"
+           rel="noopener noreferrer"
+           className="text-gray-800 underline hover:text-gray-600 transition duration-200"
+         >
+           View PDF
+         </a>
+       </p>
+     </div>
+   )}
+ </div>
+  ) : (
+    <p>No syllabus selected.</p>
+  )}
+      </Modal>
+
+
       <Modal
         title="delete course"
         visible={deleteModal}

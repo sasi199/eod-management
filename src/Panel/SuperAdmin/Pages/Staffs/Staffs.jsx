@@ -12,7 +12,7 @@ import {
   message,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { AddStaffs, AllStaffs, EditStaffs } from "../../../../services";
+import { AddStaffs, AllStaffs, DeleteStaffs, EditStaffs } from "../../../../services";
 import dayjs from "dayjs";
 
 const { Option } = Select;
@@ -145,6 +145,7 @@ const Staffs = () => {
 
   const handleEditStaff = (values) => {
     const editFormData = new FormData();
+
     editFormData.append("fullName", editStaff.fullName);
     editFormData.append("email", editStaff.email);
     editFormData.append("gender", editStaff.gender);
@@ -167,12 +168,40 @@ const Staffs = () => {
         if (res.status === 200) {
           message.success("Edit Successfull");
           SetEditModal(false);
+          console.log(editFormData);
         }
       })
       .catch((err) => {
         console.log(err, "error editing staffs");
       });
   };
+  const handleDeleteStaff = (id) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this Staff?",
+      content: "This action cannot be undone.",
+      okText: "Yes",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          // Pass the correct ID to delete
+          await DeleteStaffs(id);
+          
+          // Make sure the filtering is done using the correct ID field
+          setStaffs((prevStaffs) =>
+            prevStaffs.filter((staff) => staff._id !== id)  // Use _id if your staff object has _id
+          );
+          message.success("Staff deleted successfully.");
+        } catch (error) {
+          console.error("Error deleting Staff:", error);
+          message.error("Failed to delete the Staff. Please try again.");
+        }
+      },
+      onCancel: () => {
+        message.info("Deletion canceled.");
+      },
+    });
+  };
+  
 
   return (
     <div className="px-6 py-2">
@@ -237,7 +266,7 @@ const Staffs = () => {
                     {/* Delete Icon */}
                     <button
                       className="flex flex-col items-center justify-center w-8 h-8 rounded-full bg-orange-500 text-white hover:bg-white hover:text-orange-500 duration-200"
-                      onClick={() => console.log("Delete", staff)}
+                      onClick={() => handleDeleteStaff(staff._id)}
                     >
                       <span className="text-sm ">
                         <FiTrash size={20} />
@@ -367,9 +396,17 @@ const Staffs = () => {
             rules={[{ required: true, message: "Please select date of birth" }]}
             className="col-span-1"
           >
-            <DatePicker className="w-full" />
-          </Form.Item>
-
+            <DatePicker
+    className="w-full"
+    format="DD-MM-YYYY" 
+    onChange={(date) => {
+      if (date) {
+        const formattedDate = dayjs(date).format('DD-MM-YYYY'); 
+        console.log('Formatted Date of Birth:', formattedDate);
+      }
+    }}
+  />
+</Form.Item>
           <Form.Item
             label="Experience"
             name="experience"
@@ -669,6 +706,7 @@ const Staffs = () => {
             >
               <DatePicker
                 className="w-full"
+                format="DD-MM-YY"
                 value={
                   editStaff.dob ? dayjs(editStaff.dob, "DD-MM-YYYY") : null
                 }

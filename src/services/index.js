@@ -42,6 +42,11 @@ export const EditStaffs = async (id, data) => {
   return res;
 };
 
+export const DeleteStaffs = async (id) => {
+  const res = await interceptors.delete(`/staff/deleteStaff/${id}`);
+  return res;
+};
+
 //batches
 
 //add Batches

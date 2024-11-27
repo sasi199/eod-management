@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
-import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
+import { FaEye, FaTrash } from "react-icons/fa";
 import { Button, Modal, Form, Select, Input, Avatar } from "antd";
 import { GetReportAll } from "../../../../services";
 
@@ -8,31 +8,25 @@ const { Option } = Select;
 const { TextArea } = Input;
 
 const SuperReports = () => {
-  const [isReportOpen, setIsReportOpen] = useState(false);
-  const [reports, setReports] = useState([
-   
-  ]);
+  const [isReportOpen, setIsReportOpen] = useState(false); 
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false); 
+  const [reports, setReports] = useState([]);
+  const [selectedReport, setSelectedReport] = useState(null); 
   const [selectedPerson, setSelectedPerson] = useState(null);
 
   useEffect(() => {
-        const fetchReportsData = async () => {
-          try {
-            const response = await GetReportAll(); 
-            if (response.data) {
-              setReports(response.data.data);
-              console.log(response.data.data); 
-            }
-          } catch (error) {
-            console.error('Error fetching staff data:', error);
-            notification.error({
-              message: 'Error fetching staff data',
-             
-            });
-          }
-        };
-        fetchReportsData();
-      }, []);
-
+    const fetchReportsData = async () => {
+      try {
+        const response = await GetReportAll();
+        if (response.data) {
+          setReports(response.data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching staff data:', error);
+      }
+    };
+    fetchReportsData();
+  }, []);
 
   const showModal = () => {
     setIsReportOpen(true);
@@ -43,19 +37,15 @@ const SuperReports = () => {
     setSelectedPerson(null);
   };
 
-  // const FetchReports = () => {
-  //   fetch
-  //     .then((res) => {
-  //       console.log(res.data);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err, "error fetching reports");
-  //     });
-  // };
+  const showViewModal = (report) => {
+    setSelectedReport(report);
+    setIsViewModalOpen(true);
+  };
 
-  useEffect(() => {
-    // FetchReports();
-  }, []);
+  const closeViewModal = () => {
+    setIsViewModalOpen(false);
+    setSelectedReport(null);
+  };
 
   const columns = [
     { name: "S.No", selector: (row, index) => index + 1, center: true },
@@ -78,9 +68,8 @@ const SuperReports = () => {
           <FaEye
             className="text-blue-500 cursor-pointer"
             title="View Report"
-            onClick={showModal}
+            onClick={() => showViewModal(row)} 
           />
-          {/* <FaEdit className="text-green-500 cursor-pointer" title="Edit Report" onClick={() => handleEdit(row)} /> */}
           <FaTrash
             className="text-red-500 cursor-pointer"
             title="Delete Report"
@@ -91,25 +80,6 @@ const SuperReports = () => {
       center: true,
     },
   ];
-
-  const customStyles = {
-    headCells: {
-      style: {
-        backgroundColor: "#ff9800",
-        color: "#ffffff",
-        fontSize: "16px",
-        paddingRight: "0px",
-      },
-    },
-  };
-
-  const handleView = (report) => {
-    console.log("Viewing report:", report);
-  };
-
-  const handleEdit = (report) => {
-    console.log("Editing report:", report);
-  };
 
   const handleDelete = (id) => {
     setReports((prevReports) =>
@@ -122,47 +92,49 @@ const SuperReports = () => {
     closeModal();
   };
 
-  const personOptions = {
-    hr: [
-      { name: "HR 1", image: "https://via.placeholder.com/24" },
-      { name: "HR 2", image: "https://via.placeholder.com/24" },
-      { name: "HR 3", image: "https://via.placeholder.com/24" },
-    ],
-    coordinator: [
-      { name: "Coordinator 1", image: "https://via.placeholder.com/24" },
-      { name: "Coordinator 2", image: "https://via.placeholder.com/24" },
-      { name: "Coordinator 3", image: "https://via.placeholder.com/24" },
-    ],
-    admin: [
-      { name: "Admin 1", image: "https://via.placeholder.com/24" },
-      { name: "Admin 2", image: "https://via.placeholder.com/24" },
-      { name: "Admin 3", image: "https://via.placeholder.com/24" },
-    ],
-    trainer: [
-      { name: "Trainer 1", image: "https://via.placeholder.com/24" },
-      { name: "Trainer 2", image: "https://via.placeholder.com/24" },
-      { name: "Trainer 3", image: "https://via.placeholder.com/24" },
-    ],
+  const customStyles = {
+    headCells: {
+      style: {
+        backgroundColor: "#ff9800",
+        color: "#ffffff",
+        fontSize: "16px",
+        paddingRight: "0px",
+      },
+    },
   };
-
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Reports</h2>
-        {/* <Button className='bg-orange-500 text-white' onClick={showModal}>
-          Add Report
-        </Button> */}
       </div>
 
       <DataTable
         columns={columns}
         data={reports}
         pagination
-        highlightOnHover
         customStyles={customStyles}
+        highlightOnHover
         className="border border-gray-300 rounded-md"
       />
 
+      {/* Modal for Viewing Report Details */}
+      <Modal
+        title="View Report"
+        open={isViewModalOpen}
+        footer={null}
+        onCancel={closeViewModal}
+      >
+        {selectedReport && (
+          <div>
+            <p><strong>Reported By:</strong> {selectedReport.reporter}</p>
+            <p><strong>Status:</strong> {selectedReport.title}</p>
+            <p><strong>Content:</strong></p>
+            <TextArea rows={4} value={selectedReport.reportContent} readOnly />
+          </div>
+        )}
+      </Modal>
+
+      {/* Modal for Adding Report */}
       <Modal
         title="Add Report"
         open={isReportOpen}
@@ -173,9 +145,7 @@ const SuperReports = () => {
           <Form.Item
             label="Reported To"
             name="reportedPerson"
-            rules={[
-              { required: true, message: "Please select the reported person!" },
-            ]}
+            rules={[{ required: true, message: "Please select the reported person!" }]}
           >
             <Select
               placeholder="Select person"
@@ -190,16 +160,9 @@ const SuperReports = () => {
 
           {selectedPerson && (
             <Form.Item
-              label={`Select ${
-                selectedPerson.charAt(0).toUpperCase() + selectedPerson.slice(1)
-              }`}
+              label={`Select ${selectedPerson.charAt(0).toUpperCase() + selectedPerson.slice(1)}`}
               name={`${selectedPerson}Name`}
-              rules={[
-                {
-                  required: true,
-                  message: `Please select a ${selectedPerson}!`,
-                },
-              ]}
+              rules={[{ required: true, message: `Please select a ${selectedPerson}!` }]}
             >
               <Select placeholder={`Select ${selectedPerson}`}>
                 {personOptions[selectedPerson].map((person, index) => (
@@ -215,9 +178,7 @@ const SuperReports = () => {
           <Form.Item
             label="Report"
             name="reportContent"
-            rules={[
-              { required: true, message: "Please enter the report content!" },
-            ]}
+            rules={[{ required: true, message: "Please enter the report content!" }]}
           >
             <TextArea rows={4} placeholder="Type your report here" />
           </Form.Item>
