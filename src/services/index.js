@@ -222,8 +222,8 @@ export const GetTaskByProjectId = async (projectId) => {
   return res;  
 }
 
-export const EditTaskById = async (taskId) => {
-  const res = await interceptors.put(`/task/editTask/${taskId}`);
+export const EditTaskById = async (data,taskId) => {
+  const res = await interceptors.put(`/task/editTask/${taskId}`,data);
   return res;  
 }
 
