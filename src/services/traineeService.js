@@ -80,7 +80,7 @@ exports.createTrainee = async(req)=>{
   console.log(assignedBatch);
    
    const newAuth = new Auth({
-    traineeId: newTrainee._id,
+    accountId: newTrainee._id,
     email,
     profilePic,
     fullName,
@@ -162,8 +162,6 @@ exports.editTrainee = async(req)=>{
      const updateAuth = await Auth.findOneAndUpdate({accountId:_id},updateData,
         {new: true, runValidators: true}
      )
-
-     console.log("UpdateAurth",updateAuth);
      
 
      return updateTrainee;

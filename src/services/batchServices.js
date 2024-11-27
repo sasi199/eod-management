@@ -117,6 +117,12 @@ exports.getBatchId = async(req)=>{
     if (!batch) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Batch not found"});
     }
+
+    const assigned = await AssignedModel.findOne({ batchId: _id });
+    if (!assigned) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "No trainers or trainees assigned to this batch" });
+    }
+    
     return batch;
 }
 
