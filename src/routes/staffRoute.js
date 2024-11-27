@@ -21,7 +21,7 @@ Router.route('/createStaff').post(verifyAuthToken,uploads.single('profilePic'),s
 Router.route('/getStaffAll').get(staffController.getStaffAll);
 Router.route('/getFilterStaff').get(staffController.getFilterStaff);
 Router.route('/getStaffId/:_id').get(staffController.getStaffId);
-Router.route('/editStaff/:_id').put(checkSuperAdmin,uploads.single('profilePic'),staffController.editStaff);
+Router.route('/editStaff/:_id').put(verifyAuthToken,uploads.single('profilePic'),staffController.editStaff);
 Router.route('/deleteStaff/:_id').delete(staffController.deleteStaff);
 
 module.exports = Router;

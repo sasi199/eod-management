@@ -146,6 +146,10 @@ exports.editStaff = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Staff not found"});
     }
 
+    if (!auth) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message: "Auth not found"});
+    }
+
     const updateData = {...req.body}
     if(req.file){
         const fileExtension = req.file.originalname.split('.').pop();
@@ -172,10 +176,14 @@ exports.deleteStaff = async(req)=>{
     const {_id} = req.params;
 
     const staff = await StaffModel.findById(_id);
-    const auth = await Auth.findOne({accountId:authId});
+    console.log("adadda",staff);
+    
+    const auth = await Auth.findOne({accountId:_id});
+    console.log("ggdsdsd",auth);
+    
 
     if (!staff) {
-        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Admin not found"});
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Staff not found"});
      }
   
      if (!auth) {
@@ -183,6 +191,6 @@ exports.deleteStaff = async(req)=>{
      }
 
      await  StaffModel.findByIdAndDelete(_id);
-     await Auth.findOneAndDelete(authId);
+     await Auth.findOneAndDelete();
 
 }
