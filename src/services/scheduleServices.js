@@ -8,7 +8,7 @@ const httpStatus = require('http-status');
 exports.createSchedule = async(req)=>{
     const { batch, trainer,} = req.body
 
-    const batches = await BatchModel.findOne({batchName:batch});
+    const batches = await BatchModel.findOne({_id:batch});
 
     if (!batches) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "batch not found"});

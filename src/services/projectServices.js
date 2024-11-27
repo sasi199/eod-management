@@ -81,12 +81,15 @@ exports.deleteProject = async(req)=>{
 
 
 exports.getTaskByProject = async(req)=>{
-    const { projectId } = req.params;
-    if (!projectId) {
+    const { _id } = req.params;
+    if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Project ID is required" });
     }
 
-    const task  = await TaskModel.find({projectId});
+    const task  = await TaskModel.find({projectId:_id}).populate({
+        path:'assignees',
+        select:'fullName profilePic role'
+    });
     console.log(task,"kskshjhs");
     
     if (!task) {

@@ -71,12 +71,12 @@ exports.getTaskAll = async(req)=>{
 }
 
 exports.getTaskId = async(req)=>{
-    const { taskId } = req.params;
-    if (!taskId) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainer Id required"});
+    const { _id } = req.params;
+    if (!_id) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task Id required"});
     }
 
-    const task = await TaskModel.findById(taskId).populate({
+    const task = await TaskModel.findById(_id).populate({
         path:'assignees',
         select:'fullName profilePic role'
     });
