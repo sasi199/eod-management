@@ -17,19 +17,21 @@ exports.createTask = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Project not found'}); 
     }
 
-    const newTask = new TaskModel({
-        ...req.body,
-        projectId: project._id
-    })
-
-    await newTask.save();
-
-        const assigneeId = await Auth.findOne({accountId:assignees})
+    const assigneeId = await Auth.findOne({accountId:assignees})
         console.log(assigneeId,"asssaaa");
         
         if (!assigneeId) {
             throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Assignee not found'});
         }
+
+    const newTask = new TaskModel({
+        ...req.body,
+        projectId: project._id,
+        assignees: assigneeId
+    })
+
+    await newTask.save();
+
         const notification = new NotificationModel({
             title: "Alert",
             content: `You have been assigned a new task: ${title}`,
@@ -58,7 +60,10 @@ exports.createTask = async(req)=>{
 }
 
 exports.getTaskAll = async(req)=>{
-    const task = await TaskModel.find({});
+    const task = await TaskModel.find({}).populate({
+        path:'assignees',
+        select:'fullName profilePic role'
+    });
     if (!task) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainer not found"});
     }
@@ -71,7 +76,10 @@ exports.getTaskId = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainer Id required"});
     }
 
-    const task = await TaskModel.findById(taskId);
+    const task = await TaskModel.findById(taskId).populate({
+        path:'assignees',
+        select:'fullName profilePic role'
+    });
     if (!task) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task not found"});
     }
@@ -105,14 +113,14 @@ exports.editTask = async(req)=>{
 }
 
 exports.deleteTask = async(req)=>{
-    const { taskId } = req.params
+    const {_id } = req.params
 
-    const task = await TaskModel.findById(taskId);
+    const task = await TaskModel.findById(_id);
     if(!task){
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task not found"});
     }
 
-    await TaskModel.findByIdAndDelete();
+    await TaskModel.findByIdAndDelete(_id);
     req.io.emit("dashboardUpdate", { message: "Task deleted", taskId });
 
 }
