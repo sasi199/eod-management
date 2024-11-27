@@ -54,6 +54,13 @@ exports.createBatch = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, { message: 'Invalid course name provided' });
     }
 
+    const trainerId = await StaffModel.find({ _id: { $in: trainer },isTrainer:true});
+    console.log("gfdfddg",trainerId);
+    
+    if (!trainerId) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: 'Trainer not found' });
+    }
+
     const existingBatch = await BatchModel.findOne({batchId});
     if (existingBatch) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Batch already exist'}); 
@@ -78,7 +85,7 @@ exports.createBatch = async(req)=>{
 
     const newAssignBatch = new AssignedBatchModel({
         batchId: newBatch._id,
-        trainer,
+        trainer: trainerId.map((t) => t._id),
         trainee
     })
 

@@ -168,11 +168,11 @@ exports.editStaff = async(req)=>{
 }
 
 exports.deleteStaff = async(req)=>{
-    const {authId}= req._id;
-    const {staffId} = req.user;
+    const {authId}= req;
+    const {_id} = req.params;
 
-    const staff = await StaffModel.findById(staffId);
-    const auth = await Auth.findById(authId);
+    const staff = await StaffModel.findById(_id);
+    const auth = await Auth.findOne({accountId:authId});
 
     if (!staff) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Admin not found"});
@@ -182,7 +182,7 @@ exports.deleteStaff = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Auth not found"});
      }
 
-     await  StaffModel.findByIdAndDelete();
-     await Auth.findByIdAndDelete();
+     await  StaffModel.findByIdAndDelete(_id);
+     await Auth.findOneAndDelete(authId);
 
 }

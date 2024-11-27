@@ -14,14 +14,6 @@ const batchSchema = new mongoose.Schema({
         type: Number,
         default: 25,
     },
-    trainee: [{
-        type: String,
-        ref: 'Trainee'
-    }],
-    trainer: [{
-        type: String,
-        ref: 'Staff'
-    }]
 }, { timestamps: true, collection: "Batch" });
 
 const BatchModel = mongoose.model('Batch', batchSchema);

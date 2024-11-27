@@ -50,7 +50,7 @@ exports.createTrainee = async(req)=>{
 //    }
 
 
-   const existingBatch  = await BatchModel.findOne({batchName:batch})
+   const existingBatch  = await BatchModel.findOne({_id:batch})
    console.log(existingBatch,"bigils");
    
    if (!existingBatch) {
@@ -65,7 +65,6 @@ exports.createTrainee = async(req)=>{
     ...req.body,
     logId,
     profilePic,
-    resumeUpload,
     batch,
     password: hashedPassword
    })
@@ -77,7 +76,7 @@ exports.createTrainee = async(req)=>{
 );
 
 
-  console.log(assignedBatch,"tharun");
+  console.log(assignedBatch);
    
    const newAuth = new Auth({
     traineeId: newTrainee._id,

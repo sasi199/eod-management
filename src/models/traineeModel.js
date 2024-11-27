@@ -19,7 +19,7 @@ const traineeSchema = new mongoose.Schema({
     gender: schemaFields.requiredAndString,
     permanentAddress: schemaFields.requiredAndString,
     currentAddress: schemaFields.requiredAndString,
-    resumeUpload: schemaFields.requiredAndString,
+    // resumeUpload: schemaFields.requiredAndString,
     isActive: schemaFields.BooleanWithDefault,
     hybrid: schemaFields.StringWithEnumAndRequired(['Online','WFH']),
     // assignedBatch:{
