@@ -32,3 +32,8 @@ exports.deleteStaff = catchAsync (async(req,res)=>{
     const response = await staffServices.deleteStaff(req)
     res.status(200).json({status:true, message:'Staff deleted succesfully',data:response,})
 })
+
+exports.staffCount = catchAsync (async(req,res)=>{
+    const response = await staffServices.staffCount(req)
+    res.status(200).json({status:true, message:'Staff count get succesfully',data:response,})
+})

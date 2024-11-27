@@ -12,7 +12,7 @@ const checkSuperAdmin = (req,res,next)=>{
     next();
 }
 
-Router.use(verifyAuthToken);
+// Router.use(verifyAuthToken);
 
 
 Router.route('/createTrainee').post(uploads.single('profilePic'),traineeController.createTrainee);
@@ -20,6 +20,7 @@ Router.route('/getTraineeAll').get(traineeController.getTraineeAll);
 Router.route('/getTraineeId/:_id').get(traineeController.getTraineeId);
 Router.route('/editTrainee/:_id').put(uploads.single('profilePic'),traineeController.editTrainee);
 Router.route('/deleteTrainee/:_id').delete(traineeController.deleteTrainee);
+Router.route('/traineeCount').get(traineeController.traineeCount);
 
 
 module.exports = Router;

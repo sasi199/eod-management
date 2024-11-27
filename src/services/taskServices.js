@@ -4,6 +4,7 @@ const ApiError = require("../utils/apiError");
 const ProjectModel = require("../models/projectModel");
 const NotificationModel = require("../models/notificationModel");
 const Auth = require("../models/authModel");
+const StaffModel = require("../models/staffModel");
 
 
 
@@ -17,7 +18,7 @@ exports.createTask = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Project not found'}); 
     }
 
-    const assigneeId = await Auth.findOne({accountId:assignees})
+    const assigneeId = await StaffModel.findById(assignees);
         console.log(assigneeId,"asssaaa");
         
         if (!assigneeId) {
@@ -27,7 +28,7 @@ exports.createTask = async(req)=>{
     const newTask = new TaskModel({
         ...req.body,
         projectId: project._id,
-        assignees: assigneeId
+        assignees: assigneeId._id
     })
 
     await newTask.save();
@@ -35,7 +36,7 @@ exports.createTask = async(req)=>{
         const notification = new NotificationModel({
             title: "Alert",
             content: `You have been assigned a new task: ${title}`,
-            recipientId: assigneeId,
+            recipientId: assigneeId._id,
             status: "Unread",
         });
 

@@ -191,3 +191,13 @@ exports.deleteTrainee = async(req)=>{
      await TraineeModel.findByIdAndDelete(_id);
      await Auth.findOneAndDelete({accountId: _id});
 }
+
+
+exports.traineeCount = async(req)=>{
+    const trainee = await TraineeModel.countDocuments({});
+    if (!trainee) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainee not found"});
+    }
+
+    return trainee;
+}
