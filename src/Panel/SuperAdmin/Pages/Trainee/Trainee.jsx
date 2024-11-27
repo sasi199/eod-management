@@ -13,17 +13,18 @@ import {
   message,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { AddTrainee, GetBatches, GetTrainee } from "../../../../services";
+import { AddTrainee, EditTrainee, GetBatches, GetTrainee } from "../../../../services";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
+import moment from 'moment';
 
 const Trainee = () => {
-  const [batchFilter, setBatchFilter] = useState("");
   const [nameFilter, setNameFilter] = useState("");
   const [students, setStudents] = useState([]);
   const [form] = Form.useForm();
   const [batches, setBatches] = useState([]);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);  // State for Add Student modal
   const [isViewModalVisible, setIsViewModalVisible] = useState(false); // State for View Student modal
+  const[editingTrainee,setEditingTrainee]=useState(null)
   const [selectedTrainee, setSelectedTrainee] = useState(null);
 
   useEffect(() => {
@@ -53,18 +54,23 @@ const Trainee = () => {
 
   const handleAddStudent = () => {
     setIsAddModalVisible(true);
+    setEditingTrainee(null);
+    form.resetFields();
   };
+  const handleEditTrainee= (trainee) => {
+    setEditingTrainee(trainee); // Set the batch to edit
+    form.setFieldsValue(trainee); // Prefill the form with batch data
+    setIsAddModalVisible(true);
+  };
+
 
   const handleModalCancel = () => {
-    if (isAddModalVisible) {
-      setIsAddModalVisible(false);
-    } else if (isViewModalVisible) {
-      setIsViewModalVisible(false);
-    }
-  };
-
+    setIsAddModalVisible(false);
+    setIsViewModalVisible(false);
+  }
   const handleFormSubmit = async (values) => {
     try {
+     
       const formData = new FormData();
       Object.keys(values).forEach((key) => {
         if (key === "profilePic" || key === "resumeUpload") {
@@ -75,24 +81,50 @@ const Trainee = () => {
           formData.append(key, values[key]);
         }
       });
-
-      await AddTrainee(formData);
-      setStudents([...students]);
-
-      message.success("Trainee added successfully!");
-      setIsModalVisible(false);
+  
+      if (editingTrainee) {
+       
+        try {
+          const response = await EditTrainee(editingTrainee.id, formData);
+          setStudents((prevStudents) =>
+            prevStudents.map((trainee) =>
+              trainee.id === editingTrainee.id ? { ...trainee, ...values } : trainee
+            )
+          );
+          console.log("Traiee updated:", response);
+          message.success("trainee updated successfully!");
+        } catch (error) {
+          console.error("Error updating Trainee:", error);
+          message.error("Failed to update Trainee!");
+        }
+      } else {
+        // Add new batch
+        try {
+          const response = await AddTrainee(formData);
+          const newTrainee = {
+            ...values,
+            id: response.data.id, 
+          };
+          setStudents([...students, newTrainee]);
+          console.log("Trainee added:", response);
+          message.success("Trainee added successfully!");
+        } catch (error) {
+          console.error("Error adding Trainee:", error);
+          message.error("Failed to add Trainee!");
+        }
+      }
+  
       form.resetFields();
+      setIsAddModalVisible(false);
     } catch (error) {
-      message.error("Failed to add trainee!");
+      console.error("Validation Failed:", error);
+      message.error("Please check the form fields!");
     }
   };
 
-  const filteredData = students.filter(
+ const filteredData = students.filter(
     (student) =>
-      (batchFilter ? student.batch === batchFilter : true) &&
-      (nameFilter
-        ? student.name.toLowerCase().includes(nameFilter.toLowerCase())
-        : true)
+      (nameFilter ? student.fullName.toLowerCase().includes(nameFilter.toLowerCase()) : true)
   );
 
   const handleView = (studentId) => {
@@ -120,7 +152,7 @@ const Trainee = () => {
           <button onClick={() => handleView(row._id)} className="text-blue-500">
             <FaEye size={16} />
           </button>
-          <button onClick={() => handleEdit(row._id)} className="text-orange-500">
+          <button onClick={() => handleEditTrainee(row)} className="text-orange-500">
             <FaEdit size={16}/>
           </button>
           <button onClick={() => handleDelete(row._id)} className="text-red-500">
@@ -146,16 +178,7 @@ const Trainee = () => {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex gap-4">
-          <select
-            className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
-            value={batchFilter}
-            onChange={(e) => setBatchFilter(e.target.value)}
-          >
-            <option value="">All Batches</option>
-            <option value="Batch A">Batch A</option>
-            <option value="Batch B">Batch B</option>
-            <option value="Batch C">Batch C</option>
-          </select>
+         
           <input
             type="text"
             placeholder="Filter by Name"
@@ -182,13 +205,26 @@ const Trainee = () => {
       />
 
       <Modal
-        title="Add Student"
-        visible={isAddModalVisible}
+        title={editingTrainee ? "Edit Batch" : "Add New Batch"}
+      open={isAddModalVisible}
         onCancel={handleModalCancel}
         footer={null}
         centered
       >
-        <Form layout="vertical" onFinish={handleFormSubmit} form={form}>
+        <Form layout="vertical" onFinish={handleFormSubmit} form={form} initialValues={{fullName: "",
+    email: "",
+    dob: undefined, 
+    phoneNumber: "",
+    gender: undefined, 
+    profilePic: undefined, 
+    batch: undefined,
+    currentAddress: "",
+    permanentAddress: "",
+    experience: undefined,
+    qualification: "",
+    role: "Trainee", 
+    password: "",
+    }}>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -212,13 +248,17 @@ const Trainee = () => {
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                label="Date of Birth"
-                name="dob"
-                rules={[{ required: true, message: "Please select the date of birth!" }]}
-              >
-                <DatePicker style={{ width: "100%" }} />
-              </Form.Item>
+            <Form.Item
+        label="Date of Birth"
+        name="dob"
+        rules={[{ required: true, message: "Please select the date of birth!" }]}
+      >
+        <DatePicker 
+          style={{ width: "100%" }} 
+          value={form.getFieldValue('dob') ? moment(form.getFieldValue('dob')) : null} // Ensure the value is a moment object
+          onChange={(date) => form.setFieldsValue({ dob: date ? moment(date) : null })}  // Ensure the value is set as moment
+        />
+      </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
@@ -414,5 +454,6 @@ const Trainee = () => {
     </div>
   );
 };
+
 
 export default Trainee;

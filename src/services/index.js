@@ -96,6 +96,10 @@ export const GetTrainee = async () => {
   const res = await interceptors.get("/trainee/getTraineeAll");
   return res;
 };
+export const EditTrainee = async (id,data) => {
+  const res = await interceptors.put(`/trainee/editTrainee/${id}`,data);
+  return res;
+};
 
 // courses
 
