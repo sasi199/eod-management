@@ -194,3 +194,13 @@ exports.deleteStaff = async(req)=>{
      await Auth.findOneAndDelete();
 
 }
+
+
+exports.staffCount = async(req)=>{
+    const staff = await StaffModel.countDocuments({});
+    if (!staff) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainee not found"});
+    }
+
+    return staff;
+}

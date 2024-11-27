@@ -163,3 +163,13 @@ exports.deleteBatch = async(req)=>{
 
      await BatchModel.findByIdAndDelete(_id);
 }
+
+
+exports.batchCount = async(req)=>{
+    const batch = await BatchModel.countDocuments({});
+    if (!batch) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"batch not found"});
+    }
+
+    return batch;
+}

@@ -8,7 +8,7 @@ const Router = express.Router();
 //SuperAdminCheck
 
 const checkSuperAdmin = (req,res,next)=>{
-    if(req.user.role !== 'superAdmin'){
+    if(req.user.role !== 'SuperAdmin'){
         return res.status(httpStatus.FORBIDDEN).json({ message: "Only super admins can perform this action" });
     }
     next();

@@ -27,3 +27,8 @@ exports.deleteBatch = catchAsync(async(req,res)=>{
     const response = await batchServices.deleteBatch(req)
     res.status(200).json({status:true, message:'Batch edited succesfully',data:response,})
 })
+
+exports.batchCount = catchAsync(async(req,res)=>{
+    const response = await batchServices.batchCount(req)
+    res.status(200).json({status:true, message:'Batch count get succesfully',data:response,})
+})

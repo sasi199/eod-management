@@ -23,6 +23,7 @@ const generateTraineeLogId = async () => {
 
 
 exports.createTrainee = async(req)=>{
+    const {auth} = req;
     const { email, fullName, password,role,hybrid,batch} = req.body
     console.log(req.body);
 

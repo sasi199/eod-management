@@ -6,34 +6,53 @@ const httpStatus = require('http-status');
 
 
 exports.createSchedule = async(req)=>{
-    const { batch, trainer,} = req.body
+    const { batch, trainer, timeTable } = req.body
 
-    const batches = await BatchModel.findOne({_id:batch});
+    const existBatch = await BatchModel.findById(batch);
+    if (!existBatch) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Batch not found" });
+    } 
 
-    if (!batches) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message: "batch not found"});
+    const existTrainer = await StaffModel.findById({ _id: trainer, isTrainer: true });
+    if (!existTrainer) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Trainer not found" });
     }
 
-    const existingSchedule = await ScheduleModel.findOne({
-        batch,
-        date,
-        classTimings,
-        trainer
-      });
+    for (let day = startOfWeek; day.isSameOrBefore(endOfWeek); day.add(1, "days")) {
+        for (const slot of timeTable) {
+            
+            const conflict = await TimetableModel.findOne({
+                trainer,
+                date: day.toDate(),
+                startTime: { $lte: slot.endTime },
+                endTime: { $gte: slot.startTime },
+            });
 
-      if (existingSchedule) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message: `A schedule already exists for batch "${batchExists.name}" on ${date} at ${classTimings}`});
-      }
+            if (conflict) {
+                throw new ApiError(httpStatus.CONFLICT, {
+                    message: `Trainer is already assigned during ${slot.startTime} - ${slot.endTime} on ${day.format("YYYY-MM-DD")}`,
+                });
+            }
 
-    const newSchedule = new ScheduleModel({
-        ...req.body,
-        batch:batches._id
-    })
+            
+            const newTimetable = await TimetableModel.create({
+                ...slot,
+                trainer,
+                batch,
+                date: day.toDate(),
+            });
 
-    await newSchedule.save();
+            schedules.push(
+                await ScheduleModel.findOneAndUpdate(
+                    { batch, date: day.toDate() },
+                    { $push: { timeTable: newTimetable._id } },
+                    { upsert: true, new: true }
+                )
+            );
+        }
+    }
 
-    return newSchedule;
-
+    return schedules;
 }
 
 
