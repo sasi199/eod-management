@@ -2,21 +2,35 @@ const ScheduleModel = require("../models/sheduleModel");
 const BatchModel = require("../models/batchModel");
 const ApiError = require("../utils/apiError");
 const httpStatus = require('http-status');
+const StaffModel = require("../models/staffModel");
+const TimetableModel = require("../models/timetableModel");
+const moment = require('moment');
+
 
 
 
 exports.createSchedule = async(req)=>{
-    const { batch, trainer, timeTable } = req.body
+    const { batch, trainer, timeTable = [] } = req.body
 
     const existBatch = await BatchModel.findById(batch);
     if (!existBatch) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Batch not found" });
     } 
 
+    if (!Array.isArray(timeTable)) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "timeTable must be an array" });
+    }
+
     const existTrainer = await StaffModel.findById({ _id: trainer, isTrainer: true });
     if (!existTrainer) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Trainer not found" });
     }
+
+    const startOfWeek = moment().startOf("week").add(1, "days");
+    const endOfWeek = moment(startOfWeek).add(5, "days");
+
+    const schedules = [];
+
 
     for (let day = startOfWeek; day.isSameOrBefore(endOfWeek); day.add(1, "days")) {
         for (const slot of timeTable) {

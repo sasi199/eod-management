@@ -9,38 +9,15 @@ const scheduleSchema = new mongoose.Schema({
         ref: 'Batch',
         required: true,
     },
-    trainer:{
-        type: String,
-        ref: 'Staff',
-        required: true,
-    },
-    subject: schemaFields.StringWithEnumAndRequired([
-        'Html/Css','Javascript','Bootstrap','Jquery','React.js','Node.js/Mongodb','Python',
-        'Php','Figma'
-    ]),
-    classTimings: schemaFields.StringWithEnumAndRequired([
-        '10 am to 11 am',
-        '11 am to 12 pm',
-        '10 am to 12 pm',
-        '11 am to 11 pm',
-        '02 am to 03 pm',
-        '03 am to 05 pm',
-        '02 am to 04 pm',
-        '04 am to 06 pm',
-    ]),
     date: {
         type: Date,
         required: true,
     },
-    status: {
+    timetable:[{
         type: String,
-        enum: ['scheduled', 'completed', 'canceled'],
-        default: 'scheduled',
-    },
-    stage: {
-        type: String,
-        enum: ['not started','started','completed']
-    }
+        ref: "Timetable",
+
+    }],
 
 },{timestamps:true,collection:'Schedule'})
 
