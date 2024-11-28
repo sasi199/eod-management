@@ -94,11 +94,11 @@ exports.logoutUser = async (req) => {
   })
 
   if (!attendance) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "No attendance record found for today.");
+    throw new ApiError(httpStatus.BAD_REQUEST, {message:"No attendance record found for today."});
   }
 
   if (attendance.checkOut) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "User has already logged out.");
+    throw new ApiError(httpStatus.BAD_REQUEST, {message:"User has already logged out."});
   }
 
   attendance.checkOut = now;

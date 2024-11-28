@@ -95,47 +95,71 @@ exports.createBatch = async(req)=>{
 }
 
 
-exports.getBatchAll = async(req)=>{
-    const batch = await BatchModel.find({})
-    if (!batch) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Batch not found"});
-    }
+exports.getBatchAll = async (req) => {
+        const result = await BatchModel.aggregate([
+            {
+                
+                $lookup: {
+                    from: "AssignedBatch",
+                    localField: "_id",
+                    foreignField: "batchId",
+                    as: "assignedData"
+                }
+            },
+            {
+                
+                $unwind: {
+                    path: "$assignedData",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                
+                $lookup: {
+                    from: "Staff",
+                    localField: "assignedData.trainer",
+                    foreignField: "_id",
+                    as: "trainerDetails"
+                }
+            },
+            {
+                
+                $lookup: {
+                    from: "Trainee",
+                    localField: "assignedData.trainee",
+                    foreignField: "_id",
+                    as: "traineeDetails"
+                }
+            },
+            {
+                $project: {
+                    courseName: 1,
+                    batchId: 1,
+                    batchName: 1,
+                    batchTimings: 1,
+                    courseDuration: 1,
+                    active: 1,
+                    archive: 1,
+                    maxStrength: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    trainerDetails: {
+                        _id: 1,
+                        fullName: 1,
+                        profilePic: 1
+                    },
+                    traineeDetails: {
+                        _id: 1,
+                        fullName: 1,
+                        profilePic: 1
+                    }
+                }
+            }
+        ]);
 
-    return batch;
-}
+        return result;
+};
 
-
-exports.getBatchId = async(req)=>{
-    const { authId } = req
-    // const { _id } = req.params
-    console.log(req.params,"jajahjaha");
-    
-
-    if (_id) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Batch id required"});
-    }
-
-    const batch = await BatchModel.findById(_id)
-    if (!batch) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Batch not found"});
-    }
-
-    const assigned = await AssignedBatchModel.findOne({ batchId: _id });
-    if (!assigned) {
-        throw new ApiError(httpStatus.BAD_REQUEST, { message: "No trainers or trainees assigned to this batch" });
-    }
-
-    const trainerDetails = await StaffModel.find({ _id: { $in: assigned.trainer } },{ fullName: 1, profilePic: 1 });
-    console.log(trainerDetails,'llalllala');
-    
-    const traineeDetails = await TraineeModel.find({ _id: { $in: assigned.trainee } });
-
-    return {
-        batchDetails: batch,
-        trainerDetails,
-        traineeDetails
-    };
-}
 
 exports.getBatchId = async (req) => {
         const { authId } = req;
