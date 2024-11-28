@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; 
 import DataTable from "react-data-table-component";
 import {
   Modal,
@@ -13,18 +13,19 @@ import {
   message,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { AddTrainee, EditTrainee, GetBatches, GetTrainee } from "../../../../services";
+import { AddTrainee, GetBatches, GetTrainee, EditTrainee, DeleteTrainee } from "../../../../services";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
-import moment from 'moment';
+import moment from 'moment'
 
 const Trainee = () => {
+  const [batchFilter, setBatchFilter] = useState("");
   const [nameFilter, setNameFilter] = useState("");
   const [students, setStudents] = useState([]);
   const [form] = Form.useForm();
   const [batches, setBatches] = useState([]);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);  // State for Add Student modal
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false); // State for Edit Student modal
   const [isViewModalVisible, setIsViewModalVisible] = useState(false); // State for View Student modal
-  const[editingTrainee,setEditingTrainee]=useState(null)
   const [selectedTrainee, setSelectedTrainee] = useState(null);
 
   useEffect(() => {
@@ -32,7 +33,6 @@ const Trainee = () => {
       try {
         const response = await GetTrainee();
         setStudents(response?.data.data);
-        console.log(response.data.data);
       } catch (error) {
         message.error("Failed to fetch trainees.");
       }
@@ -54,23 +54,30 @@ const Trainee = () => {
 
   const handleAddStudent = () => {
     setIsAddModalVisible(true);
-    setEditingTrainee(null);
-    form.resetFields();
   };
-  const handleEditTrainee= (trainee) => {
-    setEditingTrainee(trainee); // Set the batch to edit
-    form.setFieldsValue(trainee); // Prefill the form with batch data
-    setIsAddModalVisible(true);
+  const handleEdit = (trainee) => {
+    // Format the dob before setting the form values
+    const traineeWithFormattedDOB = {
+      ...trainee,
+      dob: trainee.dob ? moment(trainee.dob) : null, // Ensure the dob is a moment object or null
+    };
+  
+    // Set the form values with the formatted `dob`
+    form.setFieldsValue(traineeWithFormattedDOB); // Pre-fill the form with the trainee data
+    setSelectedTrainee(trainee);
+    setIsEditModalVisible(true); // Show the edit modal
   };
-
+  
 
   const handleModalCancel = () => {
     setIsAddModalVisible(false);
+    setIsEditModalVisible(false);
     setIsViewModalVisible(false);
-  }
+    form.resetFields();
+  };
+
   const handleFormSubmit = async (values) => {
     try {
-     
       const formData = new FormData();
       Object.keys(values).forEach((key) => {
         if (key === "profilePic" || key === "resumeUpload") {
@@ -81,57 +88,64 @@ const Trainee = () => {
           formData.append(key, values[key]);
         }
       });
-  
-      if (editingTrainee) {
-       
-        try {
-          const response = await EditTrainee(editingTrainee.id, formData);
-          setStudents((prevStudents) =>
-            prevStudents.map((trainee) =>
-              trainee.id === editingTrainee.id ? { ...trainee, ...values } : trainee
-            )
-          );
-          console.log("Traiee updated:", response);
-          message.success("trainee updated successfully!");
-        } catch (error) {
-          console.error("Error updating Trainee:", error);
-          message.error("Failed to update Trainee!");
-        }
+
+      if (selectedTrainee) {
+        // Editing existing trainee
+        await EditTrainee(selectedTrainee._id, formData);
+        message.success("Trainee updated successfully!");
       } else {
-        // Add new batch
-        try {
-          const response = await AddTrainee(formData);
-          const newTrainee = {
-            ...values,
-            id: response.data.id, 
-          };
-          setStudents([...students, newTrainee]);
-          console.log("Trainee added:", response);
-          message.success("Trainee added successfully!");
-        } catch (error) {
-          console.error("Error adding Trainee:", error);
-          message.error("Failed to add Trainee!");
-        }
+        // Adding new trainee
+        await AddTrainee(formData);
+        message.success("Trainee added successfully!");
       }
-  
-      form.resetFields();
+
+      // After success, close modal and fetch updated data
+      setStudents([...students]);
       setIsAddModalVisible(false);
+      setIsEditModalVisible(false);
+      form.resetFields();
     } catch (error) {
-      console.error("Validation Failed:", error);
-      message.error("Please check the form fields!");
+      message.error("Failed to save trainee!");
     }
   };
-
- const filteredData = students.filter(
-    (student) =>
-      (nameFilter ? student.fullName.toLowerCase().includes(nameFilter.toLowerCase()) : true)
-  );
 
   const handleView = (studentId) => {
     const student = students.find((s) => s._id === studentId);
     setSelectedTrainee(student);
     setIsViewModalVisible(true);  
   };
+
+  const handleDelete = (id) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this Trainee?",
+      content: "This action cannot be undone.",
+      okText: "Yes",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          await DeleteTrainee(id);
+          setStudents((prevStudents) =>
+            prevStudents.filter((trainee) => trainee.id !== id)
+          );
+          message.success("Trainee deleted successfully.");
+        } catch (error) {
+          console.error("Error deleting Trainee:", error);
+          message.error("Failed to delete the Trainee. Please try again.");
+        }
+      },
+      onCancel: () => {
+        message.info("Deletion canceled.");
+      },
+    });
+  };
+console.log(students);
+  const filteredData = students.filter(
+    (student) =>
+      (batchFilter ? student.batch === batchFilter : true) &&
+      (nameFilter
+        ? student.fullName.toLowerCase().includes(nameFilter.toLowerCase())
+        : true)
+  );
 
   const columns = [
     { name: "S.No", selector: (row, index) => index + 1, center: true },
@@ -152,33 +166,32 @@ const Trainee = () => {
           <button onClick={() => handleView(row._id)} className="text-blue-500">
             <FaEye size={16} />
           </button>
-          <button onClick={() => handleEditTrainee(row)} className="text-orange-500">
-            <FaEdit size={16}/>
+          <button onClick={() => handleEdit(row)} className="text-orange-500">
+            <FaEdit size={16} />
           </button>
-          <button onClick={() => handleDelete(row._id)} className="text-red-500">
-            <FaTrash  size={16  }/>
+          <button onClick={() => handleDelete(row)} className="text-red-500">
+            <FaTrash size={16} />
           </button>
         </div>
       ),
       center: true,
     },
   ];
-  const customStyles = {
-    headCells: {
-      style: {
-        backgroundColor: "#ff9800",
-        color: "#ffffff",
-        fontSize: "16px",
-        paddingRight: "0px",
-      },
-    },
-  };
 
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex gap-4">
-         
+          <select
+            className="border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+            value={batchFilter}
+            onChange={(e) => setBatchFilter(e.target.value)}
+          >
+            <option value="">All Batches</option>
+            <option value="Batch A">Batch A</option>
+            <option value="Batch B">Batch B</option>
+            <option value="Batch C">Batch C</option>
+          </select>
           <input
             type="text"
             placeholder="Filter by Name"
@@ -197,37 +210,23 @@ const Trainee = () => {
 
       <DataTable
         columns={columns}
-        
         data={filteredData}
-        customStyles={customStyles}
         pagination
         className="border rounded-lg shadow-lg"
       />
 
+      {/* Add Student Modal */}
       <Modal
-        title={editingTrainee ? "Edit Batch" : "Add New Batch"}
-      open={isAddModalVisible}
+        title="Add Student"
+        visible={isAddModalVisible}
         onCancel={handleModalCancel}
         footer={null}
         centered
       >
-        <Form layout="vertical" onFinish={handleFormSubmit} form={form} initialValues={{fullName: "",
-    email: "",
-    dob: undefined, 
-    phoneNumber: "",
-    gender: undefined, 
-    profilePic: undefined, 
-    batch: undefined,
-    currentAddress: "",
-    permanentAddress: "",
-    experience: undefined,
-    qualification: "",
-    role: "Trainee", 
-    password: "",
-    }}>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
+        <Form layout="vertical" onFinish={handleFormSubmit} form={form}>
+           <Row gutter={16}>
+             <Col span={12}>
+               <Form.Item
                 label="Full Name"
                 name="fullName"
                 rules={[{ required: true, message: "Please enter the full name!" }]}
@@ -248,17 +247,13 @@ const Trainee = () => {
 
           <Row gutter={16}>
             <Col span={12}>
-            <Form.Item
-        label="Date of Birth"
-        name="dob"
-        rules={[{ required: true, message: "Please select the date of birth!" }]}
-      >
-        <DatePicker 
-          style={{ width: "100%" }} 
-          value={form.getFieldValue('dob') ? moment(form.getFieldValue('dob')) : null} // Ensure the value is a moment object
-          onChange={(date) => form.setFieldsValue({ dob: date ? moment(date) : null })}  // Ensure the value is set as moment
-        />
-      </Form.Item>
+              <Form.Item
+                label="Date of Birth"
+                name="dob"
+                rules={[{ required: true, message: "Please select the date of birth!" }]}
+              >
+                <DatePicker style={{ width: "100%" }} />
+              </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
@@ -394,7 +389,183 @@ const Trainee = () => {
         </Form>
       </Modal>
 
+      {/* Edit Student Modal */}
       <Modal
+        title="Edit Student"
+        visible={isEditModalVisible}
+        onCancel={handleModalCancel}
+        footer={null}
+        centered
+      >
+        <Form layout="vertical" onFinish={handleFormSubmit} form={form}>
+           <Row gutter={16}>
+             <Col span={12}>
+               <Form.Item
+                label="Full Name"
+                name="fullName"
+                rules={[{ required: true, message: "Please enter the full name!" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[{ required: true, message: "Please enter the email!" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Date of Birth"
+                name="dob"
+                rules={[{ required: true, message: "Please select the date of birth!" }]}
+              >
+                <DatePicker style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Phone Number"
+                name="phoneNumber"
+                rules={[{ required: true, message: "Please enter the phone number!" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Gender"
+                name="gender"
+                rules={[{ required: true, message: "Please select the gender!" }]}
+              >
+                <Select placeholder="Select Gender">
+                  <Select.Option value="Male">Male</Select.Option>
+                  <Select.Option value="Female">Female</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Hybrid"
+                name="hybrid"
+                rules={[{ required: true, message: "Please select the hybrid mode!" }]}
+              >
+                <Select>
+                  <Select.Option value="Online">Online</Select.Option>
+                  <Select.Option value="WFH">WFH</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Profile Picture" name="profilePic">
+                <Upload>
+                  <Button icon={<UploadOutlined />}>Upload</Button>
+                </Upload>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Batch" name="batch">
+                <Select placeholder="Select Batch">
+                  {batches.map((batch) => (
+                    <Select.Option key={batch._id} value={batch._id}>
+                      {batch.batchName}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Current Address"
+                name="currentAddress"
+                rules={[{ required: true, message: "Please enter the current address!" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Permanent Address" name="permanentAddress">
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Experience"
+                name="experience"
+                rules={[{ required: true, message: "Please select the experience!" }]}
+              >
+                <Select>
+                  <Select.Option value="0 to 1">0 to 1</Select.Option>
+                  <Select.Option value="1 to 3">1 to 3</Select.Option>
+                  <Select.Option value="3 to 5">3 to 5</Select.Option>
+                  <Select.Option value="5+">5+</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Qualification" name="qualification">
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Role"
+                name="role"
+                initialValue="Trainee"
+                rules={[{ required: true, message: "Please select the role!" }]}
+              >
+                <Select>
+                  <Select.Option value="Trainer">Trainer</Select.Option>
+                  <Select.Option value="Trainee">Trainee</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+            <Form.Item
+      label="Password"
+      name="password"
+      rules={[{ required: true, message: "Please enter the password!" }]}
+    >
+      <Input.Password />
+    </Form.Item>
+            </Col>
+          </Row>
+
+          <div className="flex justify-end">
+            <Button onClick={handleModalCancel} className="mr-4">
+              Cancel
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
+      {/* View Student Modal */}
+    
+        <Modal
         title="Trainee Details"
         visible={isViewModalVisible}
         onCancel={handleModalCancel}
@@ -449,11 +620,10 @@ const Trainee = () => {
         ) : (
           <p>Loading...</p>
         )}
+      
       </Modal>
-
     </div>
   );
 };
-
 
 export default Trainee;

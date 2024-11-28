@@ -97,7 +97,11 @@ export const GetTrainee = async () => {
   return res;
 };
 export const EditTrainee = async (id,data) => {
-  const res = await interceptors.put(`/trainee/editTrainee/${id}`,data);
+  const res = await interceptors.put(`/trainee/editTrainee/${id}`, data);
+  return res;
+};
+export const DeleteTrainee = async (id) => {
+  const res = await interceptors.delete(`/trainee/deleteTrainee/${id}`);
   return res;
 };
 
