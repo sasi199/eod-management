@@ -107,9 +107,11 @@ exports.getBatchAll = async(req)=>{
 
 exports.getBatchId = async(req)=>{
     const { authId } = req
-    const { _id } = req.params
+    // const { _id } = req.params
+    console.log(req.params,"jajahjaha");
+    
 
-    if (!_id) {
+    if (_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Batch id required"});
     }
 
@@ -118,13 +120,58 @@ exports.getBatchId = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Batch not found"});
     }
 
-    const assigned = await AssignedModel.findOne({ batchId: _id });
+    const assigned = await AssignedBatchModel.findOne({ batchId: _id });
     if (!assigned) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "No trainers or trainees assigned to this batch" });
     }
+
+    const trainerDetails = await StaffModel.find({ _id: { $in: assigned.trainer } },{ fullName: 1, profilePic: 1 });
+    console.log(trainerDetails,'llalllala');
     
-    return batch;
+    const traineeDetails = await TraineeModel.find({ _id: { $in: assigned.trainee } });
+
+    return {
+        batchDetails: batch,
+        trainerDetails,
+        traineeDetails
+    };
 }
+
+exports.getBatchId = async (req) => {
+        const { authId } = req;
+        const { _id } = req.params;
+
+        if (!_id) {
+            throw new ApiError(httpStatus.BAD_REQUEST, { message: "Batch id required" });
+        }
+
+        const batch = await BatchModel.findById(_id);
+        if (!batch) {
+            throw new ApiError(httpStatus.BAD_REQUEST, { message: "Batch not found" });
+        }
+
+        const assigned = await AssignedBatchModel.findOne({ batchId: _id });
+        if (!assigned) {
+            throw new ApiError(httpStatus.BAD_REQUEST, { message: "No trainers or trainees assigned to this batch" });
+        }
+
+        const trainerDetails = await StaffModel.find(
+            { _id: { $in: assigned.trainer } },
+            { fullName: 1, profilePic: 1 }
+        );
+
+        const traineeDetails = await TraineeModel.find(
+            { _id: { $in: assigned.trainee } }
+        );
+
+        return {
+            batchDetails: batch,
+            trainerDetails,
+            traineeDetails
+        };
+   
+};
+
 
 
 exports.editBatch = async(req)=>{
