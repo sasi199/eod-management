@@ -103,6 +103,12 @@ const TrainerSidebar = () => {
   const[projectName, setProjectName]=useState(projectInitialState);
   const [projectData, setProjectData] = useState([]);
   const[selectedMembers, setSelectedMembers]=useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+
+  const filteredProjects = projectData.filter((project) => 
+  project.projectName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const location = useLocation();
   let isProjectDataFetched =false;
@@ -258,8 +264,10 @@ const TrainerSidebar = () => {
   
   <input
     type="text"
-    placeholder="Search"
-    className="flex-1 text-sm text-gray-700 placeholder-white bg-transparent border border-white rounded-md py-1 px-2 outline-none focus:ring-2 focus:ring-orange-600 w-20"
+    placeholder="Search projects..."
+    value={searchQuery}
+    onChange={(e)=> setSearchQuery(e.target.value)}
+    className="flex-1 text-sm text-white placeholder-white bg-transparent border border-white rounded-md py-1 px-2 outline-none focus:ring-2 focus:ring-orange-600 w-20"
   />
 
   {/* <button
@@ -271,10 +279,10 @@ const TrainerSidebar = () => {
 </div>
 
 {/* project list */}
-          { projectData.length > 0 ?(
+          { filteredProjects.length > 0 ?(
             <>
             <div className='mt-6 '>
-              {projectData.map((project, i)=>{
+              {filteredProjects.map((project, i)=>{
                 return (
 
                 <ul  key={i} className='mt-2'>

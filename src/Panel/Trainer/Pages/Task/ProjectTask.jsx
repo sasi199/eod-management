@@ -544,12 +544,18 @@ const handleUpdate = async() => {
             name='assignees'
             rules={[{required:true, message:"Please select assignee"}]}
             >
-            <Select
-            placeholder="Select assignees"
-            value={task.assignees}
-            onChange={(value)=> handleSelectChange(value, "assignees")}
-            options={handleAssigneeOptions()}
-            />
+           <Select
+  showSearch
+  placeholder="Search and select assignees"
+  value={task.assignees}
+  onChange={(value) => handleSelectChange(value, "assignees")}
+  options={handleAssigneeOptions()}
+  filterOption={(input, option) => {
+    const fullName = option.label.props.children?.props?.children[1]?.props?.children;
+    return fullName?.toLowerCase().includes(input.toLowerCase());
+  }}
+/>
+
             </Form.Item>
             <Form.Item
             label='DueDate'
