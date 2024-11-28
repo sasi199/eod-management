@@ -10,74 +10,53 @@ const moment = require('moment');
 
 
 exports.createSchedule = async (req) => {
-    const { batch, days, trainers, timings } = req.body;
+    const { batch,date,timeTable } = req.body;
 
     const existBatch = await BatchModel.findById(batch);
     if (!existBatch) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Batch not found" });
     }
 
-    if (!Array.isArray(days) || days.length === 0) {
-        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Days must be a non-empty array" });
+    const existingSchedule = await ScheduleModel.findOne({ batch, date });
+    if (existingSchedule) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {
+            message: `A schedule already exists for this batch on Today ${date}.`,
+        });
     }
 
-    const validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    for (const day of days) {
-        if (!validDays.includes(day)) {
-            throw new ApiError(httpStatus.BAD_REQUEST, { message: `Invalid day: ${day}` });
-        }
-    }
+    for (const entry of timeTable) {
+        const { trainer, startTime, endTime } = entry;
 
-    if (!Array.isArray(trainers) || trainers.length === 0) {
-        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Trainers must be a non-empty array" });
-    }
+        const conflict = await TimetableModel.findOne({
+            trainer,
+            date,
+            $or: [
+                { startTime: { $lte: endTime }, endTime: { $gte: startTime }},
+            ],
+        });
 
-    for (const trainer of trainers) {
-        const trainerExists = await StaffModel.findOne({ _id: trainer, isTrainer: true });
-        if (!trainerExists) {
-            throw new ApiError(httpStatus.BAD_REQUEST, { message: `Trainer not found: ${trainer}` });
-        }
-    }
-
-    if (!Array.isArray(timings) || timings.length === 0) {
-        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Timings must be a non-empty array" });
-    }
-
-    for (const timing of timings) {
-        if (!timing.startTime || !timing.endTime || !timing.subject) {
-            throw new ApiError(httpStatus.BAD_REQUEST, {
-                message: "Each timing must include 'startTime', 'endTime', and 'subject'.",
+        if (conflict) {
+            throw new ApiError(httpStatus.BAD_REQUEST, { 
+                message: `Trainer ${trainer} is already assigned to another batch during the specified time.` 
             });
         }
     }
 
-
-    for (const day of days) {
-        for (const trainer of trainers) {
-            for (const timing of timings) {
-                const conflict = await ScheduleModel.findOne({
-                    batch,
-                    days: day,
-                    trainers: trainer,
-                    'timings.startTime': { $lte: timing.endTime },
-                    'timings.endTime': { $gte: timing.startTime },
-                });
-
-                if (conflict) {
-                    throw new ApiError(httpStatus.CONFLICT, {
-                        message: `Conflict detected: Trainer ${trainer} already has a schedule on ${day} from ${timing.startTime} to ${timing.endTime}.`,
-                    });
-                }
-            }
-        }
-    };   
-    
-    const newSchedule = await ScheduleModel.create({
+    const newSchedule = new ScheduleModel({
         batch,
-        days,
-        trainers,
-        timings,
+        date,
     });
+
+    await newSchedule.save();
+
+    const timeTableEntries = timeTable.map(entry => ({
+        ...entry,
+        scheduleId: newSchedule._id,
+    }));
+
+    const createdTimeTables = await TimetableModel.insertMany(timeTableEntries);
+    newSchedule.timeTable = createdTimeTables.map(entry => entry._id);
+    await newSchedule.save();
 
     return newSchedule;
 
