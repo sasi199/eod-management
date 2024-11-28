@@ -216,7 +216,7 @@ exports.editBatch = async(req)=>{
         {new: true, runValidators: true}
     )
 
-    const update =  await BatchModel.findOneAndUpdate(_id,updateData,
+    const update =  await AssignedBatchModel.findOneAndUpdate({batchId:_id},updateData,
         {new: true, runValidators: true}
     )
 

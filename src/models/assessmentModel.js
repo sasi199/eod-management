@@ -13,17 +13,10 @@ const assessmentSchema = new mongoose.Schema({
         required: true
     },
     mediaUrl: schemaFields.requiredAndString,
-    mediaType: {
-        type: String,
-        enum: ['Image', 'PDF', 'Quiz'],
-        required: true
-    },
-    // assessmentDate: schemaFields.requiredAndDate,
     assessmentTiming: schemaFields.requiredAndString,
     attendedMembers: { type: [String], default: [] },
     completedMembers: { type: [String], default: [] },
     marks: { type: Map, of: Number },
-    quizAccessStartTime: { type: Date },
 }, { timestamps: true, collection: "Assessment" });
 
 const AssessmentModel = mongoose.model('Assessment', assessmentSchema);

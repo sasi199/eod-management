@@ -15,32 +15,12 @@ exports.createAssessment = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, "Batch not found");
     }
 
-    // let mediaUrl;
-    // if (req.file) {
-    //     const fileExtension = req.file.originalname.split('.').pop();
-    //     const fileName = `${Date.now()}.${fileExtension}`;
-    //     mediaUrl = await uploadCloud(`assessment/${fileName}`, req.file);
-
     let mediaUrl;
-
-    
-    if (['Image', 'PDF'].includes(mediaType)) {
-        if (!req.file) {
-            throw new ApiError(httpStatus.BAD_REQUEST, `File is required for media type: ${mediaType}`);
-        }
-
+    if (req.file) {
         const fileExtension = req.file.originalname.split('.').pop();
         const fileName = `${Date.now()}.${fileExtension}`;
         mediaUrl = await uploadCloud(`assessment/${fileName}`, req.file);
     }
-
-    if (mediaType === 'Quiz') {
-        if (!quizLink) {
-            throw new ApiError(httpStatus.BAD_REQUEST, "Quiz link is required for media type: Quiz");
-        }
-        mediaUrl = quizLink;
-    }
-
 
     if (!mediaUrl) {
         throw new ApiError(httpStatus.BAD_REQUEST, "Media URL could not be processed");

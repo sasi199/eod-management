@@ -86,12 +86,19 @@ exports.logoutUser = async (req) => {
   const { authId } = req;
   const now = new Date();
 
-  const today = new Date().toISOString().slice(0, 10);
+  const startOfDay = new Date();
+  startOfDay.setUTCHours(0, 0, 0, 0);
+
+  const endOfDay = new Date();
+  endOfDay.setUTCHours(23, 59, 59, 999);
 
   const attendance = await AttendanceModel.findOne({
     user:authId,
-    date: today
+    date: { $gte: startOfDay, $lte: endOfDay },
   })
+
+  console.log(attendance,"alallalal");
+  
 
   if (!attendance) {
     throw new ApiError(httpStatus.BAD_REQUEST, {message:"No attendance record found for today."});

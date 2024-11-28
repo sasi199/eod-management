@@ -9,65 +9,80 @@ const moment = require('moment');
 
 
 
-exports.createSchedule = async(req)=>{
-    const { batch, trainer, timeTable = [] } = req.body
+exports.createSchedule = async (req) => {
+    const { batch, days, trainers, timings } = req.body;
 
     const existBatch = await BatchModel.findById(batch);
     if (!existBatch) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Batch not found" });
-    } 
-
-    if (!Array.isArray(timeTable)) {
-        throw new ApiError(httpStatus.BAD_REQUEST, { message: "timeTable must be an array" });
     }
 
-    const existTrainer = await StaffModel.findById({ _id: trainer, isTrainer: true });
-    if (!existTrainer) {
-        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Trainer not found" });
+    if (!Array.isArray(days) || days.length === 0) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Days must be a non-empty array" });
     }
 
-    const startOfWeek = moment().startOf("week").add(1, "days");
-    const endOfWeek = moment(startOfWeek).add(5, "days");
-
-    const schedules = [];
-
-
-    for (let day = startOfWeek; day.isSameOrBefore(endOfWeek); day.add(1, "days")) {
-        for (const slot of timeTable) {
-            
-            const conflict = await TimetableModel.findOne({
-                trainer,
-                date: day.toDate(),
-                startTime: { $lte: slot.endTime },
-                endTime: { $gte: slot.startTime },
-            });
-
-            if (conflict) {
-                throw new ApiError(httpStatus.CONFLICT, {
-                    message: `Trainer is already assigned during ${slot.startTime} - ${slot.endTime} on ${day.format("YYYY-MM-DD")}`,
-                });
-            }
-
-            
-            const newTimetable = await TimetableModel.create({
-                ...slot,
-                trainer,
-                batch,
-                date: day.toDate(),
-            });
-
-            schedules.push(
-                await ScheduleModel.findOneAndUpdate(
-                    { batch, date: day.toDate() },
-                    { $push: { timeTable: newTimetable._id } },
-                    { upsert: true, new: true }
-                )
-            );
+    const validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    for (const day of days) {
+        if (!validDays.includes(day)) {
+            throw new ApiError(httpStatus.BAD_REQUEST, { message: `Invalid day: ${day}` });
         }
     }
 
-    return schedules;
-}
+    if (!Array.isArray(trainers) || trainers.length === 0) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Trainers must be a non-empty array" });
+    }
+
+    for (const trainer of trainers) {
+        const trainerExists = await StaffModel.findOne({ _id: trainer, isTrainer: true });
+        if (!trainerExists) {
+            throw new ApiError(httpStatus.BAD_REQUEST, { message: `Trainer not found: ${trainer}` });
+        }
+    }
+
+    if (!Array.isArray(timings) || timings.length === 0) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Timings must be a non-empty array" });
+    }
+
+    for (const timing of timings) {
+        if (!timing.startTime || !timing.endTime || !timing.subject) {
+            throw new ApiError(httpStatus.BAD_REQUEST, {
+                message: "Each timing must include 'startTime', 'endTime', and 'subject'.",
+            });
+        }
+    }
+
+
+    for (const day of days) {
+        for (const trainer of trainers) {
+            for (const timing of timings) {
+                const conflict = await ScheduleModel.findOne({
+                    batch,
+                    days: day,
+                    trainers: trainer,
+                    'timings.startTime': { $lte: timing.endTime },
+                    'timings.endTime': { $gte: timing.startTime },
+                });
+
+                if (conflict) {
+                    throw new ApiError(httpStatus.CONFLICT, {
+                        message: `Conflict detected: Trainer ${trainer} already has a schedule on ${day} from ${timing.startTime} to ${timing.endTime}.`,
+                    });
+                }
+            }
+        }
+    };   
+    
+    const newSchedule = await ScheduleModel.create({
+        batch,
+        days,
+        trainers,
+        timings,
+    });
+
+    return newSchedule;
+
+};
+
 
 
 exports.getScheduleAll = async(req)=>{

@@ -25,10 +25,10 @@ const taskSchema = new mongoose.Schema(
                 date: { type: Date, default: Date.now },
             },
         ],
-        assignees: {
+        assignees: [{
                 type: String,
                 ref: 'Staff'
-            },
+            }],
         tags: [{ type: String, trim: true }],
     },
     {
