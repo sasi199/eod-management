@@ -4,7 +4,6 @@ const ApiError = require("../utils/apiError");
 const httpStatus = require('http-status');
 const StaffModel = require("../models/staffModel");
 const TimetableModel = require("../models/timetableModel");
-const moment = require('moment');
 
 
 
@@ -65,7 +64,13 @@ exports.createSchedule = async (req) => {
 
 
 exports.getScheduleAll = async(req)=>{
-    const schedule = await ScheduleModel.find({})
+    const schedule = await ScheduleModel.find({}).populate({
+        path:'timeTable',
+        populate:{
+            path: 'trainer',
+            select: 'fullName profilePic'
+        }
+    })
     if (!schedule) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Schedule not found"});
     }
@@ -80,7 +85,13 @@ exports.getScheduleId = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Schedule  id required"});
     }
 
-    const schedule = await ScheduleModel.findById(_id);
+    const schedule = await ScheduleModel.findById(_id).populate({
+        path:'timeTable',
+        populate:{
+            path:'trainer',
+            select:'fullName profilePic'
+        }
+    });
     if (!schedule) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Schedule  not  found"});
     }
@@ -93,7 +104,7 @@ exports.getScheduleId = async(req)=>{
 exports.editSchedule = async(req)=>{
     const { _id } = req.params;
 
-    if(_id){
+    if(!_id){
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Schedule  id required"});
     }
 
@@ -104,9 +115,13 @@ exports.editSchedule = async(req)=>{
 
     const updateData = {...req.body};
     const updateSchedule = await ScheduleModel.findByIdAndUpdate(_id,updateData,
+        {new:true,runValidators:true});
+
+    const updateTimetable = await TimetableModel.findByIdAndUpdate({scheduleId:_id},updateData,
         {new:true,runValidators:true})
 
     await updateSchedule.save();
+    await updateTimetable.save();
     return updateSchedule;
 
 }

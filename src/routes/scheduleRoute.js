@@ -5,9 +5,9 @@ const { verifyAuthToken } = require('../middlewares/jwt.config');
 
 const Router = express.Router();
 
-Router.use(verifyAuthToken)
+// Router.use(verifyAuthToken)
 
-Router.route('/createSchedule').post(scheduleController.createSchedule);
+Router.route('/createSchedule').post(verifyAuthToken,scheduleController.createSchedule);
 Router.route('/getScheduleAll').get(scheduleController.getScheduleAll);
 Router.route('/getScheduleId:_id').get(scheduleController.getScheduleId);
 Router.route('/editSchedule/:_id').put(scheduleController.editSchedule);
