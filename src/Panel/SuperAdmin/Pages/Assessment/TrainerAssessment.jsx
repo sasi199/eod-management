@@ -355,46 +355,61 @@ const TrainerAssessment = () => {
         </Form>
       </Modal>
       <Modal
-        title="View Assessment"
-        visible={isViewModalVisible}
-        onCancel={() => setIsViewModalVisible(false)}
-        footer={null}
-        destroyOnClose
-      >
-        {selectedAssessment && (
-          <div className="space-y-4">
-            <p>
-              <strong>Assessment Title:</strong>{" "}
-              {selectedAssessment.assessmentTitle || "N/A"}
-            </p>
-            <p>
-              <strong>Batch:</strong> {selectedAssessment.batchName || "N/A"}
-            </p>
-            <p>
-              <strong>Media URL:</strong>{" "}
-              {selectedAssessment.mediaUrl ? (
-                <a
-                  href={selectedAssessment.mediaUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-500 underline"
-                >
-                  View Media
-                </a>
-              ) : (
-                "No Media"
-              )}
-            </p>
-            <p>
-              <strong>Timing:</strong>{" "}
-              {selectedAssessment.assessmentTiming || "N/A"}
-            </p>
-            <p>
-              <strong>Subject:</strong> {selectedAssessment.subject || "N/A"}
-            </p>
-          </div>
+  title={<h2 className="text-xl font-semibold text-gray-700">View Assessment</h2>}
+  visible={isViewModalVisible}
+  onCancel={() => setIsViewModalVisible(false)}
+  footer={null}
+  destroyOnClose
+  className="rounded-lg shadow-lg"
+>
+  {selectedAssessment && (
+    <div className="p-4 bg-gray-50 rounded-lg space-y-6">
+      <div className="flex flex-col">
+        <span className="font-medium text-gray-600">Assessment Title:</span>
+        <span className="text-lg font-semibold text-gray-800">
+          {selectedAssessment.assessmentTitle || "N/A"}
+        </span>
+      </div>
+
+      <div className="flex flex-col">
+        <span className="font-medium text-gray-600">Batch:</span>
+        <span className="text-lg font-semibold text-gray-800">
+          {selectedAssessment.batchName || "N/A"}
+        </span>
+      </div>
+
+      <div className="flex flex-col">
+        <span className="font-medium text-gray-600">Media URL:</span>
+        {selectedAssessment.mediaUrl ? (
+          <a
+            href={selectedAssessment.mediaUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 underline hover:text-blue-700"
+          >
+            View Media
+          </a>
+        ) : (
+          <span className="text-lg font-semibold text-gray-800">No Media</span>
         )}
-      </Modal>
+      </div>
+
+      <div className="flex flex-col">
+        <span className="font-medium text-gray-600">Timing:</span>
+        <span className="text-lg font-semibold text-gray-800">
+          {selectedAssessment.assessmentTiming || "N/A"}
+        </span>
+      </div>
+
+      <div className="flex flex-col">
+        <span className="font-medium text-gray-600">Subject:</span>
+        <span className="text-lg font-semibold text-gray-800">
+          {selectedAssessment.subject || "N/A"}
+        </span>
+      </div>
+    </div>
+  )}
+</Modal>
     </div>
   );
 };
