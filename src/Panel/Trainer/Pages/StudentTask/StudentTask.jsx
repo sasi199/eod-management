@@ -5,12 +5,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Input, message } from 'antd';
 import { FaDeleteLeft, FaFolderOpen } from 'react-icons/fa6';
 import { FaEdit } from 'react-icons/fa';
-// import ProjectTask from './ProjectTask';
 import { useDispatch } from 'react-redux';
 import { setProjectId, setProjectTitle} from '../../../../Redux/TrainerRedux';
 import { store } from '../../../../Redux/Store';
 
-const Task = () => {
+const StudentTask = () => {
 
   const projectInitialState = {
     projectName:""
@@ -174,9 +173,9 @@ const handleDeleteCancel = () => {
       <>
       <div className='h-screen flex flex-col overflow-x-hidden relative'>
       <div className='group inline-block top-18 right-4 absolute'>
-     {/* <button onClick={()=>setIsModalVisible(true)} className='bg-orange-500 rounded-lg px-3 py-2 group-hover:bg-white group-hover:border group-hover:border-orange-500 transition-all transform duration-300 ease-in-out'>
+     <button onClick={()=>setIsModalVisible(true)} className='bg-orange-500 rounded-lg px-3 py-2 group-hover:bg-white group-hover:border group-hover:border-orange-500 transition-all transform duration-300 ease-in-out'>
      <span className='text-white font-bold group-hover:text-orange-500 transition-all transform duration-300 ease-in-out'> Create Project</span>
-      </button> */}
+      </button>
      </div>
       <div className='mt-10 p-4 rounded-lg relative'>
       <ul className="space-y-6">
@@ -193,12 +192,12 @@ const handleDeleteCancel = () => {
            <div className="text-base font-medium text-gray-800">
              {project.projectName}
            </div>
-           {/* <div className='absolute right-8'>
+           <div className='absolute right-8'>
             <div className='flex gap-4'>
             <FaEdit onClick={()=>handleEditProject(project)} className='text-lg cursor-pointer'/>
             <FaDeleteLeft onClick={()=>handleDeleteProject(project)} className='text-lg cursor-pointer'/>
             </div>
-           </div> */}
+           </div>
            </div>
            <div className="text-sm text-gray-500 mt-1">
              Created on: {convertToIST(project.createdAt)}
@@ -219,17 +218,17 @@ const handleDeleteCancel = () => {
         <FaFolderOpen className='text-[70px] text-gray-300'/>
         <p className='text-sm text-center mt-2'>You don’t have any projects yet. Start creating your first project to see it here.</p>
 
-     {/* <div className='group inline-block mt-4'>
+     <div className='group inline-block mt-4'>
      <button onClick={()=>setIsModalVisible(true)} className='bg-orange-500 rounded-lg px-3 py-2 group-hover:bg-white group-hover:border group-hover:border-orange-500 transition-all transform duration-300 ease-in-out'>
      <span className='text-white font-bold group-hover:text-orange-500 transition-all transform duration-300 ease-in-out'> Create Project</span>
       </button>
-     </div> */}
+     </div>
      </div>
       </>
      )
 
      }
-      {/* <div>
+      <div>
         <Modal
          title="Create New Project"
          open={isModalVisible}
@@ -250,15 +249,15 @@ const handleDeleteCancel = () => {
  
            <div className="flex justify-start gap-4 mt-6 pt-1 ">
              {/* <Button onClick={handleCancel}>Cancel</Button> */}
-             {/* <Button type="primary" onClick={handleOk}>
+             <Button type="primary" onClick={handleOk}>
                Create Project
              </Button>
            </div>
          </div>
        </Modal>
-    </div>  */}
+    </div>
 
-    {/* edit model 
+    {/*edit model  */}
     <div>
         <Modal
          title="Edit Project"
@@ -278,18 +277,18 @@ const handleDeleteCancel = () => {
              />
            </div>
  
-           <div className="flex justify-start gap-4 mt-6 pt-1 "> */}
+           <div className="flex justify-start gap-4 mt-6 pt-1 ">
              {/* <Button onClick={handleCancel}>Cancel</Button> */}
-             {/* <Button type="primary" onClick={handleEditOk}>
+             <Button type="primary" onClick={handleEditOk}>
                Update Project
              </Button>
            </div>
          </div>
        </Modal>
-    </div> */}
+    </div>
 
     {/* delete */}
-    {/* <Modal
+    <Modal
     open={isDeleteModalVisible}
     onOk={handleDeleteOk}
     onCancel={handleDeleteCancel}
@@ -297,7 +296,7 @@ const handleDeleteCancel = () => {
     cancelText="No"
     >
       <p>Are you sure to delete the project?</p>
-    </Modal> */}
+    </Modal>
     </div>
 
     </>
@@ -305,4 +304,4 @@ const handleDeleteCancel = () => {
   
 }
 
-export default Task;
+export default StudentTask

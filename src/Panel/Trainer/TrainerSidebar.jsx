@@ -5,7 +5,7 @@ import { MdAssignment } from 'react-icons/md';
 import logo from '../../assets/Login/NavbarLogo.png'
 import { CreateProject, GetProjects, logout } from '../../services';
 import {Modal, Input, Select, Button, message} from 'antd'
-import { FaSquarePlus } from 'react-icons/fa6';
+import { FaDochub, FaGraduationCap, FaRProject, FaSquarePlus } from 'react-icons/fa6';
 import Task from '../SuperAdmin/Pages/Task/Task';
 const Navbar = () => {
   const location = useLocation();
@@ -103,6 +103,12 @@ const TrainerSidebar = () => {
   const[projectName, setProjectName]=useState(projectInitialState);
   const [projectData, setProjectData] = useState([]);
   const[selectedMembers, setSelectedMembers]=useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+
+  const filteredProjects = projectData.filter((project) => 
+  project.projectName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const location = useLocation();
   let isProjectDataFetched =false;
@@ -209,6 +215,13 @@ const TrainerSidebar = () => {
             Task
           </Link>
           <Link 
+            to="/trainersidebar/studenttask" 
+            onClick={toggleTaskView}
+            className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
+            <FaGraduationCap />
+           Student Task
+          </Link>
+          <Link 
             to="/trainersidebar/assessment" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
             <MdAssignment/>
@@ -258,8 +271,10 @@ const TrainerSidebar = () => {
   
   <input
     type="text"
-    placeholder="Search"
-    className="flex-1 text-sm text-gray-700 placeholder-white bg-transparent border border-white rounded-md py-1 px-2 outline-none focus:ring-2 focus:ring-orange-600 w-20"
+    placeholder="Search projects..."
+    value={searchQuery}
+    onChange={(e)=> setSearchQuery(e.target.value)}
+    className="flex-1 text-sm text-white placeholder-white bg-transparent border border-white rounded-md py-1 px-2 outline-none focus:ring-2 focus:ring-orange-600 w-20"
   />
 
   {/* <button
@@ -271,10 +286,10 @@ const TrainerSidebar = () => {
 </div>
 
 {/* project list */}
-          { projectData.length > 0 ?(
+          { filteredProjects.length > 0 ?(
             <>
             <div className='mt-6 '>
-              {projectData.map((project, i)=>{
+              {filteredProjects.map((project, i)=>{
                 return (
 
                 <ul  key={i} className='mt-2'>

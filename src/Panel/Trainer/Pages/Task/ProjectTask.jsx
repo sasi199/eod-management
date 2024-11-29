@@ -43,7 +43,7 @@ const taskInitialValues = {
   description: "",
   status: "",
   assignees: null,
-  dueDate: null,
+  dueDate: "",
   priority: "",
   projectId:""
 }
@@ -544,12 +544,20 @@ const handleUpdate = async() => {
             name='assignees'
             rules={[{required:true, message:"Please select assignee"}]}
             >
-            <Select
-            placeholder="Select assignees"
-            value={task.assignees}
-            onChange={(value)=> handleSelectChange(value, "assignees")}
-            options={handleAssigneeOptions()}
-            />
+           <Select
+  showSearch
+  placeholder="Search and select assignees"
+  value={task.assignees}
+  onChange={(value) => (
+    console.log("assigness",value),
+    handleSelectChange(value, "assignees"))}
+  options={handleAssigneeOptions()}
+  filterOption={(input, option) => {
+    const fullName = option.label.props.children?.props?.children[1]?.props?.children;
+    return fullName?.toLowerCase().includes(input.toLowerCase());
+  }}
+/>
+
             </Form.Item>
             <Form.Item
             label='DueDate'
@@ -605,18 +613,18 @@ const handleUpdate = async() => {
 
       {/* Modal */}  {/* Task Details */}
       <Modal
-        title="Task Details"
+        title={<span style={{ fontSize: '24px', fontWeight: 'bold' }}>Task Details</span>}
         visible={isModalVisible}
         onCancel={handleModalClose}
         footer={null}
-        width="50%"
+        width="80%"
         centered
         className='relative'
       >
     {selectedTask && (
  <div className="flex justify-between gap-6 p-6">
  {/* Task Details Section */}
- <div className="bg-white p-6 space-y-6 max-w-4xl w-[65%] rounded-lg shadow-md">
+ <div className="bg-white p-6 space-y-6 max-w-4xl w-[60%] rounded-lg shadow-md">
    {/* Task Header */}
    <div className="flex justify-between items-center pb-4 border-b">
     {/* Edit title */}
@@ -671,14 +679,16 @@ const handleUpdate = async() => {
        {isEditing.assignees ? (
           <Select
           placeholder="Select assignees"
-          value={formValues.assignees[0].fullName}
-          onChange={(value)=> handleFieldChange("assignees",[
-            {_id:value._id, 
-              fullName:value.fullName
-              }
-          ])}
+          value={formValues?.assignees[0]?._id}
+          onChange={(value)=>(
+            handleFieldChange("assignees",value))}
           onBlur={()=> toggleEdit("assignees")}
           options={handleAssigneeOptions()}
+          onDropdownVisibleChange={(open) => {
+            if (open) {
+              handleFieldChange("assignees", []); // Clear value when dropdown is opened
+            }
+          }}
           />
        ):(
         <Tooltip
@@ -713,20 +723,29 @@ const handleUpdate = async() => {
        <span className="font-semibold text-lg text-gray-700 mr-2">Due Date:</span>
      
        {isEditing.dueDate ? (
-        <DatePicker
+<DatePicker
   style={{ width: "100%" }}
-  value={formValues.dueDate ? moment(formValues.dueDate, "DD-MM-YYYY") : null} // Ensure proper moment parsing
-  onChange={(date) => {
-    console.log("Selected date:", date); // Debugging
-    if (date) {
-      handleFieldChange("dueDate",date);
+  value={
+      formValues.dueDate && moment(formValues.dueDate).isValid()
+        ? moment(formValues.dueDate) // Use moment if valid
+        : null // Default to null if invalid
     }
-  }}// Pass the formatted value to handleFieldChange
-  onBlur={() => toggleEdit("dueDate")}
-  disabledDate={(current) => current && current < moment().startOf("day")}
-  format="DD-MM-YYYY"
-  showTime={false}
+  onChange={(date) => {
+    if (date) {
+      const formattedDate = date.toISOString(); // Convert moment to ISO string
+      handleFieldChange("dueDate", formattedDate); // Update state
+    }
+  }}
+  format="DD-MM-YYYY" // Adjust the display format
+  disabledDate={(current) => current && current < moment()} // Disable past dates
+  onOpenChange={(open) => {
+    if (open) {
+      handleFieldChange("dueDate", null); // Clear the value when the picker is opened
+    }
+  }}
 />
+
+
 ) : (
 
   <span 
@@ -740,23 +759,44 @@ const handleUpdate = async() => {
      </div>
 
      {/* Priority */}
-     <div className="flex items-center">
-       <FaExclamationTriangle className="mr-2 text-gray-500" />
-       <span className="font-semibold text-lg text-gray-700 mr-2">Priority:</span>
-       <span
-         className={`font-bold text-lg ${
-           selectedTask.priority === 'high'
-             ? 'text-red-500'
-             : selectedTask.priority === 'medium'
-             ? 'text-orange-500'
-             : selectedTask.priority === 'normal'
-             ? 'text-green-500'
-             : 'text-blue-500'
-         }`}
-       >
-         {selectedTask.priority.charAt(0).toUpperCase() + selectedTask.priority.slice(1)}
-       </span>
-     </div>
+   {isEditing.priority ? (
+
+    
+  <div className="flex items-center">
+  <FaExclamationTriangle className="mr-2 text-gray-500" />
+  <span className="font-semibold text-lg text-gray-700 mr-2">Priority:</span>
+  <Select
+         placeholder="Select status"
+         value={formValues.priority}
+         onChange={(value)=> handleFieldChange("priority", value)}
+         onBlur={() => toggleEdit("priority")}
+         options={handlePriorityOptions()}
+         />
+</div>
+   ):(
+    <div className="flex items-center">
+    <FaExclamationTriangle className="mr-2 text-gray-500" />
+    <span className="font-semibold text-lg text-gray-700 mr-2">Priority:</span>
+    <span
+      className={`font-bold text-lg cursor-pointer ${
+        formValues.priority === 'high'
+          ? 'text-red-500'
+          : formValues.priority === 'medium'
+          ? 'text-orange-500'
+          : formValues.priority === 'normal'
+          ? 'text-green-500'
+          : 'text-blue-500'
+      }`}
+      onClick={() => toggleEdit("priority")} 
+    >
+    {formValues.priority
+        ? formValues.priority.charAt(0).toUpperCase() + formValues.priority.slice(1)
+        : 'Not Set'}
+    </span>
+  </div>
+   )
+
+   }
    </div>
 
    {/*Editable Task Description */}
@@ -788,16 +828,16 @@ const handleUpdate = async() => {
 
 
  {/* Activity Section */}
- <div className="bg-gray-50 w-[35%] rounded-lg p-6 shadow-md overflow-y-auto">
+ <div className="bg-gray-50 w-[40%] rounded-lg p-6 shadow-md overflow-y-scroll">
    <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Activity</h3>
    <ul className="space-y-4">
      {selectedTask.activities.map((activity, index) => (
        <li
          key={index}
-         className="flex flex-col bg-white p-4 rounded-lg shadow-sm hover:shadow-lg transition-shadow"
+         className="flex flex-col bg-white p-2 rounded-lg shadow-sm hover:shadow-lg transition-shadow"
        >
-         <div className="text-gray-800 font-medium">{activity.activity}</div>
-         <span className="text-gray-500 text-sm mt-1">
+         <div className="text-gray-800 font-medium text-[8px]">{activity.activity}</div>
+         <span className="text-gray-500 text-[8px] mt-1">
            {formatToReadableDateTime(activity.date)}
          </span>
        </li>
