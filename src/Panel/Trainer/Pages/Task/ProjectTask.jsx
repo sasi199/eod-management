@@ -828,9 +828,9 @@ const handleUpdate = async() => {
 
 
  {/* Activity Section */}
- <div className="bg-gray-50 w-[40%] rounded-lg p-6 shadow-md overflow-y-scroll">
+ <div className="bg-gray-50 w-[40%] rounded-lg p-6 shadow-md overflow-y-scroll h-96 ">
    <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Activity</h3>
-   <ul className="space-y-4">
+   <ul className="space-y-4 ">
      {selectedTask.activities.map((activity, index) => (
        <li
          key={index}
