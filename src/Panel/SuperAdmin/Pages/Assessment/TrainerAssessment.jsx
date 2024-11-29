@@ -1,57 +1,164 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Button, Modal, Form, Input, Select, Upload, message } from "antd";
+import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import DataTable from "react-data-table-component";
-import { Modal, Form, Input, Select, Upload, Button, DatePicker } from "antd";
+import {
+  CreateAssessment,
+  DeleteAssessment,
+  EditAssessment,
+  GetAssessment,
+  GetBatches,
+} from "../../../../services";
 import { UploadOutlined } from "@ant-design/icons";
-import moment from "moment";
-import { CreateAssessment } from "../../../../services/index";
 
 const { Option } = Select;
 
 const TrainerAssessment = () => {
-  const [data, setData] = useState([
-    { id: 1, name: "Assessment 1", date: "2024-11-27", batch: "Nov-24-2024" },
-    { id: 2, name: "Assessment 2", date: "2024-11-20", batch: "Dec-24-2024" },
-  ]);
-  const [filteredData, setFilteredData] = useState(data);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [addModal, SetAddmodal] = useState(false);
-  const [form] = Form.useForm();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [batches, setBatches] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [selectedAssessment, setSelectedAssessment] = useState(null);
+  const [assessments, setAssessments] = useState([]);
+  const [form] = Form.useForm();
 
-  const [filters, setFilters] = useState({ date: null, batch: null });
+  const handleEdit = (row) => {
+    setIsEditing(true);
+    setEditingId(row._id);
+    setIsModalVisible(true);
+
+    form.setFieldsValue({
+      assessmentTitle: row.assessmentTitle,
+      batch: row.batchName,
+      mediaUrl: row.mediaUrl,
+      assessmentTiming: row.assessmentTiming,
+      subject: row.subject,
+    });
+  };
+
+  const handleView = (row) => {
+    setSelectedAssessment(row);
+    setIsViewModalVisible(true);
+  };
+
+  useEffect(() => {
+    const fetchAssessment = async () => {
+      try {
+        const response = await GetAssessment();
+        if (response.data?.data) {
+          const enrichedAssessments = response.data.data.map((assessment) => {
+            const batch = batches.find((b) => b.batchId === assessment.batchId);
+            return {
+              ...assessment,
+              batchName: batch ? batch.batchName : "N/A",
+            };
+          });
+          setAssessments(enrichedAssessments);
+        } else {
+          message.warning("No assessments found.");
+        }
+      } catch (error) {
+        console.error("Error fetching assessments:", error);
+        message.error("Failed to fetch assessments. Please try again.");
+      }
+    };
+    fetchAssessment();
+  }, [batches]);
+
+  useEffect(() => {
+    const fetchBatches = async () => {
+      try {
+        const response = await GetBatches();
+        setBatches(response.data.data);
+        console.log(response.data.data);
+      } catch (error) {
+        console.error("Error fetching batches:", error);
+        message.error("Failed to fetch batches. Please try again.");
+      }
+    };
+    fetchBatches();
+  }, []);
+
+  const handleDeleteAssessment = (id) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this Assessment?",
+      content: "This action cannot be undone.",
+      okText: "Yes",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          await DeleteAssessment(id);
+          setAssessments((prevAssessment) =>
+            prevAssessment.filter((assessments) => assessments.id !== id)
+          );
+          message.success("Assessment deleted successfully.");
+        } catch (error) {
+          console.error("Error deleting Assessment:", error);
+          message.error("Failed to delete the Assessment. Please try again.");
+        }
+      },
+    });
+  };
 
   const columns = [
-    { name: "ID", selector: (row) => row.id, sortable: true, center: true },
-    { name: "Name", selector: (row) => row.name, sortable: true, center: true },
-    { name: "Date", selector: (row) => row.date, sortable: true, center: true },
+    { name: "S.No", selector: (row, index) => index + 1, center: true },
+
+    {
+      name: "Assessment Title",
+      selector: (row) => row.assessmentTitle || "N/A",
+      sortable: true,
+    },
     {
       name: "Batch",
-      selector: (row) => row.batch,
+      selector: (row) => row.batchName || "N/A",
       sortable: true,
-      center: true,
+    },
+    {
+      name: "Media URL",
+      selector: (row) =>
+        row.mediaUrl ? (
+          <a
+            href={row.mediaUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 underline"
+          >
+            View Media
+          </a>
+        ) : (
+          "No Media"
+        ),
+    },
+    {
+      name: "Timing",
+      selector: (row) => row.assessmentTiming || "N/A",
+      sortable: true,
+    },
+    {
+      name: "Subject",
+      selector: (row) => row.subject || "N/A",
+      sortable: true,
     },
     {
       name: "Actions",
-      center: true,
       cell: (row) => (
-        <div className="flex space-x-2">
-          <Button
-            onClick={() => {
-              setIsModalOpen(true), setSelectedAssessment(row);
-            }}
-            type="link"
-          >
-            View
-          </Button>
-          <Button onClick={() => handleEdit(row)} type="link">
-            Edit
-          </Button>
-          <Button onClick={() => handleDelete(row.id)} type="link" danger>
-            Delete
-          </Button>
+        <div className="flex space-x-4 text-lg">
+          <FaEye
+            className="text-green-500 cursor-pointer"
+            onClick={() => handleView(row)}
+          />
+          <FaEdit
+            className="text-yellow-500 cursor-pointer"
+            onClick={() => handleEdit(row)}
+          />
+          <FaTrash
+            className="text-red-500 cursor-pointer"
+            onClick={() => handleDeleteAssessment(row._id)}
+          />
         </div>
       ),
+      ignoreRowClick: true,
     },
   ];
 
@@ -66,185 +173,156 @@ const TrainerAssessment = () => {
     },
   };
 
-  const handleAddClick = () => {
-    SetAddmodal(true);
-    form.resetFields(); // Reset the fields to make sure they are empty
+  const showModal = () => {
+    setIsModalVisible(true);
   };
-  const handleAssessmentFileUpload = (file) => {
-    form.setFieldValue("mediaUrl", file);
+
+  const handleMediaUpload = ({ file }) => {
+    form.setFieldsValue({ mediaUrl: file });
     return false;
   };
 
-  const handleAddAssessment = (value) => {
-    const formData = new FormData();
-
-    formData.append("subject", value.subject);
-    formData.append("assessmentTiming", value.assessmentTiming);
-    formData.append("batch", value.batch);
-    formData.append("assessmentTitle", value.assessmentTitle);
-
-    if (value.mediaUrl && value.mediaUrl.fileList) {
-      formData.append("mediaUrl", value.mediaUrl.fileList);
-    } 
-    CreateAssessment(formData)
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err, "error creating");
-      });
-  };
-
-  const handleView = (row) => {
-    setSelectedAssessment(row);
-    setIsModalOpen(true); // Show the modal for viewing the assessment
-  };
-
-  const handleEdit = (row) => {
-    setSelectedAssessment(row);
-    form.setFieldsValue({
-      assessmentTitle: row.name,
-      batch: row.batch,
-      assessmentTiming: "2 hours", // You can pre-fill with actual timing
-      subject: "React.Js", // You can pre-fill with actual subject
-    });
-    setIsEditModalOpen(true); // Open the modal for editing the assessment
-  };
-
-  const handleFormSubmit = (values) => {
-    if (selectedAssessment) {
-      // Edit existing assessment
-      const updatedData = data.map((assessment) =>
-        assessment.id === selectedAssessment.id
-          ? { ...assessment, name: values.assessmentTitle }
-          : assessment
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      const selectedBatch = batches.find(
+        (batch) => batch.batchName === values.batch
       );
-      setData(updatedData);
-    } else {
-      // Add new assessment
-      const newAssessment = {
-        id: data.length + 1,
-        name: values.assessmentTitle,
-        date: new Date().toISOString().split("T")[0],
-        batch: values.batch,
-      };
-      setData([...data, newAssessment]);
+
+      const formData = new FormData();
+      formData.append("assessmentTitle", values.assessmentTitle);
+      formData.append("batch", values.batch);
+      formData.append("batchId", selectedBatch ? selectedBatch.batchId : "");
+      formData.append("assessmentTiming", values.assessmentTiming);
+      formData.append("subject", values.subject);
+
+      if (values.mediaUrl.file) {
+        formData.append("mediaUrl", values.mediaUrl.file);
+      }
+
+      if (isEditing && editingId) {
+        // Call EditAssessment API
+        const response = await EditAssessment(editingId, formData);
+        if (response.status === 200) {
+          // Update the assessments state
+          setAssessments((prev) =>
+            prev.map((item) =>
+              item._id === editingId
+                ? { ...item, ...values, batchName: values.batch }
+                : item
+            )
+          );
+          message.success("Assessment updated successfully!");
+        } else {
+          message.error("Failed to update assessment.");
+        }
+      } else {
+        // Add Assessment logic (already in your code)
+        const response = await CreateAssessment(formData);
+        if (response.status === 200) {
+          setAssessments([
+            ...assessments,
+            {
+              ...values,
+              batchName: values.batch,
+            },
+          ]);
+          message.success("Assessment added successfully!");
+        } else {
+          message.error("Failed to add assessment.");
+        }
+      }
+
+      form.resetFields();
+      setIsModalVisible(false);
+      setIsEditing(false);
+      setEditingId(null);
+    } catch (error) {
+      console.error("Validation Failed:", error);
+      message.error("Please check your input and try again.");
     }
-    setIsModalOpen(false);
-    setIsEditModalOpen(false);
+  };
+
+  const handleCancel = () => {
     form.resetFields();
-  };
-
-  const handleDelete = (id) => {
-    const filteredData = data.filter((assessment) => assessment.id !== id);
-    setData(filteredData);
-  };
-
-  const handleFilterChange = (value, type) => {
-    const updatedFilters = { ...filters, [type]: value };
-    setFilters(updatedFilters);
-    applyFilters(updatedFilters);
-  };
-
-  const applyFilters = (filters) => {
-    let filtered = [...data];
-    if (filters.date) {
-      filtered = filtered.filter((assessment) =>
-        moment(assessment.date).isSame(filters.date, "day")
-      );
-    }
-    if (filters.batch) {
-      filtered = filtered.filter(
-        (assessment) => assessment.batch === filters.batch
-      );
-    }
-    setFilteredData(filtered);
+    setIsModalVisible(false);
+    setIsEditing(false);
+    setEditingId(null);
   };
 
   return (
     <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-semibold">Trainer Assessment</h1>
-        <div className="flex space-x-32">
-          <DatePicker
-            value={filters.date ? moment(filters.date) : null}
-            onChange={(date) => handleFilterChange(date, "date")}
-            placeholder="Select Date"
-            className="w-40"
-          />
-          <Select
-            value={filters.batch}
-            onChange={(value) => handleFilterChange(value, "batch")}
-            placeholder="Select Batch"
-            className="w-40"
-          >
-            <Option value="Nov-24-2024">Nov-24-2024</Option>
-            <Option value="Dec-24-2024">Dec-24-2024</Option>
-          </Select>
-        </div>
-        <button
-          onClick={handleAddClick}
-          className="bg-orange-500 text-white px-4 py-1 rounded hover:bg-orange-600 transition"
-        >
-          Add Assessment
-        </button>
-      </div>
+      <button
+        className="bg-orange-500 px-3 py-1 text-white rounded-lg mb-4"
+        onClick={() => {
+          setIsModalVisible(true);
+          setIsEditing(false);
+          form.resetFields();
+        }}
+      >
+        Add Assessment
+      </button>
+
       <DataTable
         columns={columns}
-        data={filteredData}
-        customStyles={customStyles}
+        data={assessments}
         pagination
+        customStyles={customStyles}
         highlightOnHover
-        className="bg-white rounded shadow-md"
+        responsive
+        className="rounded-lg border shadow-md"
       />
 
       <Modal
-        visible={addModal}
-        title="add assessment"
-        footer={null}
-        centered
-        onCancel={() => SetAddmodal(false)}
+        title={isEditing ? "Edit Assessment" : "Add Assessment"}
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        destroyOnClose
       >
-        <Form form={form} layout="vertical" onFinish={handleAddAssessment}>
+        <Form form={form} layout="vertical">
           <Form.Item
-            name="assessmentTitle"
             label="Assessment Title"
+            name="assessmentTitle"
             rules={[
-              { required: true, message: "Please enter the assessment title!" },
+              { required: true, message: "Please input the assessment title!" },
             ]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item
-            name="batch"
             label="Batch"
-            rules={[{ required: true, message: "Please select the batch!" }]}
+            name="batch"
+            rules={[{ required: true, message: "Please select a batch!" }]}
           >
-            <Select>
-              <Option value="Nov-24-2024">Nov-24-2024</Option>
-              <Option value="Dec-24-2024">Dec-24-2024</Option>
+            <Select placeholder="Select a batch">
+              {batches.map((batch) => (
+                <Option key={batch.batchName} value={batch.batchName}>
+                  {batch.batchName}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 
           <Form.Item
+            label="Media File"
             name="mediaUrl"
-            label="Upload File"
             valuePropName="file"
-            // getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
+            rules={[{ required: true, message: "Please upload a media file!" }]}
           >
-            <Upload beforeUpload={handleAssessmentFileUpload} accept=".pdf">
-              <Button icon={<UploadOutlined />}>Upload File</Button>
+            <Upload beforeUpload={handleMediaUpload} maxCount={1}>
+              <Button icon={<UploadOutlined />}>Upload Media</Button>
             </Upload>
           </Form.Item>
 
           <Form.Item
-            name="assessmentTiming"
             label="Assessment Timing"
+            name="assessmentTiming"
             rules={[
               {
                 required: true,
-                message: "Please enter the assessment timing!",
+                message: "Please input the assessment timing!",
               },
             ]}
           >
@@ -252,137 +330,70 @@ const TrainerAssessment = () => {
           </Form.Item>
 
           <Form.Item
-            name="subject"
             label="Subject"
-            rules={[{ required: true, message: "Please enter the subject!" }]}
+            name="subject"
+            rules={[{ required: true, message: "Please select a subject!" }]}
           >
-            <Input />
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              htmlType="submit"
-              className="w-full bg-orange-500 text-white"
-            >
-              Add Assessment
-            </Button>
+            <Select placeholder="Select a subject">
+              {[
+                "Html/Css",
+                "Javascript",
+                "J-Query",
+                "React.Js",
+                "Node.Js/Mongodb",
+                "Python",
+                "Figma",
+                "PHP",
+                "Flutter",
+              ].map((subject) => (
+                <Option key={subject} value={subject}>
+                  {subject}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>
-
-      {/* Modal for /View Assessment */}
       <Modal
-        title={"View Assessment"}
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        title="View Assessment"
+        visible={isViewModalVisible}
+        onCancel={() => setIsViewModalVisible(false)}
         footer={null}
+        destroyOnClose
       >
         {selectedAssessment && (
           <div className="space-y-4">
-            <div>
-              <strong>Assessment Title: </strong>
-              {selectedAssessment.name}
-            </div>
-            <div>
-              <strong>Batch: </strong>
-              {selectedAssessment.batch || "N/A"}
-            </div>
-            <div>
-              <strong>Assessment Timing: </strong>
-              {selectedAssessment.assessmentTiming || "N/A"}
-            </div>
-            <div>
-              <strong>Subject: </strong>
-              {selectedAssessment.subject || "N/A"}
-            </div>
-            <div>
-              <strong>File: </strong>
+            <p>
+              <strong>Assessment Title:</strong>{" "}
+              {selectedAssessment.assessmentTitle || "N/A"}
+            </p>
+            <p>
+              <strong>Batch:</strong> {selectedAssessment.batchName || "N/A"}
+            </p>
+            <p>
+              <strong>Media URL:</strong>{" "}
               {selectedAssessment.mediaUrl ? (
                 <a
                   href={selectedAssessment.mediaUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="text-blue-500 underline"
                 >
-                  View File
+                  View Media
                 </a>
               ) : (
-                "No file uploaded"
+                "No Media"
               )}
-            </div>
+            </p>
+            <p>
+              <strong>Timing:</strong>{" "}
+              {selectedAssessment.assessmentTiming || "N/A"}
+            </p>
+            <p>
+              <strong>Subject:</strong> {selectedAssessment.subject || "N/A"}
+            </p>
           </div>
         )}
-      </Modal>
-
-      {/* Modal for Editing Assessment */}
-      <Modal
-        title="Edit Assessment"
-        open={isEditModalOpen}
-        onCancel={() => setIsEditModalOpen(false)}
-        footer={null}
-      >
-        <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
-          <Form.Item
-            name="assessmentTitle"
-            label="Assessment Title"
-            rules={[
-              { required: true, message: "Please enter the assessment title!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            name="batch"
-            label="Batch"
-            rules={[{ required: true, message: "Please select the batch!" }]}
-          >
-            <Select>
-              <Option value="Nov-24-2024">Nov-24-2024</Option>
-              <Option value="Dec-24-2024">Dec-24-2024</Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            name="mediaUrl"
-            label="Upload File"
-            valuePropName="fileList"
-            getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
-          >
-            <Upload beforeUpload={() => false} accept=".pdf">
-              <Button icon={<UploadOutlined />}>Upload File</Button>
-            </Upload>
-          </Form.Item>
-
-          <Form.Item
-            name="assessmentTiming"
-            label="Assessment Timing"
-            rules={[
-              {
-                required: true,
-                message: "Please enter the assessment timing!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            name="subject"
-            label="Subject"
-            rules={[{ required: true, message: "Please enter the subject!" }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              htmlType="submit"
-              className="w-full bg-orange-500 text-white"
-            >
-              Update
-            </Button>
-          </Form.Item>
-        </Form>
       </Modal>
     </div>
   );

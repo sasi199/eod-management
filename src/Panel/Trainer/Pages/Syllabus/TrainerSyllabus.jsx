@@ -2,19 +2,21 @@ import React, { useEffect, useState } from "react";
 import { GetSyllabus } from "../../../../services";
 import { Worker, Viewer } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css"; 
+import { MdCloudDownload } from "react-icons/md";
 
 
 const TrainerSyllabus = () => {
   const [syllabusList, setSyllabusList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filterCourseName, setFilterCourseName] = useState("");
 
   useEffect(() => {
-    
     const fetchSyllabus = async () => {
       try {
         const response = await GetSyllabus();
-        setSyllabusList(response.data.data); 
+        setSyllabusList(response.data.data);
+        console.log(response.data.data);
         setLoading(false);
       } catch (err) {
         setError("Failed to fetch syllabus data.");
@@ -28,7 +30,6 @@ const TrainerSyllabus = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center space-x-2">
-        
         <span>Loading syllabus...</span>
       </div>
     );
@@ -42,25 +43,54 @@ const TrainerSyllabus = () => {
     );
   }
 
+
+  const filteredSyllabus = filterCourseName
+    ? syllabusList.filter((syllabus) => syllabus.courseName === filterCourseName)
+    : syllabusList;
+
   return (
     <div className="p-6 space-y-4">
-      <h1 className="text-2xl font-semibold text-gray-800 mb-4">Trainer Syllabus</h1>
-      {syllabusList.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {syllabusList.map((syllabus) => (
+      <h1 className="text-2xl font-semibold text-gray-800 mb-4">Syllabus</h1>
+      
+      <div className="mb-4">
+        <label htmlFor="filter" className="block text-gray-700 font-medium">
+          Filter by Course:
+        </label>
+        <select
+          id="filter"
+          value={filterCourseName}
+          onChange={(e) => setFilterCourseName(e.target.value)}
+          className="mt-2  px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
+        >
+          <option value="">All Courses</option>
+          {/* Dynamically generate options */}
+          {Array.from(new Set(syllabusList.map((syllabus) => syllabus.courseName))).map(
+            (course, index) => (
+              <option key={index} value={course}>
+                {course}
+              </option>
+            )
+          )}
+        </select>
+      </div>
+
+      
+      {filteredSyllabus.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-[70%]">
+          {filteredSyllabus.map((syllabus) => (
             <div
               key={syllabus._id}
-              className="border p-4 rounded-md shadow-lg bg-white hover:shadow-xl transition-all duration-300"
+              className="border rounded-md shadow-lg bg-white hover:shadow-xl transition-all duration-300"
             >
-              <h2 className="text-lg font-medium text-gray-800 mb-2">
-                {syllabus.courseName} - {syllabus.subjectName}
-              </h2>
-              <div className="relative h-64 w-full">
+             
+              <div className="relative h-44 ">
                 {syllabus.uploadFile ? (
-                  // <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                    <Viewer
-                      fileUrl={syllabus.course}
-                      initialPage={0}
+                  <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                    <Viewer 
+                    
+                      fileUrl={syllabus.uploadFile}
+                      initialPage={0} 
+                      
                       theme={{
                         theme: "light",
                       }}
@@ -70,9 +100,14 @@ const TrainerSyllabus = () => {
                       style={{
                         width: "100%",
                         height: "100%",
+                        overflow: "hidden"
+                        
+                      
                       }}
+                      
                     />
-                  // </Worker>
+                  </Worker>
+                  
                 ) : (
                   <div className="flex items-center justify-center h-full">
                     <p className="text-red-500 font-medium">No PDF available</p>
@@ -80,14 +115,17 @@ const TrainerSyllabus = () => {
                 )}
               </div>
               {syllabus.uploadFile && (
-                <div className="mt-2">
+                <div className="mt-2 flex bg-gray-100 items-center justify-between px-4">
+                   <h2 className="text-lg font-medium text-gray-800 ">
+               {syllabus.subjectName}
+              </h2>
                   <a
                     href={syllabus.uploadFile}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block text-blue-600 hover:underline"
+                    className="inline-block text-orange-600 hover:underline"
                   >
-                    Open PDF in New Tab
+                    <MdCloudDownload size={40}/>
                   </a>
                 </div>
               )}

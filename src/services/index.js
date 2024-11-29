@@ -245,3 +245,10 @@ export const DeleteTaskById = async (taskId) => {
   return res;  
 }
 
+
+//scuhdule
+
+export const createSchedule = async (data)=>{
+  const res= await interceptors.post('/schedule/createSchedule',data);
+  return res;
+}

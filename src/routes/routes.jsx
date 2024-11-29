@@ -194,10 +194,10 @@ export const pages = [
         path: "assessment",
         element: <TrainerAssessment />,
       },
-      {
-        path: "attendance",
-        element: <TrainerAttendace />,
-      },
+      // {
+      //   path: "attendance",
+      //   element: <TrainerAttendace />,
+      // },
       // {
       //   path: "attendance/create",
       //   element: <CreatePage />,

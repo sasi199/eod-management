@@ -1,214 +1,622 @@
-import { Button, Modal, Input, DatePicker, Select, Table } from "antd";
-import React, { useState } from "react";
-import DataTable from "react-data-table-component";
-import dayjs from "dayjs";
+// import React, { useEffect, useState } from 'react';
+// import { Button, Modal, Form, Input, Select, TimePicker, Row, Col, Checkbox, message } from 'antd';
+// import { AllStaffs, GetBatches, createSchedule } from '../../../../services';
+// import moment from 'moment';
 
-const { Option } = Select;
+
+// const Schedule = () => {
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const[batch, setBatch] = useState([]);
+//   const[trainers, setTrainers]=useState([]);
+
+//   const [form] = Form.useForm();
+
+//   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+//   const handleOpenModal = () => {
+//     setIsModalOpen(true);
+//   };
+
+//   const handleCloseModal = () => {
+//     setIsModalOpen(false);
+//     form.resetFields();
+//   };
+
+ 
+//   const handleSubmit = async (values) => {
+//     try {
+//       // Prepare the data in the required format
+//       const selectedDays = values.schedule.filter((day) => day.selected);
+  
+//       // Debug: Check the values of startTime and endTime
+//       console.log("Start Time and End Time:", selectedDays.map((day) => ({
+//         startTime: day.startTime, 
+//         endTime: day.endTime,
+//       })));
+  
+//       const formattedData = {
+//         batch: values.batch,  // Batch ID
+//         days: selectedDays.map((day) => daysOfWeek[values.schedule.indexOf(day)]), // Array of selected days
+//         trainers: selectedDays.map((day) => day.trainer), // Array of selected trainers
+//         timings: selectedDays.map((day) => ({
+//           startTime: moment(day.startTime).isValid() ? moment(day.startTime).format("hh:mm A") : "Invalid Start Time", // Format start time as '03:00 PM'
+//           endTime: moment(day.endTime).isValid() ? moment(day.endTime).format("hh:mm A") : "Invalid End Time", // Format end time as '04:00 PM'
+//           subject: day.subject, // Subject
+//         })),
+//       };
+  
+//       // Debug: Check formattedData before sending
+//       console.log("Formatted Data to send:", formattedData);
+  
+//       // Now, send the formatted data to the API
+//       const response = await createSchedule(formattedData);
+  
+//       if (response.status === 200) {
+//         message.success("Schedule created successfully!");
+//         form.resetFields(); // Reset form fields
+//       }
+//     } catch (error) {
+//       console.error("Error creating schedule:", error);
+//       message.error("Failed to create schedule. Please try again.");
+//     }
+//   };
+  
+  
+
+//   useEffect(() => {
+//     const fetchBatches = async () => {
+//       try {
+//         const response = await GetBatches();
+//         setBatch(response.data.data);
+//         console.log(response.data.data);
+//       } catch (error) {
+//         console.error("Error fetching batches:", error);
+//         message.error("Failed to fetch batches. Please try again.");
+//       }
+//     };
+//     fetchBatches();
+//   }, []);
+//   useEffect(() => {
+//     const fetchTrainer = async () => {
+//       try {
+//         const response = await AllStaffs();
+//         setTrainers(response.data.data);
+//         console.log(response.data.data);
+//       } catch (error) {
+//         console.error("Error fetching trainer:", error);
+//         message.error("Failed to fetch trainer. Please try again.");
+//       }
+//     };
+//     fetchTrainer();
+//   }, []);
+
+
+
+
+//   return (
+//     <div className="p-4">
+//       <Button
+//         type="primary"
+//         onClick={handleOpenModal}
+//         className="mb-4 bg-purple-500 hover:bg-purple-600 text-white"
+//       >
+//         Add Schedule
+//       </Button>
+
+//       <Modal
+//         title={<span className="text-lg font-semibold">Add Schedule</span>}
+//         open={isModalOpen}
+//         onCancel={handleCloseModal}
+//         footer={null}
+//         width={1000}
+//       >
+//         <Form
+//           form={form}
+//           layout="vertical"
+//           onFinish={handleSubmit}
+//         >
+//           {/* Batch Field */}
+         
+//         <Form.Item
+//   name="batch"
+//   label="Batch"
+//   rules={[{ required: true, message: 'Batch is required' }]}
+// >
+//   <Select placeholder="Select batch">
+//     {batch.map((item) => (
+//       <Select.Option key={item._id} value={item._id}>
+//         {item.batchName}
+//       </Select.Option>
+//     ))}
+//   </Select>
+// </Form.Item>
+
+        
+
+//           {/* Table Header */}
+//           <Row gutter={[16, 16]} className="font-medium text-gray-700 border-b pb-2 mb-2">
+//             <Col span={2} className="text-center">Select</Col>
+//             <Col span={4}>Day</Col>
+//             <Col span={6}>Trainer</Col>
+//             <Col span={6}>Subject</Col>
+//             <Col span={3} className="text-center">Start Time</Col>
+//             <Col span={3} className="text-center">End Time</Col>
+//           </Row>
+
+//           {/* Days Schedule */}
+//           {daysOfWeek.map((day, index) => (
+//             <Row key={day} gutter={[16, 16]} align="middle" className="mb-2">
+//               {/* Checkbox */}
+//               <Col span={2} className="text-center">
+//                 <Form.Item
+//                   name={['schedule', index, 'selected']}
+//                   valuePropName="checked"
+//                   initialValue={false}
+//                   className="mb-0"
+//                 >
+//                   <Checkbox />
+//                 </Form.Item>
+//               </Col>
+
+//               {/* Day */}
+//               <Col span={4} className="font-medium text-gray-800">
+//                 {day}
+//               </Col>
+
+//               {/* Trainer */}
+//               <Col span={6}>
+//                 <Form.Item
+//                   shouldUpdate={(prevValues, curValues) =>
+//                     prevValues.schedule?.[index]?.selected !== curValues.schedule?.[index]?.selected
+//                   }
+//                   noStyle
+//                 >
+//                   {({ getFieldValue }) => (
+//                     <Form.Item
+//                       name={['schedule', index, 'trainer']}
+//                       rules={[{
+//                         required: getFieldValue(['schedule', index, 'selected']),
+//                         message: 'Trainer is required',
+//                       }]}
+//                       className="mb-0"
+//                     >
+//                       <Select
+//                         placeholder="Select trainer"
+//                         disabled={!getFieldValue(['schedule', index, 'selected'])}
+//                       >
+//                         {trainers.map((trainer) => (
+//                           <Select.Option key={trainer._id} value={trainer._id}>
+                          
+//                           <div className='flex gap-4'><img src={trainer.profilePic}   alt={trainer.fullName}
+//             className="w-8 h-8 rounded-full" />  {trainer.fullName}</div>
+//                           </Select.Option>
+//                         ))}
+//                       </Select>
+//                     </Form.Item>
+//                   )}
+//                 </Form.Item>
+//               </Col>
+
+//               {/* Subject */}
+//               <Col span={6}>
+//                 <Form.Item
+//                   shouldUpdate={(prevValues, curValues) =>
+//                     prevValues.schedule?.[index]?.selected !== curValues.schedule?.[index]?.selected
+//                   }
+//                   noStyle
+//                 >
+//                   {({ getFieldValue }) => (
+//                     <Form.Item
+//                       name={['schedule', index, 'subject']}
+//                       rules={[{
+//                         required: getFieldValue(['schedule', index, 'selected']),
+//                         message: 'Subject is required',
+//                       }]}
+//                       className="mb-0"
+//                     >
+//                         <Select placeholder="Select a subject">
+//               {[
+//                 "Html/Css",
+//                 "Javascript",
+//                 "J-Query",
+//                 "React.Js",
+//                 "Node.Js/Mongodb",
+//                 "Python",
+//                 "Figma",
+//                 "PHP",
+//                 "Flutter",
+//               ].map((subject) => (
+//                 <Option key={subject} value={subject}>
+//                   {subject}
+//                 </Option>
+//               ))}
+//             </Select>
+//                     </Form.Item>
+//                   )}
+//                 </Form.Item>
+//               </Col>
+
+//               {/* Start Time */}
+//               <Col span={3}>
+//                 <Form.Item
+//                   shouldUpdate={(prevValues, curValues) =>
+//                     prevValues.schedule?.[index]?.selected !== curValues.schedule?.[index]?.selected
+//                   }
+//                   noStyle
+//                 >
+//                   {({ getFieldValue }) => (
+//                     <Form.Item
+//                       name={['schedule', index, 'startTime']}
+//                       rules={[{
+//                         required: getFieldValue(['schedule', index, 'selected']),
+//                         message: 'Start time is required',
+//                       }]}
+//                       className="mb-0"
+//                     >
+//                     <TimePicker
+//   use12Hours
+//   format="h:mm A"
+//   className="w-full"
+//   value={moment(day.startTime)}  // Make sure you set a valid moment object here
+//   disabled={!getFieldValue(['schedule', index, 'selected'])}
+// />
+//                     </Form.Item>
+//                   )}
+//                 </Form.Item>
+//               </Col>
+
+//               {/* End Time */}
+//               <Col span={3}>
+//                 <Form.Item
+//                   shouldUpdate={(prevValues, curValues) =>
+//                     prevValues.schedule?.[index]?.selected !== curValues.schedule?.[index]?.selected
+//                   }
+//                   noStyle
+//                 >
+//                   {({ getFieldValue }) => (
+//                     <Form.Item
+//                       name={['schedule', index, 'endTime']}
+//                       rules={[{
+//                         required: getFieldValue(['schedule', index, 'selected']),
+//                         message: 'End time is required',
+//                       }]}
+//                       className="mb-0"
+//                     >
+//                     <TimePicker
+//   use12Hours
+//   format="h:mm A"
+//   className="w-full"
+//   value={moment(day.startTime)}  // Make sure you set a valid moment object here
+//   disabled={!getFieldValue(['schedule', index, 'selected'])}
+// />
+//                     </Form.Item>
+//                   )}
+//                 </Form.Item>
+//               </Col>
+//             </Row>
+//           ))}
+
+//           {/* Submit Button */}
+//           <Form.Item>
+//             <Button
+//               type="primary"
+//               htmlType="submit"
+//               className="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-medium"
+//             >
+//               Submit
+//             </Button>
+//           </Form.Item>
+//         </Form>
+//       </Modal>
+//     </div>
+//   );
+// };
+
+// export default Schedule;
+
+import React, { useEffect, useState } from 'react';
+import { Button, Modal, Form, Input, Select, TimePicker, Row, Col, Checkbox, message } from 'antd';
+import { AllStaffs, GetBatches, createSchedule } from '../../../../services';
+import moment from 'moment';
 
 const Schedule = () => {
-  const [batches, setBatches] = useState([
-    {
-      id: 1,
-      name: "Batch A",
-      students: 30,
-      course: "Full Stack Developer",
-      date: "2024-11-01",
-      timetable: [
-        { subject: "React", instructor: "VIGNESH", time: "10:00 AM" },
-        { subject: "Node.js ", instructor: "Gopal", time: "2:00 PM" },
-      ],
-    },
-    {
-      id: 2,
-      name: "Batch B",
-      students: 25,
-      course: "Digital Marketing",
-      date: "2024-02-01",
-      timetable: [
-        { subject: "PHP", instructor: "ASHOK", time: "9:30 AM" },
-        { subject: "Communication", instructor: "Magimai", time: "1:00 PM" },
-      ],
-    },
-    {
-      id: 3,
-      name: "Batch C",
-      students: 20,
-      course: "Full Stack Developer",
-      date: "2024-03-01",
-      timetable: [
-        { subject: "JavaScript Advanced", instructor: "Chris Evans", time: "11:00 AM" },
-        { subject: "Database Design", instructor: "Robert Downey", time: "3:00 PM" },
-      ],
-    },
-  ]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [batch, setBatch] = useState([]);
+  const [trainers, setTrainers] = useState([]);
+  const [form] = Form.useForm();
 
-  const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
-  const [isTimetableModalOpen, setIsTimetableModalOpen] = useState(false);
-  const [newBatch, setNewBatch] = useState({ name: "", students: "", course: "", date: "", timetable: [] });
-  const [selectedBatch, setSelectedBatch] = useState(null);
-  const [newTimetable, setNewTimetable] = useState({ subject: "", instructor: "", time: "" });
+  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-  const columns = [
-    { name: "ID", selector: (row) => row.id, sortable: true, center: true },
-    { name: "Batch Name", selector: (row) => row.name, sortable: true, center: true },
-    { name: "Students", selector: (row) => row.students, sortable: true, center: true },
-    { name: "Course", selector: (row) => row.course, sortable: true, center: true },
-    { name: "Date", selector: (row) => row.date, sortable: true, center: true },
-    {
-      name: "Actions",
-      center: true,
-      cell: (row) => (
-        <div className="flex gap-2">
-          <Button onClick={() => handleAddTimetable(row)} className="border border-blue-500 text-blue-500">
-            Add Timetable
-          </Button>
-          <Button onClick={() => handleEdit(row)} className="border border-green-500 text-green-500">
-            Edit
-          </Button>
-          <Button onClick={() => handleDelete(row.id)} className="border border-red-500 text-red-500">
-            Delete
-          </Button>
-        </div>
-      ),
-    },
-  ];
-
-  const timetableColumns = [
-    { title: "Subject", dataIndex: "subject", key: "subject" },
-    { title: "Instructor", dataIndex: "instructor", key: "instructor" },
-    { title: "Time", dataIndex: "time", key: "time" },
-  ];
-
-  const handleAddBatch = () => {
-    setBatches((prev) => [
-      ...prev,
-      { ...newBatch, id: prev.length + 1, date: dayjs(newBatch.date).format("YYYY-MM-DD") },
-    ]);
-    setIsBatchModalOpen(false);
-    setNewBatch({ name: "", students: "", course: "", date: "", timetable: [] });
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
   };
 
-  const handleAddTimetable = (batch) => {
-    setSelectedBatch(batch);
-    setIsTimetableModalOpen(true);
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    form.resetFields();
   };
 
-  const handleSaveTimetable = () => {
-    setBatches((prevBatches) =>
-      prevBatches.map((batch) =>
-        batch.id === selectedBatch.id
-          ? { ...batch, timetable: [...batch.timetable, newTimetable] }
-          : batch
-      )
-    );
-    setIsTimetableModalOpen(false);
-    setNewTimetable({ subject: "", instructor: "", time: "" });
+  const handleSubmit = async (values) => {
+    try {
+      // Prepare the data in the required format
+      const selectedDays = values.schedule.filter((day) => day.selected);
+  
+      // Debug: Check the values of startTime and endTime
+      console.log("Start Time and End Time:", selectedDays.map((day) => ({
+        startTime: day.startTime, 
+        endTime: day.endTime,
+      })));
+  
+      const formattedData = {
+        batch: values.batch,
+        days: selectedDays.map((day) => daysOfWeek[values.schedule.indexOf(day)]),
+        trainers: selectedDays.map((day) => day.trainer),
+        timings: selectedDays.map((day) => ({
+          startTime: moment(day.startTime).isValid()
+            ? moment(day.startTime).format('hh:mm A')
+            : 'Invalid Start Time',
+          endTime: moment(day.endTime).isValid()
+            ? moment(day.endTime).format('hh:mm A')
+            : 'Invalid End Time',
+          subject: day.subject,
+        })),
+      };
+  
+      // Debug: Check formattedData before sending
+      console.log("Formatted Data to send:", formattedData);
+  
+      // Now, send the formatted data to the API
+      const response = await createSchedule(formattedData);
+  
+      if (response.status === 200) {
+        message.success("Schedule created successfully!");
+        form.resetFields(); // Reset form fields
+      }
+    } catch (error) {
+      console.error("Error creating schedule:", error);
+      message.error("Failed to create schedule. Please try again.");
+    }
   };
+
+  useEffect(() => {
+    const fetchBatches = async () => {
+      try {
+        const response = await GetBatches();
+        setBatch(response.data.data);
+        console.log(response.data.data);
+      } catch (error) {
+        console.error("Error fetching batches:", error);
+        message.error("Failed to fetch batches. Please try again.");
+      }
+    };
+    fetchBatches();
+  }, []);
+
+  useEffect(() => {
+    const fetchTrainer = async () => {
+      try {
+        const response = await AllStaffs();
+        setTrainers(response.data.data);
+        console.log(response.data.data);
+      } catch (error) {
+        console.error("Error fetching trainer:", error);
+        message.error("Failed to fetch trainer. Please try again.");
+      }
+    };
+    fetchTrainer();
+  }, []);
 
   return (
     <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2>Schedule</h2>
-        <button
-          onClick={() => setIsBatchModalOpen(true)}
-          className="bg-orange-500 text-white px-3 py-1 rounded-lg hover:bg-orange-600"
-        >
-          Add Schedule
-        </button>
-      </div>
-
-      <DataTable
-        columns={columns}
-        data={batches}
-        pagination
-        highlightOnHover
-        customStyles={{
-          headCells: {
-            style: { backgroundColor: "#ff9800", color: "#ffffff", fontSize: "16px" },
-          },
-        }}
-        className="border rounded shadow-sm"
-      />
+      <Button
+        type="primary"
+        onClick={handleOpenModal}
+        className="mb-4 bg-purple-500 hover:bg-purple-600 text-white"
+      >
+        Add Schedule
+      </Button>
 
       <Modal
-        title="Add New Schedule"
-        visible={isBatchModalOpen}
-        onCancel={() => setIsBatchModalOpen(false)}
+        title={<span className="text-lg font-semibold">Add Schedule</span>}
+        open={isModalOpen}
+        onCancel={handleCloseModal}
         footer={null}
+        width={1000}
       >
-        <Input
-          placeholder="Batch Name"
-          value={newBatch.name}
-          onChange={(e) => setNewBatch({ ...newBatch, name: e.target.value })}
-          className="mb-3"
-        />
-        <Input
-          type="number"
-          placeholder="Number of Students"
-          value={newBatch.students}
-          onChange={(e) => setNewBatch({ ...newBatch, students: e.target.value })}
-          className="mb-3"
-        />
-        <Select
-          placeholder="Select Course"
-          value={newBatch.course}
-          onChange={(value) => setNewBatch({ ...newBatch, course: value })}
-          className="w-full mb-3"
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
         >
-          <Option value="Full Stack Developer">Full Stack Developer</Option>
-          <Option value="Digital Marketing">Digital Marketing</Option>
-        </Select>
-        <DatePicker
-          placeholder="Select Date"
-          onChange={(date) => setNewBatch({ ...newBatch, date })}
-          className="w-full"
-        />
-        <button
-          onClick={handleAddBatch}
-          className="w-full bg-orange-500 text-white hover:bg-orange-600 py-1 mt-4 rounded-lg text-lg"
-        >
-          Add Schedule
-        </button>
-      </Modal>
+          {/* Batch Field */}
+          <Form.Item
+            name="batch"
+            label="Batch"
+            rules={[{ required: true, message: 'Batch is required' }]}
+          >
+            <Select placeholder="Select batch">
+              {batch.map((item) => (
+                <Select.Option key={item._id} value={item._id}>
+                  {item.batchName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
 
-      <Modal
-        title={`Add Timetable for ${selectedBatch?.name}`}
-        visible={isTimetableModalOpen}
-        onCancel={() => setIsTimetableModalOpen(false)}
-        onOk={handleSaveTimetable}
-        okText="Add Timetable"
-      >
-        <Input
-          placeholder="Subject"
-          value={newTimetable.subject}
-          onChange={(e) => setNewTimetable({ ...newTimetable, subject: e.target.value })}
-          className="mb-3"
-        />
-        <Input
-          placeholder="Instructor"
-          value={newTimetable.instructor}
-          onChange={(e) => setNewTimetable({ ...newTimetable, instructor: e.target.value })}
-          className="mb-3"
-        />
-        <Input
-          placeholder="Time"
-          value={newTimetable.time}
-          onChange={(e) => setNewTimetable({ ...newTimetable, time: e.target.value })}
-          className="mb-3"
-        />
-      </Modal>
+          {/* Table Header */}
+          <Row gutter={[16, 16]} className="font-medium text-gray-700 border-b pb-2 mb-2">
+            <Col span={2} className="text-center">Select</Col>
+            <Col span={4}>Day</Col>
+            <Col span={6}>Trainer</Col>
+            <Col span={6}>Subject</Col>
+            <Col span={3} className="text-center">Start Time</Col>
+            <Col span={3} className="text-center">End Time</Col>
+          </Row>
 
-      {selectedBatch && (
-        <div className="mt-4">
-          <h3>Timetable for {selectedBatch.name}</h3>
-          <Table
-            columns={timetableColumns}
-            dataSource={selectedBatch.timetable}
-            pagination={false}
-            rowKey="time"
-          />
-        </div>
-      )}
+          {/* Days Schedule */}
+          {daysOfWeek.map((day, index) => (
+            <Row key={day} gutter={[16, 16]} align="middle" className="mb-2">
+              {/* Checkbox */}
+              <Col span={2} className="text-center">
+                <Form.Item
+                  name={['schedule', index, 'selected']}
+                  valuePropName="checked"
+                  initialValue={false}
+                  className="mb-0"
+                >
+                  <Checkbox />
+                </Form.Item>
+              </Col>
+
+              {/* Day */}
+              <Col span={4} className="font-medium text-gray-800">
+                {day}
+              </Col>
+
+              {/* Trainer */}
+              <Col span={6}>
+                <Form.Item
+                  shouldUpdate={(prevValues, curValues) =>
+                    prevValues.schedule?.[index]?.selected !== curValues.schedule?.[index]?.selected
+                  }
+                  noStyle
+                >
+                  {({ getFieldValue }) => (
+                    <Form.Item
+                      name={['schedule', index, 'trainer']}
+                      rules={[{
+                        required: getFieldValue(['schedule', index, 'selected']),
+                        message: 'Trainer is required',
+                      }]}
+                      className="mb-0"
+                    >
+                      <Select
+                        placeholder="Select trainer"
+                        disabled={!getFieldValue(['schedule', index, 'selected'])}
+                      >
+                        {trainers.map((trainer) => (
+                          <Select.Option key={trainer._id} value={trainer._id}>
+                            <div className='flex gap-4'>
+                              <img src={trainer.profilePic} alt={trainer.fullName} className="w-8 h-8 rounded-full" />
+                              {trainer.fullName}
+                            </div>
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  )}
+                </Form.Item>
+              </Col>
+
+              {/* Subject */}
+              <Col span={6}>
+                <Form.Item
+                  shouldUpdate={(prevValues, curValues) =>
+                    prevValues.schedule?.[index]?.selected !== curValues.schedule?.[index]?.selected
+                  }
+                  noStyle
+                >
+                  {({ getFieldValue }) => (
+                    <Form.Item
+                      name={['schedule', index, 'subject']}
+                      rules={[{
+                        required: getFieldValue(['schedule', index, 'selected']),
+                        message: 'Subject is required',
+                      }]}
+                      className="mb-0"
+                    >
+                      <Select placeholder="Select a subject">
+                        {[
+                          "Html/Css",
+                          "Javascript",
+                          "J-Query",
+                          "React.Js",
+                          "Node.Js/Mongodb",
+                          "Python",
+                          "Figma",
+                          "PHP",
+                          "Flutter",
+                        ].map((subject) => (
+                          <Select.Option key={subject} value={subject}>
+                            {subject}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  )}
+                </Form.Item>
+              </Col>
+
+              {/* Start Time */}
+              <Col span={3}>
+                <Form.Item
+                  shouldUpdate={(prevValues, curValues) =>
+                    prevValues.schedule?.[index]?.selected !== curValues.schedule?.[index]?.selected
+                  }
+                  noStyle
+                >
+                  {({ getFieldValue }) => (
+                    <Form.Item
+                      name={['schedule', index, 'startTime']}
+                      rules={[{
+                        required: getFieldValue(['schedule', index, 'selected']),
+                        message: 'Start time is required',
+                      }]}
+                      className="mb-0"
+                    >
+                      <TimePicker
+                        use12Hours
+                        format="h:mm A"
+                        className="w-full"
+                        disabled={!getFieldValue(['schedule', index, 'selected'])}
+                      />
+                    </Form.Item>
+                  )}
+                </Form.Item>
+              </Col>
+
+              {/* End Time */}
+              <Col span={3}>
+                <Form.Item
+                  shouldUpdate={(prevValues, curValues) =>
+                    prevValues.schedule?.[index]?.selected !== curValues.schedule?.[index]?.selected
+                  }
+                  noStyle
+                >
+                  {({ getFieldValue }) => (
+                    <Form.Item
+                      name={['schedule', index, 'endTime']}
+                      rules={[{
+                        required: getFieldValue(['schedule', index, 'selected']),
+                        message: 'End time is required',
+                      }]}
+                      className="mb-0"
+                    >
+                      <TimePicker
+                        use12Hours
+                        format="h:mm A"
+                        className="w-full"
+                        disabled={!getFieldValue(['schedule', index, 'selected'])}
+                      />
+                    </Form.Item>
+                  )}
+                </Form.Item>
+              </Col>
+            </Row>
+          ))}
+
+          {/* Submit Button */}
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+            >
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

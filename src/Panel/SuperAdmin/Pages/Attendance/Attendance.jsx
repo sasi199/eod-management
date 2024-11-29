@@ -2,17 +2,22 @@ import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import { FaEye } from "react-icons/fa";
 import { GetAttendance } from "../../../../services";
+import FileSaver from "file-saver";
+import ExportJsonExcel from "js-export-excel";
+import { Modal } from "antd";
+import { IoMdCloudDownload } from "react-icons/io";
+
 
 const Attendance = () => {
   const todayDate = new Date().toISOString().split("T")[0];
 
   const [attendanceData, setAttendanceData] = useState([]);
-  const [roles, setRoles] = useState([]); // Added the state for roles
+  const [roles, setRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState(todayDate);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch attendance data from the API
   useEffect(() => {
     const fetchAttendanceData = async () => {
       try {
@@ -65,37 +70,31 @@ const Attendance = () => {
   });
 
   const convert12HoursFormat = (time) => {
-    // Ensure time is a valid string before attempting to use 'includes'
-    if (!time || typeof time !== 'string') {
-      return 'Invalid Time'; // Return a fallback value if the time is invalid
+    if (!time || typeof time !== "string") {
+      return "Invalid Time";
     }
-  
-    // If time already includes AM/PM, return it as is
+
     if (time.includes("AM") || time.includes("PM")) {
       return time;
     }
-  
-    // Create a Date object from the time and convert it to a string in HH:MM:SS format
+
     const date = new Date(time);
     if (isNaN(date.getTime())) {
-      return 'Invalid Time'; // Return a fallback value if the Date is invalid
+      return "Invalid Time";
     }
-  
+
     const hours = date.getHours();
     const minutes = date.getMinutes();
-  
-    // Determine AM/PM period
+
     const period = hours >= 12 ? "PM" : "AM";
-  
-    // Convert hours to 12-hour format
-    const formattedHour = hours % 12 || 12; // Convert 0 to 12 (for midnight)
-    
-    // Add leading zero to minutes if necessary
+
+    const formattedHour = hours % 12 || 12;
+
     const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-  
+
     return `${formattedHour}:${formattedMinutes} ${period}`;
   };
-  
+
   const columns = [
     {
       name: "S.No",
@@ -168,7 +167,6 @@ const Attendance = () => {
     },
     {
       name: "Check-In",
-      // selector: (row) => new Date(row.checkIn).toLocaleTimeString(),
       selector: (row) => <span>{convert12HoursFormat(row.checkIn)}</span>,
       sortable: true,
       center: true,
@@ -201,6 +199,55 @@ const Attendance = () => {
     },
   };
 
+  const exportToExcel = (data, fileName = "attendance.xlsx") => {
+    const processedData = data.map((item) => ({
+      fullName: item.user?.fullName || "N/A",
+      role: item.user?.role || "N/A",
+      status: item.status || "N/A",
+      checkIn: new Date(item.checkIn).toLocaleTimeString() || "N/A",
+      checkOut: new Date(item.checkOut).toLocaleTimeString() || "N/A",
+      late
+    }));
+  
+    const options = {
+      fileName,
+      datas: [
+        {
+          sheetData: processedData,
+          sheetName: "Attendance",
+          sheetFilter: ["fullName", "role", "status","isLate", "checkIn", "checkOut"],
+          sheetHeader: ["Name", "Role", "Status","Late", "Check-In", "Check-Out"],
+        },
+      ],
+    };
+  
+    const toExcel = new ExportJsonExcel(options);
+    toExcel.saveExcel();
+  };
+
+  const handleExport = (period) => {
+    let filtered = attendanceData;
+
+    if (period === "today") {
+      filtered = filtered.filter(
+        (item) => new Date(item.date).toISOString().split("T")[0] === todayDate
+      );
+    } else if (period === "week") {
+      const startOfWeek = new Date();
+      startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+      filtered = filtered.filter((item) => new Date(item.date) >= startOfWeek);
+    } else if (period === "month") {
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      filtered = filtered.filter((item) => new Date(item.date) >= startOfMonth);
+    }
+
+    exportToExcel(filtered, `Attendance_${period}.xlsx`);
+  };
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-around items-center mb-4">
@@ -229,7 +276,15 @@ const Attendance = () => {
           onChange={handleDateChange}
           className="p-2 border border-gray-300 rounded-lg"
         />
+      
+      <button
+          onClick={openModal}
+            className="flex items-center gap-2 bg-orange-500 text-white p-2 px-4 rounded-lg "
+          >
+          <IoMdCloudDownload size={22} /> Export
+          </button>
       </div>
+      
       {!selectedRole && attendanceData.length === 0 && (
         <div className="text-center text-red-500 font-semibold mt-4">
           Please choose a role to view the attendance data.
@@ -244,6 +299,36 @@ const Attendance = () => {
           customStyles={customStyles}
         />
       )}
+
+<Modal
+        title="Export Attendance"
+        open={isModalOpen}
+        onCancel={closeModal}
+        footer={null}
+        centered
+      >
+        <div className=" flex gap-8">
+          <button
+            onClick={() => handleExport("today")}
+            className="bg-orange-500 text-white px-4 py-4 rounded-lg w-full"
+          >
+            Export Today
+          </button>
+          <button
+            onClick={() => handleExport("week")}
+            className="bg-orange-500 text-white px-4 py-2 rounded-lg w-full"
+          >
+            Export Week
+          </button>
+          <button
+            onClick={() => handleExport("month")}
+            className="bg-orange-500 text-white px-4 py-2 rounded-lg w-full"
+          >
+            Export Month
+          </button>
+        </div>
+      </Modal>
+
     </div>
   );
 };
