@@ -13,6 +13,7 @@ import {
   GetTrainee,
   GetBatches,
   GetSyllabus,
+  GetAttendance,
 } from "../../../../services/index";
 
 const Dashboard = () => {
@@ -25,6 +26,7 @@ const Dashboard = () => {
   const [traineeCount, SetTraineeCount] = useState(null);
   const [batchesCount, SetBatchesCount] = useState(null);
   const [syllabusCount, SetSyllabusCount] = useState(null);
+  const [attendence, SetAttendence] = useState([]);
 
   const FetchStaffCount = () => {
     AllStaffs()
@@ -66,72 +68,151 @@ const Dashboard = () => {
       });
   };
 
+  const FetchAttendence = () => {
+    GetAttendance()
+      .then((res) => {
+        SetAttendence(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err, "error fetching");
+      });
+  };
+
   useEffect(() => {
     FetchStaffCount();
     FetchTraineeCount();
     FetchBatches();
     FetchSyllabus();
+    FetchAttendence();
   }, []);
+
+  function getWeekDates() {
+    let dates = [];
+    let today = new Date();
+    let dayOfWeek = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+
+    // Adjust to make Monday the start of the week
+    let startOfWeek = new Date(today);
+    startOfWeek.setDate(
+      today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)
+    ); // Adjust if today is Sunday
+
+    for (let i = 0; i < 7; i++) {
+      let date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
+
+      // Format the date as DD-MM-YYYY
+      let formattedDate =
+        ("0" + date.getDate()).slice(-2) +
+        "-" +
+        ("0" + (date.getMonth() + 1)).slice(-2) +
+        "-" +
+        date.getFullYear();
+
+      dates.push(formattedDate);
+    }
+
+    return dates;
+  }
+
+  // const AttendenceCount = [];
+
+  function getCountsArray(data) {
+    const counts = {};
+
+    data.forEach((entry) => {
+      // Extract the date part (YYYY-MM-DD)
+      const date = entry.date.split("T")[0];
+
+      // Increment the count for this date
+      counts[date] = (counts[date] || 0) + 1;
+    });
+
+    // Get unique sorted dates
+    const sortedDates = Object.keys(counts).sort();
+
+    // Create an array of counts in the same order as the sorted dates
+    return sortedDates.map((date) => counts[date]);
+  }
+
+  const countsArray = getCountsArray(attendence);
 
   useEffect(() => {
     const chartDom = document.getElementById("attendance-chart");
     const myChart = echarts.init(chartDom);
 
-    const attendanceData = {
-      HR: {
-        dates: [
-          "Mon (01)",
-          "Tue (02)",
-          "Wed (03)",
-          "Thu (04)",
-          "Fri (05)",
-          "Sat (06)",
-          "Sun (07)",
-        ],
-        data: [120, 200, 150, 80, 170, 160, 130],
-      },
-      Coordinators: {
-        dates: [
-          "Mon (01)",
-          "Tue (02)",
-          "Wed (03)",
-          "Thu (04)",
-          "Fri (05)",
-          "Sat (06)",
-          "Sun (07)",
-        ],
-        data: [100, 180, 140, 90, 60, 100, 120],
-      },
-      Employees: {
-        dates: [
-          "Mon (01)",
-          "Tue (02)",
-          "Wed (03)",
-          "Thu (04)",
-          "Fri (05)",
-          "Sat (06)",
-          "Sun (07)",
-        ],
-        data: [90, 170, 120, 100, 80, 90, 110],
-      },
-    };
+    // const attendanceData = {
+    //   HR: {
+    //     dates: [
+    //       "Mon (01)",
+    //       "Tue (02)",
+    //       "Wed (03)",
+    //       "Thu (04)",
+    //       "Fri (05)",
+    //       "Sat (06)",
+    //       "Sun (07)",
+    //     ],
+    //     data: [100, 200, 150, 80, 170, 160, 130],
+    //   },
+    //   Coordinators: {
+    //     dates: [
+    //       "Mon (01)",
+    //       "Tue (02)",
+    //       "Wed (03)",
+    //       "Thu (04)",
+    //       "Fri (05)",
+    //       "Sat (06)",
+    //       "Sun (07)",
+    //     ],
+    //     data: [100, 180, 140, 90, 60, 100, 120],
+    //   },
+    //   Employees: {
+    //     dates: [
+    //       "Mon (01)",
+    //       "Tue (02)",
+    //       "Wed (03)",
+    //       "Thu (04)",
+    //       "Fri (05)",
+    //       "Sat (06)",
+    //       "Sun (07)",
+    //     ],
+    //     data: [90, 170, 120, 100, 80, 90, 110],
+    //   },
+    // };
 
-    const selectedData = attendanceData[selectedRole];
+    // const selectedData = attendanceData[selectedRole];
 
+    const maxCount = Math.max(...countsArray);
     const option = {
       xAxis: {
         type: "category",
-        data: selectedData.dates,
+        // data: selectedData.dates,
+        data: getWeekDates(),
         axisLine: { lineStyle: { color: "#ccc" } },
       },
       yAxis: {
         type: "value",
+        max: maxCount + 2,
+        interval: 1,
         axisLine: { lineStyle: { color: "#ccc" } },
-        axisLabel: { formatter: "{value} Attendees" },
+        axisLabel: {
+          formatter: "{value}",
+        },
+      },
+      tooltip: {
+        trigger: "axis",
+        axisPointer: {
+          
+          type: "shadow",// Can be 'line', 'shadow', or 'cross'
+        },
+        formatter: function (params) {
+          const dataPoint = params[0];
+          return `${dataPoint.axisValue}<br/>Attendees: ${dataPoint.data}`;
+        },
       },
       series: [
         {
-          data: selectedData.data,
+          data: countsArray,
           type: "bar",
           itemStyle: { color: "#f97316", borderRadius: [10, 10, 0, 0] },
           barWidth: 20,
