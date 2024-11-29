@@ -68,7 +68,7 @@ exports.editAssessment = async(req)=>{
     const {authId} = req;
     const { _id } = req.params;
 
-    if (_id) {
+    if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, "Assessment _id required")
     }
 
