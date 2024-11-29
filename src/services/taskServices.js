@@ -111,7 +111,7 @@ exports.editTask = async(req)=>{
     if (updateData.title && updateData.title !== task.title) {
         activities.push({
             type: 'updated',
-            activity: `Title changed from "${task.title}" to "${updateData.title}"`,
+            activity: `Title changed from ${task.title} to ${updateData.title}`,
             date: now,
             timeAgo: formatDistanceToNow(now, { addSuffix: true }),
         });
@@ -129,7 +129,7 @@ exports.editTask = async(req)=>{
     if (updateData.priority && updateData.priority !== task.priority) {
         activities.push({
             type: 'updated',
-            activity: `Priority changed from "${task.priority}" to "${updateData.priority}"`,
+            activity: `Priority changed from ${task.priority} to ${updateData.priority}`,
             date: now,
             timeAgo: formatDistanceToNow(now, { addSuffix: true }),
         });
@@ -138,7 +138,7 @@ exports.editTask = async(req)=>{
     if (updateData.status && updateData.status !== task.status) {
         activities.push({
             type: 'updated',
-            activity: `Status changed from "${task.status}" to "${updateData.status}"`,
+            activity: `Status changed from ${task.status} to ${updateData.status}`,
             date: now,
             timeAgo: formatDistanceToNow(now, { addSuffix: true }),
         });
@@ -148,7 +148,7 @@ exports.editTask = async(req)=>{
     if (updateData.dueDate && updateData.dueDate !== task.dueDate.toISOString()) {
         activities.push({
             type: 'updated',
-            activity: `Due date changed from "${task.dueDate.toISOString().split('T')[0]}" to "${updateData.dueDate}"`,
+            activity: `Due date changed from ${task.dueDate.toISOString().split('T')[0]} to ${updateData.dueDate}`,
             date: now,
             timeAgo: formatDistanceToNow(now, { addSuffix: true }),
         });
