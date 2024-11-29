@@ -39,7 +39,7 @@ exports.createAssessment = async(req)=>{
 
 
 exports.getAssessmentAll = async(req)=>{
-    const assessment = await AssessmentModel.find({}).populate('quetion');
+    const assessment = await AssessmentModel.find({});
     if (!assessment) {
         throw new ApiError(httpStatus.BAD_REQUEST, "Assessments not found");
     }
