@@ -154,14 +154,25 @@ exports.editTask = async(req)=>{
         });
     }
 
-    await TaskModel.findByIdAndUpdate(
+    // task.activities.push(...activities);
+
+    // Object.assign(task, updateData);
+
+    if (activities.length > 0) {
+        await TaskModel.findByIdAndUpdate(
+            _id,
+            {
+                $push: { activities: { $each: activities } },
+            }
+        );
+    }
+    
+    const updatedTask = await TaskModel.findByIdAndUpdate(
         _id,
-        { $push: { activities: { $each: activities } }, ...updateData },
+        { $set: updateData },
         { new: true }
     );
     
-
-    Object.assign(task, updateData);
 
     await task.save();
 
