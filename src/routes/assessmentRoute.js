@@ -10,7 +10,7 @@ const Router = express.Router();
 Router.route('/createAssessment').post(uploads.single('mediaUrl'),assessmentController.createAssessment);
 Router.route('/getAssessmentAll').get(assessmentController.getAssessmentAll);
 Router.route('/getAssessmentId/:_id').get(assessmentController.getAssessmentId);
-Router.route('/editAssessment/:_id').put(assessmentController.editAssessment);
+Router.route('/editAssessment/:_id').put(uploads.single('mediaUrl'),assessmentController.editAssessment);
 Router.route('/deleteAssessment/:_id').delete(assessmentController.deleteAssessment);
 
 module.exports = Router;
