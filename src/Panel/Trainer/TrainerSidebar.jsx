@@ -5,7 +5,7 @@ import { MdAssignment } from 'react-icons/md';
 import logo from '../../assets/Login/NavbarLogo.png'
 import { CreateProject, GetProjects, logout } from '../../services';
 import {Modal, Input, Select, Button, message} from 'antd'
-import { FaSquarePlus } from 'react-icons/fa6';
+import { FaDochub, FaGraduationCap, FaRProject, FaSquarePlus } from 'react-icons/fa6';
 import Task from '../SuperAdmin/Pages/Task/Task';
 const Navbar = () => {
   const location = useLocation();
@@ -213,6 +213,13 @@ const TrainerSidebar = () => {
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
             <FaTasks />
             Task
+          </Link>
+          <Link 
+            to="/trainersidebar/studenttask" 
+            onClick={toggleTaskView}
+            className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
+            <FaGraduationCap />
+           Student Task
           </Link>
           <Link 
             to="/trainersidebar/assessment" 

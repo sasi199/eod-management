@@ -42,6 +42,7 @@ import Course from "../Panel/SuperAdmin/Pages/Course/Course";
 import TraineeTask from "../Panel/Trainer/Pages/Task/Task";
 import TrainerTask from "../Panel/Trainer/Pages/Task/Task";
 import ProjectTask from "../Panel/Trainer/Pages/Task/ProjectTask";
+import StudentTask from "../Panel/Trainer/Pages/StudentTask/StudentTask";
 
 // export default pages;
 
@@ -180,6 +181,10 @@ export const pages = [
       {
         path: "task",
         element: <TrainerTask />,
+      },
+      {
+        path:"studenttask",
+        element: <StudentTask/>
       },
 
       {
