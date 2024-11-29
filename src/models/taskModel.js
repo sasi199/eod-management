@@ -18,7 +18,7 @@ const taskSchema = new mongoose.Schema(
         activities: [
             {
                 type: schemaFields.StringWithEnumAndDefault(
-                    ['assigned', 'started', 'in progress', 'bug', 'completed'],
+                    ['assigned', 'started', 'in progress', 'bug', 'completed','updated'],
                     'assigned'
                 ),
                 activity: { type: String, trim: true }, 

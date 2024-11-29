@@ -5,6 +5,8 @@ const ProjectModel = require("../models/projectModel");
 const NotificationModel = require("../models/notificationModel");
 const Auth = require("../models/authModel");
 const StaffModel = require("../models/staffModel");
+const { formatDistanceToNow } = require('date-fns');
+
 
 
 
@@ -91,6 +93,7 @@ exports.getTaskId = async(req)=>{
 exports.editTask = async(req)=>{
     const { _id } = req.params;
     if (!_id) {
+
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task Id required"});
     }
 
@@ -102,14 +105,64 @@ exports.editTask = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task not found"});
     }
 
-    const updateTask = await TaskModel.findByIdAndUpdate(_id,updateData,
-        { new:true,runValidators:true }
-    )
+    const activities = [];
+    const now = new Date();
 
-    await updateTask.save();
-    req.io.emit("dashboardUpdate", { message: "Task updated", task: updateTask });
+    if (updateData.title && updateData.title !== task.title) {
+        activities.push({
+            type: 'updated',
+            activity: `Title changed from "${task.title}" to "${updateData.title}"`,
+            date: now,
+            timeAgo: formatDistanceToNow(now, { addSuffix: true }),
+        });
+    }
 
-    return updateTask;
+    if (updateData.description && updateData.description !== task.description) {
+        activities.push({
+            type: 'updated',
+            activity: `Description updated`,
+            date: now,
+            timeAgo: formatDistanceToNow(now, { addSuffix: true }),
+        });
+    }
+
+    if (updateData.priority && updateData.priority !== task.priority) {
+        activities.push({
+            type: 'updated',
+            activity: `Priority changed from "${task.priority}" to "${updateData.priority}"`,
+            date: now,
+            timeAgo: formatDistanceToNow(now, { addSuffix: true }),
+        });
+    }
+
+    if (updateData.status && updateData.status !== task.status) {
+        activities.push({
+            type: 'updated',
+            activity: `Status changed from "${task.status}" to "${updateData.status}"`,
+            date: now,
+            timeAgo: formatDistanceToNow(now, { addSuffix: true }),
+        });
+    }
+
+
+    if (updateData.dueDate && updateData.dueDate !== task.dueDate.toISOString()) {
+        activities.push({
+            type: 'updated',
+            activity: `Due date changed from "${task.dueDate.toISOString().split('T')[0]}" to "${updateData.dueDate}"`,
+            date: now,
+            timeAgo: formatDistanceToNow(now, { addSuffix: true }),
+        });
+    }
+
+    task.activities.push(...activities);
+
+    Object.assign(task, updateData);
+
+    await task.save();
+
+    req.io.emit("dashboardUpdate", { message: "Task updated", task });
+
+    return task;
 
 }
 
