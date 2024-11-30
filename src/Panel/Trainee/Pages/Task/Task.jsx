@@ -19,7 +19,7 @@ import moment from "moment";
 import { FaBook, FaClipboardList, FaUser } from "react-icons/fa6";
 const { Title, Text } = Typography;
 
-const StudentTask = () => {
+const TraineeTask = () => {
   const initialTaskState = {
     id: null,
     taskTitle: "",
@@ -117,7 +117,7 @@ const StudentTask = () => {
     {
       name: "Actions",
       cell: (row) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2 pl-6">
           <Tooltip title="View">
             <Button
               className="text-green-500 border border-green-500"
@@ -134,21 +134,21 @@ const StudentTask = () => {
               <FaEdit />
             </Button>
           </Tooltip>
-          <Tooltip title="Delete">
+          {/* <Tooltip title="Delete">
             <Button
               className="text-red-500 border border-red-500"
               onClick={() => handleModalToggle("delete", row)}
             >
               <FaTrash />
             </Button>
-          </Tooltip>
+          </Tooltip> */}
         </div>
       ),
       center: true,
     },
   ];
 
- 
+
   const customStyles = {
     headCells: {
       style: {
@@ -162,13 +162,13 @@ const StudentTask = () => {
 
   return (
     <div className="p-4">
-      <button
+      {/* <button
         type="primary"
         onClick={() => handleModalToggle("create")}
         className="mb-4 bg-orange-500 border text-white hover:border-orange-500 hover:text-orange-500 hover:bg-white transition-all transform duration-300 px-3 py-1 rounded-lg"
       >
         Create Task
-      </button>
+      </button> */}
 
       <DataTable
         columns={columns}
@@ -176,7 +176,7 @@ const StudentTask = () => {
         customStyles={customStyles}
         pagination
         highlightOnHover
-        className="border border-gray-300 rounded-md"
+        className="border border-gray-300 rounded-md mt-8"
       />
 
       {/* Create Task Modal */}
@@ -440,4 +440,4 @@ const StudentTask = () => {
   );
 };
 
-export default StudentTask;
+export default TraineeTask;

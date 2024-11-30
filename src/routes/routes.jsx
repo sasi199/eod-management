@@ -39,7 +39,7 @@ import SuperReports from "../Panel/SuperAdmin/Pages/Report/SuperReport";
 import Task from "../Panel/SuperAdmin/Pages/Task/Task";
 import EOD from "../Panel/SuperAdmin/Pages/Task/EOD";
 import Course from "../Panel/SuperAdmin/Pages/Course/Course";
-import TraineeTask from "../Panel/Trainer/Pages/Task/Task";
+import TraineeTask from "../Panel/Trainee/Pages/Task/Task";
 import TrainerTask from "../Panel/Trainer/Pages/Task/Task";
 import ProjectTask from "../Panel/Trainer/Pages/Task/ProjectTask";
 import StudentTask from "../Panel/Trainer/Pages/StudentTask/StudentTask";
@@ -147,6 +147,10 @@ export const pages = [
       {
         path: "attendance",
         element: <Attendance />,
+      },
+      {
+        path:"task",
+        element:<TraineeTask/>
       },
       {
         path: "notifications",
