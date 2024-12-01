@@ -14,6 +14,7 @@ const reportRouter = require("../routes/reportRoute");
 const projectRouter = require("../routes/projectRoute");
 const syllabusRouter = require("../routes/syllabusRoute");
 const chatRouter = require("../routes/chatRoute");
+const traineeTaskRouter = require("../routes/traineeTaskRoute");
 
 
 
@@ -73,6 +74,10 @@ const Routes = [
   {
     path: "/chat",
     route: chatRouter,
+  },
+  {
+    path: "/traineeTask",
+    route: traineeTaskRouter,
   },
 
 

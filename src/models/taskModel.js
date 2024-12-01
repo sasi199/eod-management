@@ -15,16 +15,6 @@ const taskSchema = new mongoose.Schema(
         },
         priority: schemaFields.StringWithEnumAndDefault(['high', 'medium', 'low', 'normal'],'normal'),
         status: schemaFields.StringWithEnumAndDefault(['todo', 'in progress', 'completed'],'todo'),
-        activities: [
-            {
-                type: schemaFields.StringWithEnumAndDefault(
-                    ['assigned', 'started', 'in progress', 'bug', 'completed','updated'],
-                    'assigned'
-                ),
-                activity: { type: String, trim: true }, 
-                date: { type: Date, default: Date.now },
-            },
-        ],
         assignees: [{
                 type: String,
                 ref: 'Staff'

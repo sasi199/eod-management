@@ -83,13 +83,18 @@ exports.createBatch = async(req)=>{
 
     await newBatch.save();
 
-    const newAssignBatch = new AssignedBatchModel({
-        batchId: newBatch._id,
-        trainer: trainerId.map((t) => t._id),
-        trainee
-    })
+    const assignBatchPromises = trainerId.map(async (trainer) => {
+        const newAssignBatch = new AssignedBatchModel({
+            batchId: newBatch._id,
+            trainer: trainer._id,
+        });
 
-    await newAssignBatch.save()
+        // Save the assignment for each trainer
+        await newAssignBatch.save();
+    });
+
+    // Wait for all trainers to be assigned
+    await Promise.all(assignBatchPromises);
 
     return newBatch;
 }

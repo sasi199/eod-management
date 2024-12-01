@@ -70,14 +70,12 @@ exports.createTrainee = async(req)=>{
     password: hashedPassword
    })
 
-   const assignedBatch = await AssignedBatchModel.findOneAndUpdate(
-    { batchId: existingBatch._id },
-    { trainee: newTrainee._id },
-    { new: true, runValidators: true }
-);
+    const newAssignBatch = new AssignedBatchModel({
+        batchId: existingBatch._id,
+        trainee: newTrainee._id
+    });
 
-
-  console.log(assignedBatch);
+await newAssignBatch.save();
    
    const newAuth = new Auth({
     accountId: newTrainee._id,

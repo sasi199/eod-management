@@ -1,53 +1,56 @@
-const TaskModel = require("../models/taskModel");
+const TraineeTaskModel = require("../models/TraineeTaskModel");
+const StudentProgressModel = require("../models/studentProgressModel");
+const BatchModel = require("../models/batchModel");
 const httpStatus = require('http-status');
 const ApiError = require("../utils/apiError");
-const ProjectModel = require("../models/projectModel");
 const NotificationModel = require("../models/notificationModel");
 const Auth = require("../models/authModel");
 const StaffModel = require("../models/staffModel");
 const { formatDistanceToNow } = require('date-fns');
-const ActivityModel = require("../models/taskActivityModel");
+const AssignedBatchModel = require("../models/assignedBatchesModel");
 
 
 
 
-exports.createTask = async(req)=>{
-    const { title, description, assignees,projectId, dueDate, priority} = req.body;
+exports.createTraineeTask = async(req)=>{
+    const { title, description, dueDate, priority, trainerId, batchId} = req.body;
 
-    const project = await ProjectModel.findById(projectId)
-    console.log("vfdsesfg",project);
+    const batch = await AssignedBatchModel.findOne({batchId}).populate('trainee'); 
+    console.log(batch,"lalalaal");
     
-    if (!project) {
-        throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Project not found'}); 
+    
+    if (!batch) {
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Batch not found'}); 
     }
 
-    const assigneeId = await StaffModel.findById(assignees);
-        console.log(assigneeId,"asssaaa");
-        
-        if (!assigneeId) {
-            throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Assignee not found'});
-        }
+    if (!batch.trainee || batch.trainee.length === 0) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: 'No trainees found in the batch' });
+    }
 
-    const newTask = new TaskModel({
-        ...req.body,
-        projectId: project._id,
-        assignees: assigneeId._id
-    })
 
-    await newTask.save();
-
-    const activity = new ActivityModel({
-        type: 'assigned',
-        activity: 'Task created',
-        taskId: newTask._id
+    const newTask = await TraineeTaskModel.create({
+        title,
+        description,
+        dueDate,
+        trainerId,
+        batchId
     });
 
-    await activity.save();
+
+    const progressPromises = batch.trainee.map(async (trainee) => {
+        return await StudentProgressModel.create({
+            taskId: newTask._id,
+            traineeId: trainee._id,
+            status: 'not attended',
+        });
+    });
+
+    await Promise.all(progressPromises);
 
         const notification = new NotificationModel({
             title: "Alert",
             content: `You have been assigned a new task: ${title}`,
-            recipientId: assigneeId._id,
+            recipientId: batchId._id,
             status: "Unread",
         });
 
@@ -71,7 +74,7 @@ exports.createTask = async(req)=>{
 
 }
 
-exports.getTaskAll = async(req)=>{
+exports.getTraineeTaskAll = async(req)=>{
     const task = await TaskModel.find({}).populate({
         path:'assignees',
         select:'fullName profilePic role'
@@ -79,14 +82,10 @@ exports.getTaskAll = async(req)=>{
     if (!task) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainer not found"});
     }
-
-    const activities = await ActivityModel.find({ taskId: task._id }).sort({ date: -1 });
-    task.activities = activities;
-
     return task;
 }
 
-exports.getTaskId = async(req)=>{
+exports.getTraineeTaskId = async(req)=>{
     const { _id } = req.params;
     if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task Id required"});
@@ -100,13 +99,10 @@ exports.getTaskId = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task not found"});
     }
 
-    const activities = await ActivityModel.find({ taskId: task._id }).sort({ date: -1 });
-    task.activities = activities;
-
     return task;
 }
 
-exports.editTask = async(req)=>{
+exports.editTraineeTask = async(req)=>{
     const { _id } = req.params;
     if (!_id) {
 
@@ -174,21 +170,14 @@ exports.editTask = async(req)=>{
 
     // Object.assign(task, updateData);
 
-    // if (activities.length > 0) {
-    //     await TaskModel.findByIdAndUpdate(
-    //         _id,
-    //         {
-    //             $push: { activities: { $each: activities } },
-    //         }
-    //     );
-    // }
-
-    const activityDocs = await ActivityModel.insertMany(
-        activities.map(activity => ({
-            ...activity,
-            taskId: task._id,
-        }))
-    );
+    if (activities.length > 0) {
+        await TaskModel.findByIdAndUpdate(
+            _id,
+            {
+                $push: { activities: { $each: activities } },
+            }
+        );
+    }
     
     const updatedTask = await TaskModel.findByIdAndUpdate(
         _id,
@@ -205,7 +194,7 @@ exports.editTask = async(req)=>{
 
 }
 
-exports.deleteTask = async(req)=>{
+exports.deleteTraineeTask = async(req)=>{
     const {_id } = req.params
 
     const task = await TaskModel.findById(_id);
