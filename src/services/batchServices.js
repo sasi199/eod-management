@@ -111,13 +111,13 @@ exports.getBatchAll = async (req) => {
                     as: "assignedData"
                 }
             },
-            {
+            // {
                 
-                $unwind: {
-                    path: "$assignedData",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
+            //     $unwind: {
+            //         path: "$assignedData",
+            //         preserveNullAndEmptyArrays: true
+            //     }
+            // },
             {
                 
                 $lookup: {

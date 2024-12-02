@@ -15,15 +15,14 @@ const AssignedBatchModel = require("../models/assignedBatchesModel");
 exports.createTraineeTask = async(req)=>{
     const { title, description, dueDate, priority, trainerId, batchId} = req.body;
 
-    const batch = await AssignedBatchModel.findOne({batchId}).populate('trainee'); 
-    console.log(batch,"lalalaal");
-    
-    
-    if (!batch) {
-        throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Batch not found'}); 
+    const traineeData = await AssignedBatchModel.find({batchId, trainee:{$exists:true}}).populate('trainee'); 
+    const trainerData = await AssignedBatchModel.findOne({batchId,trainer:trainerId});
+  
+    if ( !trainerData) {
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Batch not found for trainer'}); 
     }
 
-    if (!batch.trainee || batch.trainee.length === 0) {
+    if (!traineeData || traineeData.length === 0) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: 'No trainees found in the batch' });
     }
 
@@ -37,31 +36,35 @@ exports.createTraineeTask = async(req)=>{
     });
 
 
-    const progress = await StudentProgressModel.create({
+    const progressEntries = traineeData.map((data) => ({
         taskId: newTask._id,
-        traineeId: batch.trainee._id,
+        traineeId: data.trainee._id,
         status: 'not attended',
-    });
+    }));
+    await StudentProgressModel.insertMany(progressEntries);
 
-        const notification = new NotificationModel({
-            title: "Alert",
-            content: `You have been assigned a new task: ${title}`,
-            recipientId: batchId._id,
-            status: "Unread",
-        });
-
-        await notification.save();
-
-        const socketId = req.io.connectedUsers;
+ 
+    const notifications = traineeData.map((doc) => ({
+        title: "Alert",
+        content: `You have been assigned a new task: ${title}`,
+        recipientId: doc.trainee._id,
+        status: "Unread",
+    }));
+    await NotificationModel.insertMany(notifications);
+console.log("trinnn",traineeData)
+   
+    traineeData.forEach((doc) => {
+        const traineeId = doc.trainee._id;
+        const socketId = req.io.connectedUsers ? req.io.connectedUsers[traineeId] : null
         if (socketId) {
             req.io.to(socketId).emit("taskNotification", {
                 taskId: newTask._id,
-                title: notification.title,
-                content: notification.content,
-                status: notification.status,
-                createdAt: notification.createdAt,
+                title: "Alert",
+                content: `You have been assigned a new task: ${title}`,
+                status: "Unread",
             });
         }
+    });
     
 
     req.io.emit("dashboardUpdate", { message: "Task created", task: newTask });
