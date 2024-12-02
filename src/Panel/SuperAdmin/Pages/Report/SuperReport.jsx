@@ -106,7 +106,7 @@ const SuperReports = () => {
           <FaReply
             className="text-green-500 cursor-pointer"
             title="Reply to Report"
-            onClick={() => showReplyModal(row)} // Open reply modal
+            onClick={() => showReplyModal(row)} 
           />
         </div>
       ),
@@ -140,7 +140,6 @@ const SuperReports = () => {
         className="border border-gray-300 rounded-md"
       />
 
-      {/* Modal for Viewing Report Details */}
       <Modal
         title="View Report"
         open={isViewModalOpen}
@@ -165,7 +164,6 @@ const SuperReports = () => {
         )}
       </Modal>
 
-      {/* Modal for Replying to Report */}
       <Modal
         title="Reply to Report"
         open={isReplyModalOpen}

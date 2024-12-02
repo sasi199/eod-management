@@ -12,7 +12,12 @@ import {
   message,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { AddStaffs, AllStaffs, DeleteStaffs, EditStaffs } from "../../../../services";
+import {
+  AddStaffs,
+  AllStaffs,
+  DeleteStaffs,
+  EditStaffs,
+} from "../../../../services";
 import dayjs from "dayjs";
 
 const { Option } = Select;
@@ -21,7 +26,7 @@ const Staffs = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const[showIsTrainer,setShowIsTrainer]=useState(false);
+  const [showIsTrainer, setShowIsTrainer] = useState(false);
   const [staffs, setStaffs] = useState([]);
   const [isCardModalVisible, setIsCardModalVisible] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
@@ -41,7 +46,7 @@ const Staffs = () => {
     role: "",
     password: "",
     profilePic: "",
-    isTrainer:"",
+    isTrainer: "",
   });
 
   useEffect(() => {
@@ -78,9 +83,9 @@ const Staffs = () => {
     setIsCardModalVisible(false);
   };
 
-  const handleRoleChange = (value)=>{
-    setShowIsTrainer(value === "Employee")
-  }
+  const handleRoleChange = (value) => {
+    setShowIsTrainer(value === "Employee");
+  };
 
   const handleAddStaff = async (values) => {
     const formData = new FormData();
@@ -185,10 +190,10 @@ const Staffs = () => {
         try {
           // Pass the correct ID to delete
           await DeleteStaffs(id);
-          
+
           // Make sure the filtering is done using the correct ID field
-          setStaffs((prevStaffs) =>
-            prevStaffs.filter((staff) => staff._id !== id)  // Use _id if your staff object has _id
+          setStaffs(
+            (prevStaffs) => prevStaffs.filter((staff) => staff._id !== id) // Use _id if your staff object has _id
           );
           message.success("Staff deleted successfully.");
         } catch (error) {
@@ -201,7 +206,6 @@ const Staffs = () => {
       },
     });
   };
-  
 
   return (
     <div className="px-6 py-2">
@@ -380,8 +384,6 @@ const Staffs = () => {
             </Select>
           </Form.Item>
 
-        
-
           <Form.Item
             label="Qualification"
             name="qualification"
@@ -397,16 +399,16 @@ const Staffs = () => {
             className="col-span-1"
           >
             <DatePicker
-    className="w-full"
-    format="DD-MM-YYYY" 
-    onChange={(date) => {
-      if (date) {
-        const formattedDate = dayjs(date).format('DD-MM-YYYY'); 
-        console.log('Formatted Date of Birth:', formattedDate);
-      }
-    }}
-  />
-</Form.Item>
+              className="w-full"
+              format="DD-MM-YYYY"
+              onChange={(date) => {
+                if (date) {
+                  const formattedDate = dayjs(date).format("DD-MM-YYYY");
+                  console.log("Formatted Date of Birth:", formattedDate);
+                }
+              }}
+            />
+          </Form.Item>
           <Form.Item
             label="Experience"
             name="experience"
@@ -451,18 +453,18 @@ const Staffs = () => {
             </Upload>
           </Form.Item>
           {showIsTrainer && (
-        <Form.Item
-          label="IsTrainer"
-          name="isTrainer"
-          rules={[{ required: true, message: "Please select yes or no" }]}
-          className="col-span-1"
-        >
-          <Select className="w-full">
-            <Option value="Yes">Yes</Option>
-            <Option value="No">No</Option>
-          </Select>
-        </Form.Item>
-      )}
+            <Form.Item
+              label="IsTrainer"
+              name="isTrainer"
+              rules={[{ required: true, message: "Please select yes or no" }]}
+              className="col-span-1"
+            >
+              <Select className="w-full">
+                <Option value="Yes">Yes</Option>
+                <Option value="No">No</Option>
+              </Select>
+            </Form.Item>
+          )}
 
           <Form.Item className="col-span-2">
             <Button type="primary" htmlType="submit" className="w-full">

@@ -63,7 +63,6 @@ const TrainerSyllabus = () => {
           className="mt-2  px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
         >
           <option value="">All Courses</option>
-          {/* Dynamically generate options */}
           {Array.from(new Set(syllabusList.map((syllabus) => syllabus.courseName))).map(
             (course, index) => (
               <option key={index} value={course}>

@@ -44,10 +44,8 @@ const TraineeAssessment = () => {
               key={assessment._id}
               className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-shadow duration-300"
             >
-              {/* Assessment Title */}
               <h2 className="text-xl font-semibold mb-2 text-gray-800">{assessment.assessmentTitle}</h2>
 
-              {/* Subject and Timing */}
               <p className="text-gray-700 text-md mb-2">
                 <strong>Subject:</strong> {assessment.subject}
               </p>
@@ -55,7 +53,6 @@ const TraineeAssessment = () => {
                 <strong>Time:</strong> {assessment.assessmentTiming}
               </p>
 
-              {/* Media URL (Link to PDF or other media) */}
               <div className="mb-4">
                 <a
                   href={assessment.mediaUrl}
@@ -67,7 +64,6 @@ const TraineeAssessment = () => {
                 </a>
               </div>
 
-              {/* Completed and Attended Members */}
               <div className="mt-4 flex justify-between items-center">
                 <p className="text-sm text-gray-500">
                   {assessment.completedMembers.length} / {assessment.attendedMembers.length} Completed

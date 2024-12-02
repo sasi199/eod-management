@@ -374,7 +374,7 @@ const Batches = () => {
     fetchStaffs();
   }, []);
 
-  // Fetch batches data
+  
   useEffect(() => {
     const fetchBatches = async () => {
       try {

@@ -320,7 +320,6 @@ const Course = () => {
         onCancel={() => SetEditModal(false)}
       >
         <Form layout="vertical" onFinish={handleEditSyllabus}>
-          {/* Course Selection */}
           <Form.Item
             label="Course"
             // name="course"
@@ -339,10 +338,8 @@ const Course = () => {
             </Select>
           </Form.Item>
 
-          {/* Topics Selection */}
           <Form.Item
             label="Topics"
-            // name="topic"
             rules={[
               {
                 required: true,
@@ -367,7 +364,6 @@ const Course = () => {
             </Select>
           </Form.Item>
 
-          {/* PDF Upload */}
           <Form.Item
             label="Upload PDF"
             name="document"
@@ -380,7 +376,6 @@ const Course = () => {
             </Upload>
           </Form.Item>
 
-          {/* Submit Button */}
           <Form.Item>
             <Button
               htmlType="submit"
@@ -392,7 +387,6 @@ const Course = () => {
         </Form>
       </Modal>
 
-      {/* Modal for Adding Syllabus */}
       <Modal
         title="Add Syllabus"
         open={isModalOpen}
@@ -400,7 +394,6 @@ const Course = () => {
         onCancel={closeModal}
       >
         <Form layout="vertical" onFinish={handleFormSubmit}>
-          {/* Course Selection */}
           <Form.Item
             label="Course"
             name="course"
@@ -481,7 +474,6 @@ const Course = () => {
             </Upload>
           </Form.Item>
 
-          {/* Submit Button */}
           <Form.Item>
             <Button
               htmlType="submit"

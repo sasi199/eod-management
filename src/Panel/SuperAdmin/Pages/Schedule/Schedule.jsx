@@ -11,7 +11,6 @@
 //   const [form] = Form.useForm();
 
 //   // Mock data for trainers
-  
 
 //   const handleOpenModal = () => setIsModalOpen(true);
 //   const handleCloseModal = () => setIsModalOpen(false);
@@ -167,7 +166,6 @@
 //   </Select>
 // </Form.Item>
 
-
 //                       {/* Trainer */}
 //                       <Form.Item
 //                         {...restField}
@@ -244,9 +242,24 @@
 
 // export default Schedule;
 
-import React, { useEffect, useState } from 'react';
-import { Button, Modal, Form, Input, TimePicker, Select, DatePicker, message, Table } from 'antd';
-import { AllStaffs, GetBatches, getSchedule, createSchedule } from '../../../../services';
+import React, { useEffect, useState } from "react";
+import {
+  Button,
+  Modal,
+  Form,
+  Input,
+  TimePicker,
+  Select,
+  DatePicker,
+  message,
+  Table,
+} from "antd";
+import {
+  AllStaffs,
+  GetBatches,
+  getSchedule,
+  createSchedule,
+} from "../../../../services";
 
 const { Option } = Select;
 
@@ -254,52 +267,49 @@ const Schedule = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [batches, setBatches] = useState([]);
   const [staffs, setStaffs] = useState([]);
-  const [scheduleData, setScheduleData] = useState([]); // State to store fetched schedule data
+  const [scheduleData, setScheduleData] = useState([]); 
   const [form] = Form.useForm();
 
-  // Open and close modal handlers
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
-  // Handle form submission
   const handleSubmit = async (values) => {
     console.log("Form Values:", values);
     if (!values.batch || !values.date || !values.timeTable) {
-      message.error('Please ensure all required fields are filled!');
+      message.error("Please ensure all required fields are filled!");
       return;
     }
 
     const payload = {
       batch: values.batch,
-      date: values.date.format('YYYY-MM-DD'),
+      date: values.date.format("YYYY-MM-DD"),
       timeTable: values.timeTable.map((item) => ({
         trainer: item.trainer,
-        startTime: item.startTime.format('HH:mm'),
-        endTime: item.endTime.format('HH:mm'),
+        startTime: item.startTime.format("HH:mm"),
+        endTime: item.endTime.format("HH:mm"),
         subject: item.subject,
       })),
     };
 
-    console.log('Payload:', payload);
+    console.log("Payload:", payload);
 
     try {
       const response = await createSchedule(payload);
 
       if (response.status === 200) {
-        message.success('Schedule added successfully!');
+        message.success("Schedule added successfully!");
         form.resetFields();
         handleCloseModal();
-        fetchSchedule(); // Refetch schedule data after successfully adding
+        fetchSchedule(); 
       } else {
-        message.error('Failed to add schedule. Please try again.');
+        message.error("Failed to add schedule. Please try again.");
       }
     } catch (error) {
-      console.error('Error:', error);
-      message.error('Failed to add schedule. Please try again.');
+      console.error("Error:", error);
+      message.error("Failed to add schedule. Please try again.");
     }
   };
 
-  // Fetch batches, staffs, and schedules on component mount
   useEffect(() => {
     const fetchBatches = async () => {
       try {
@@ -307,7 +317,7 @@ const Schedule = () => {
         setBatches(response.data.data);
         console.log(response.data.data);
       } catch (error) {
-        console.error('Error fetching batches:', error.message);
+        console.error("Error fetching batches:", error.message);
       }
     };
 
@@ -317,60 +327,65 @@ const Schedule = () => {
         setStaffs(response.data.data);
         console.log(response.data.data);
       } catch (error) {
-        console.error('Error fetching staffs:', error.message);
+        console.error("Error fetching staffs:", error.message);
       }
     };
 
     const fetchSchedule = async () => {
       try {
-        const response = await getSchedule(); // Fetch schedule data
-        setScheduleData(response.data); // Set schedule data to state
+        const response = await getSchedule(); 
+        setScheduleData(response.data); 
         console.log(response.data);
       } catch (error) {
-        console.error('Error fetching schedule:', error.message);
+        console.error("Error fetching schedule:", error.message);
       }
     };
 
     fetchBatches();
     fetchStaffs();
-    fetchSchedule(); // Call the function to fetch schedule data
+    fetchSchedule(); 
   }, []);
 
-  // Define columns for the timetable
   const columns = [
     {
-      title: 'Batch',
-      dataIndex: 'batchName',
-      key: 'batchName',
+      title: "Batch",
+      dataIndex: "batchName",
+      key: "batchName",
     },
     {
-      title: 'Course Name',
-      dataIndex: 'courseName',
-      key: 'courseName',
+      title: "Course Name",
+      dataIndex: "courseName",
+      key: "courseName",
     },
     {
-      title: 'Batch Timings',
-      dataIndex: 'batchTimings',
-      key: 'batchTimings',
+      title: "Batch Timings",
+      dataIndex: "batchTimings",
+      key: "batchTimings",
     },
     {
-      title: 'Trainer',
-      dataIndex: 'trainer',
-      key: 'trainer',
+      title: "Trainer",
+      dataIndex: "trainer",
+      key: "trainer",
       render: (trainerId) => {
         const trainer = staffs.find((staff) => staff._id === trainerId);
         return trainer ? (
           <div className="flex items-center">
-            <img src={trainer.profilePic} alt={trainer.fullName} className="w-10 h-10 rounded-full object-cover mr-2" />
+            <img
+              src={trainer.profilePic}
+              alt={trainer.fullName}
+              className="w-10 h-10 rounded-full object-cover mr-2"
+            />
             {trainer.fullName}
           </div>
-        ) : 'N/A';
+        ) : (
+          "N/A"
+        );
       },
     },
     {
-      title: 'Trainees',
-      dataIndex: 'trainees',
-      key: 'trainees',
+      title: "Trainees",
+      dataIndex: "trainees",
+      key: "trainees",
       render: (traineeList) => (
         <div>
           {traineeList.map((trainee) => (
@@ -387,25 +402,24 @@ const Schedule = () => {
       ),
     },
     {
-      title: 'Date',
-      dataIndex: 'date',
-      key: 'date',
+      title: "Date",
+      dataIndex: "date",
+      key: "date",
     },
     {
-      title: 'Actions',
-      key: 'actions',
+      title: "Actions",
+      key: "actions",
       render: () => <Button type="link">View More</Button>,
     },
   ];
 
-  // Prepare the schedule data for the table
   const timetableData = scheduleData.map((schedule) => ({
     key: schedule._id,
     batchName: schedule.batchName,
     courseName: schedule.courseName,
     batchTimings: schedule.batchTimings,
-    trainer: schedule.trainerDetails[0]?._id, // Assuming each batch has only one trainer
-    trainees: schedule.traineeDetails, // List of trainees
+    trainer: schedule.trainerDetails[0]?._id, 
+    trainees: schedule.traineeDetails, 
     date: schedule.date,
   }));
 
@@ -428,7 +442,9 @@ const Schedule = () => {
           layout="vertical"
           onFinish={handleSubmit}
           initialValues={{
-            timeTable: [{ trainer: '', startTime: null, endTime: null, subject: '' }],
+            timeTable: [
+              { trainer: "", startTime: null, endTime: null, subject: "" },
+            ],
           }}
           className="space-y-6"
         >
@@ -436,7 +452,7 @@ const Schedule = () => {
           <Form.Item
             label="Batch"
             name="batch"
-            rules={[{ required: true, message: 'Please select the batch!' }]}
+            rules={[{ required: true, message: "Please select the batch!" }]}
           >
             <Select placeholder="Select batch">
               {batches.map((batch) => (
@@ -451,7 +467,7 @@ const Schedule = () => {
           <Form.Item
             label="Date"
             name="date"
-            rules={[{ required: true, message: 'Please select the date!' }]}
+            rules={[{ required: true, message: "Please select the date!" }]}
           >
             <DatePicker format="YYYY-MM-DD" className="w-full" />
           </Form.Item>
@@ -467,12 +483,27 @@ const Schedule = () => {
                       <Form.Item
                         {...restField}
                         label="Subject"
-                        name={[name, 'subject']}
-                        fieldKey={[fieldKey, 'subject']}
-                        rules={[{ required: true, message: 'Please select the subject!' }]}
+                        name={[name, "subject"]}
+                        fieldKey={[fieldKey, "subject"]}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please select the subject!",
+                          },
+                        ]}
                       >
                         <Select placeholder="Select subject">
-                          {['Html/Css', 'Javascript', 'J-Query', 'React.Js', 'Node.Js/Mongodb', 'Python', 'Figma', 'PHP', 'Flutter'].map((subject) => (
+                          {[
+                            "Html/Css",
+                            "Javascript",
+                            "J-Query",
+                            "React.Js",
+                            "Node.Js/Mongodb",
+                            "Python",
+                            "Figma",
+                            "PHP",
+                            "Flutter",
+                          ].map((subject) => (
                             <Option key={subject} value={subject}>
                               {subject}
                             </Option>
@@ -484,9 +515,14 @@ const Schedule = () => {
                       <Form.Item
                         {...restField}
                         label="Trainer"
-                        name={[name, 'trainer']}
-                        fieldKey={[fieldKey, 'trainer']}
-                        rules={[{ required: true, message: 'Please select a trainer!' }]}
+                        name={[name, "trainer"]}
+                        fieldKey={[fieldKey, "trainer"]}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please select a trainer!",
+                          },
+                        ]}
                       >
                         <Select placeholder="Select trainer">
                           {staffs.map((trainer) => (
@@ -508,9 +544,14 @@ const Schedule = () => {
                       <Form.Item
                         {...restField}
                         label="Start Time"
-                        name={[name, 'startTime']}
-                        fieldKey={[fieldKey, 'startTime']}
-                        rules={[{ required: true, message: 'Please select start time!' }]}
+                        name={[name, "startTime"]}
+                        fieldKey={[fieldKey, "startTime"]}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please select start time!",
+                          },
+                        ]}
                       >
                         <TimePicker className="w-full" format="HH:mm" />
                       </Form.Item>
@@ -519,9 +560,14 @@ const Schedule = () => {
                       <Form.Item
                         {...restField}
                         label="End Time"
-                        name={[name, 'endTime']}
-                        fieldKey={[fieldKey, 'endTime']}
-                        rules={[{ required: true, message: 'Please select end time!' }]}
+                        name={[name, "endTime"]}
+                        fieldKey={[fieldKey, "endTime"]}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please select end time!",
+                          },
+                        ]}
                       >
                         <TimePicker className="w-full" format="HH:mm" />
                       </Form.Item>
@@ -549,7 +595,6 @@ const Schedule = () => {
             )}
           </Form.List>
 
-          {/* Submit Button */}
           <Form.Item>
             <Button type="primary" htmlType="submit" className="w-full">
               Add Schedule
@@ -558,7 +603,6 @@ const Schedule = () => {
         </Form>
       </Modal>
 
-      {/* Timetable */}
       <div className="mt-8">
         <h2 className="text-xl font-semibold">Timetable</h2>
         <Table
@@ -573,4 +617,3 @@ const Schedule = () => {
 };
 
 export default Schedule;
-
