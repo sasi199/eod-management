@@ -14,7 +14,9 @@ import {
   GetBatches,
   GetSyllabus,
   GetAttendance,
+  GetTasksAll,
 } from "../../../../services/index";
+import moment from "moment";
 
 const Dashboard = () => {
   const [selectedRole, setSelectedRole] = useState("HR");
@@ -27,6 +29,7 @@ const Dashboard = () => {
   const [batchesCount, SetBatchesCount] = useState(null);
   const [syllabusCount, SetSyllabusCount] = useState(null);
   const [attendence, SetAttendence] = useState([]);
+  const [listAllTasks, setListAllTasks] = useState([]);
 
   const FetchStaffCount = () => {
     AllStaffs()
@@ -334,6 +337,105 @@ const Dashboard = () => {
     return matchesTrainer && matchesBatch;
   });
 
+
+   // Columns for the List View
+   const listTaskcolumns = [
+    {
+      title: 'Task',
+      dataIndex: 'task',
+      key: 'task',
+      render: (text, record) => (
+        <span
+          className="font-medium text-gray-700 hover:text-purple-600 cursor-pointer"
+          onClick={() => showModal(record)}
+        >
+          {/* {console.log("yyrgrfry",record)} */}
+          {record.title}
+        </span>
+      ),
+    },
+    {
+      title: 'Assignee',
+      dataIndex: 'assignee',
+      key: 'assignee',
+      render: (text, record) => (
+        <div className="flex items-center">
+          <img
+            src={record?.assignees[0]?.profilePic}
+            alt={record?.assignees[0]?.fullName.charAt(0).toUpperCase()}
+            className="w-8 h-8 rounded-full mr-3"
+          />
+          <span>{record?.assignees[0]?.fullName}</span>
+        </div>
+      ),
+    },
+    {
+      title: 'Due Date',
+      dataIndex: 'dueDate',
+      key: 'dueDate',
+      render: (date) => <span className="text-gray-500">{moment(date).format("DD-MM-YYYY")}</span>,
+    },
+    {
+      title: 'Priority',
+      dataIndex: 'priority',
+      key: 'priority',
+      render: (priority) => {
+        const color =
+          priority === 'high'
+            ? 'red'
+            : priority === 'medium'
+            ? 'orange'
+            : priority === 'normal'
+            ?'green'
+            :'blue';
+        return <Tag color={color} style={{width:60, display:'flex', alignItems:'center', justifyContent:'center'}}>{priority}</Tag>;
+      },
+    },
+    {
+  title: 'Status',
+  dataIndex: 'status',
+  key: 'status',
+  render: (status) => {
+    // console.log("sttttt", status); // Logs the correct value
+
+    // Convert the first character to uppercase and keep the rest lowercase
+    const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+
+    // Define colors for each status
+    const colors = {
+      todo: 'purple',
+      'in progress': 'orange',
+      completed: 'green',
+    };
+
+    const color = colors[status.toLowerCase()] || 'gray'; // Fallback to gray if no match
+
+    return (
+      <div>
+        <p style={{ color }}>{formattedStatus}</p>
+      </div>
+    );
+  },
+}
+
+  ];
+
+  const fetchAllTasks = async() => {
+    try {
+      const response = await GetTasksAll();
+      console.log("res in admin tasks",response);
+      if(response.data.status){
+        setListAllTasks(response.data.data);
+      } 
+    } catch (error) {
+      console.error("error in admin dashboard taks",error)
+    }
+  };
+
+  useEffect(()=>{
+    fetchAllTasks();
+  },[])
+
   return (
     <div className="p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -429,14 +531,14 @@ const Dashboard = () => {
           <div id="attendance-chart" style={{ height: 400 }}></div>
         </div>
 
-        <div className="shadow-lg px-6 py-4 bg-white rounded-xl">
+        <div className="shadow-lg px-6 py-4  bg-white rounded-xl">
           <div className="flex items-center justify-between py-4">
             <p className="text-lg text-gray-700 font-semibold">
-              Trainer Schedule
+              Recent  Tasks
             </p>
 
             <div className="flex space-x-4">
-              <Select
+              {/* <Select
                 placeholder="Select Trainer"
                 value={selectedTrainer}
                 onChange={(value) => setSelectedTrainer(value)}
@@ -448,8 +550,8 @@ const Dashboard = () => {
                     {item.trainer}
                   </Select.Option>
                 ))}
-              </Select>
-              <Select
+              </Select> */}
+              {/* <Select
                 placeholder="Select Batch"
                 value={selectedBatch}
                 onChange={(value) => setSelectedBatch(value)}
@@ -461,15 +563,25 @@ const Dashboard = () => {
                     {item.batch}
                   </Select.Option>
                 ))}
-              </Select>
+              </Select> */}
             </div>
           </div>
 
-          <Table
+          {/* <Table
             columns={columns}
             dataSource={filteredData}
             rowKey="sno"
             pagination={{ pageSize: 4, borderColor: "#f97316;" }}
+          /> */}
+              <Table
+            dataSource={listAllTasks}
+            columns={listTaskcolumns}
+            pagination={{
+              pageSize: 4, // Sets the number of rows per page
+              showSizeChanger: true, // Allows changing rows per page
+              pageSizeOptions: ["5", "10", "15"], // Options for rows per page
+            }}
+            className="border rounded-lg shadow"
           />
         </div>
       </div>
