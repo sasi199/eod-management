@@ -168,14 +168,14 @@ exports.editTrainee = async(req)=>{
 
 exports.deleteTrainee = async(req)=>{
     const { authId } = req
-    const { _id } = req.user
+    const { _id } = req.params
 
     if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Trainee id required"});
      }
 
      const trainee = await TraineeModel.findById(_id);
-     const auth = await Auth.findById({accountId:_id});
+     const auth = await Auth.findOne({accountId:_id});
 
      if (!trainee) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Trainer not found"});

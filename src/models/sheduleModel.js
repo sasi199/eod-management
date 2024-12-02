@@ -12,10 +12,6 @@ const scheduleSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    timeTable: [{
-            type: String,
-            ref: 'TimeTable',
-        }],
     
 }, { timestamps: true, collection: 'Schedule' });
 

@@ -37,15 +37,11 @@ exports.createTraineeTask = async(req)=>{
     });
 
 
-    const progressPromises = batch.trainee.map(async (trainee) => {
-        return await StudentProgressModel.create({
-            taskId: newTask._id,
-            traineeId: trainee._id,
-            status: 'not attended',
-        });
+    const progress = await StudentProgressModel.create({
+        taskId: newTask._id,
+        traineeId: batch.trainee._id,
+        status: 'not attended',
     });
-
-    await Promise.all(progressPromises);
 
         const notification = new NotificationModel({
             title: "Alert",
@@ -75,13 +71,24 @@ exports.createTraineeTask = async(req)=>{
 }
 
 exports.getTraineeTaskAll = async(req)=>{
-    const task = await TaskModel.find({}).populate({
-        path:'assignees',
-        select:'fullName profilePic role'
+    const task = await TraineeTaskModel.find({}).populate({
+        path:'batchId',
+        populate:{
+            path: 'trainee',
+            select: 'fullName profilepic'
+        }
     });
     if (!task) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainer not found"});
     }
+
+    if (!task || task.length === 0) {
+        throw new ApiError(httpStatus.NOT_FOUND, { message: "No tasks found" });
+    }
+
+    // Step 2: Fetch progress for each task
+    const taskIds = task.map(tasks => tasks._id); // Extract all task IDs
+    const progressData = await StudentProgressModel.find({ taskId: { $in: taskIds } });
     return task;
 }
 
