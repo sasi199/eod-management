@@ -13,7 +13,7 @@ const Attendance = () => {
 
   const [attendanceData, setAttendanceData] = useState([]);
   const [roles, setRoles] = useState([]);
-  const [selectedRole, setSelectedRole] = useState("");
+  const [selectedRole, setSelectedRole] = useState("SuperAdmin");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState(todayDate);
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -30,11 +30,15 @@ export const AddStaffs = async (staffData) => {
 
 //get staffs
 
+
 export const AllStaffs = async () => {
   const res = await interceptors.get("/staff/getStaffAll");
   return res;
 };
-
+export const staffId = async (id) => {
+  const res = await interceptors.get(`/staff/getStaff/${id}`);
+  return res;
+};
 //edit staffs
 
 export const EditStaffs = async (id, data) => {

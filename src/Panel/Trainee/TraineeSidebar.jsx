@@ -78,12 +78,12 @@ const TraineeSidebar = () => {
             <FaUserGraduate />
             Assessment
           </Link>
-          <Link 
+          {/* <Link 
             to="/traineesidebar/attendance" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
             <SlCalender />
             Attendance
-          </Link>
+          </Link> */}
           <Link 
             to="/traineesidebar/task" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
@@ -97,12 +97,12 @@ const TraineeSidebar = () => {
             <FaBell />
             Notifications
           </Link>
-          <Link 
+          {/* <Link 
             to="/sidebar/chat" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
             <FaComment />
             Chat
-          </Link>
+          </Link> */}
         
           <Link 
             to="/traineesidebar/reports" 

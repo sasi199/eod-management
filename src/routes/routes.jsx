@@ -43,6 +43,8 @@ import TraineeTask from "../Panel/Trainee/Pages/Task/Task";
 import TrainerTask from "../Panel/Trainer/Pages/Task/Task";
 import ProjectTask from "../Panel/Trainer/Pages/Task/ProjectTask";
 import StudentTask from "../Panel/Trainer/Pages/StudentTask/StudentTask";
+import MyBatch from "../Panel/Trainer/Pages/MyBatch/MyBatch";
+import TraineeAssessment from "../Panel/Trainee/Pages/Assesment/TraineeAssessment";
 
 // export default pages;
 
@@ -139,11 +141,15 @@ export const pages = [
         path: "syllabus",
         element: <TraineeSyllabus />,
       },
+      
       {
         path: "notifications",
         element: <TraineeNotificaitons />,
       },
-
+      {
+        path: "assessment",
+        element: <TraineeAssessment />,
+      },
       {
         path: "attendance",
         element: <Attendance />,
@@ -195,10 +201,10 @@ export const pages = [
         path: "syllabus",
         element: <TrainerSyllabus />,
       },
-      // {
-      //   path: "notifications",
-      //   element: <TraineeNotificaitons />,
-      // },
+      {
+        path: "myBatch",
+        element: <MyBatch />,
+      },
       {
         path: "assessment",
         element: <TrainerAssessment />,

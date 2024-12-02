@@ -1,215 +1,415 @@
-import React, { useState } from "react";
-import { IoIosAdd } from "react-icons/io";
-import { Modal, Form, Input, Button } from "antd";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import Sidebar from "./Sidebar";
-import { MdOutlineFileUpload } from "react-icons/md";
-import { FaLink } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { Button, Modal, Form, Input, Select, Upload, message } from "antd";
+import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
+import DataTable from "react-data-table-component";
+import {
+  CreateAssessment,
+  DeleteAssessment,
+  EditAssessment,
+  GetAssessment,
+  GetBatches,
+} from "../../../../services";
+import { UploadOutlined } from "@ant-design/icons";
 
-// const Navbar = () => (
-//   <div className="w-full bg-blue-600 text-white p-4">
-//     <h1 className="text-lg font-semibold">Trainer Assessment</h1>
-//   </div>
-// );
+const { Option } = Select;
 
 const TrainerAssessment = () => {
-  const [selectedBatch, setSelectedBatch] = useState(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalContent, setModalContent] = useState("");
-  const [editorContent, setEditorContent] = useState("");
-  const [title, setTitle] = useState("");
+  const [batches, setBatches] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+  const [selectedAssessment, setSelectedAssessment] = useState(null);
+  const [assessments, setAssessments] = useState([]);
+  const [form] = Form.useForm();
 
-  const batches = [
+  const handleEdit = (row) => {
+    setIsEditing(true);
+    setEditingId(row._id);
+    setIsModalVisible(true);
+
+    form.setFieldsValue({
+      assessmentTitle: row.assessmentTitle,
+      batch: row.batchName,
+      mediaUrl: row.mediaUrl,
+      assessmentTiming: row.assessmentTiming,
+      subject: row.subject,
+    });
+  };
+
+  const handleView = (row) => {
+    setSelectedAssessment(row);
+    setIsViewModalVisible(true);
+  };
+
+  useEffect(() => {
+    const fetchAssessment = async () => {
+      try {
+        const response = await GetAssessment();
+        if (response.data?.data) {
+          const enrichedAssessments = response.data.data.map((assessment) => {
+            const batch = batches.find((b) => b.batchId === assessment.batchId);
+            return {
+              ...assessment,
+              batchName: batch ? batch.batchName : "N/A",
+            };
+          });
+          setAssessments(enrichedAssessments);
+        } else {
+          message.warning("No assessments found.");
+        }
+      } catch (error) {
+        console.error("Error fetching assessments:", error);
+        message.error("Failed to fetch assessments. Please try again.");
+      }
+    };
+    fetchAssessment();
+  }, [batches]);
+
+  useEffect(() => {
+    const fetchBatches = async () => {
+      try {
+        const response = await GetBatches();
+        setBatches(response.data.data);
+        console.log(response.data.data);
+      } catch (error) {
+        console.error("Error fetching batches:", error);
+        message.error("Failed to fetch batches. Please try again.");
+      }
+    };
+    fetchBatches();
+  }, []);
+
+  const handleDeleteAssessment = (id) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this Assessment?",
+      content: "This action cannot be undone.",
+      okText: "Yes",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          await DeleteAssessment(id);
+          setAssessments((prevAssessment) =>
+            prevAssessment.filter((assessments) => assessments.id !== id)
+          );
+          message.success("Assessment deleted successfully.");
+        } catch (error) {
+          console.error("Error deleting Assessment:", error);
+          message.error("Failed to delete the Assessment. Please try again.");
+        }
+      },
+    });
+  };
+
+  const columns = [
+    { name: "S.No", selector: (row, index) => index + 1, center: true },
+
     {
-      name: "March 31",
-      studentCount: 30,
-      image: "https://via.placeholder.com/150",
+      name: "Assessment Title",
+      selector: (row) => row.assessmentTitle || "N/A",
+      sortable: true,
     },
     {
-      name: "April 22",
-      studentCount: 25,
-      image: "https://via.placeholder.com/150",
+      name: "Batch",
+      selector: (row) => row.batchName || "N/A",
+      sortable: true,
     },
     {
-      name: "May 15",
-      studentCount: 20,
-      image: "https://via.placeholder.com/150",
+      name: "Media URL",
+      selector: (row) =>
+        row.mediaUrl ? (
+          <a
+            href={row.mediaUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 underline"
+          >
+            View Media
+          </a>
+        ) : (
+          "No Media"
+        ),
+    },
+    {
+      name: "Timing",
+      selector: (row) => row.assessmentTiming || "N/A",
+      sortable: true,
+    },
+    {
+      name: "Subject",
+      selector: (row) => row.subject || "N/A",
+      sortable: true,
+    },
+    {
+      name: "Actions",
+      cell: (row) => (
+        <div className="flex space-x-4 text-lg">
+          <FaEye
+            className="text-green-500 cursor-pointer"
+            onClick={() => handleView(row)}
+          />
+          <FaEdit
+            className="text-yellow-500 cursor-pointer"
+            onClick={() => handleEdit(row)}
+          />
+          <FaTrash
+            className="text-red-500 cursor-pointer"
+            onClick={() => handleDeleteAssessment(row._id)}
+          />
+        </div>
+      ),
+      ignoreRowClick: true,
     },
   ];
 
-  const handleBatchSelect = (batch) => {
-    setSelectedBatch(batch);
+  const customStyles = {
+    headCells: {
+      style: {
+        backgroundColor: "#ff9800",
+        color: "#ffffff",
+        fontSize: "16px",
+        paddingRight: "0px",
+      },
+    },
   };
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const openModal = (content) => {
-    setModalContent(content);
+  const showModal = () => {
     setIsModalVisible(true);
   };
 
-  const closeModal = () => {
-    setIsModalVisible(false);
-    setEditorContent("");
-    setTitle("");
+  const handleMediaUpload = ({ file }) => {
+    form.setFieldsValue({ mediaUrl: file });
+    return false;
   };
 
-  const handleEditorChange = (value) => {
-    setEditorContent(value);
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      const selectedBatch = batches.find(
+        (batch) => batch.batchName === values.batch
+      );
+
+      const formData = new FormData();
+      formData.append("assessmentTitle", values.assessmentTitle);
+      formData.append("batch", values.batch);
+      formData.append("batchId", selectedBatch ? selectedBatch.batchId : "");
+      formData.append("assessmentTiming", values.assessmentTiming);
+      formData.append("subject", values.subject);
+
+      if (values.mediaUrl.file) {
+        formData.append("mediaUrl", values.mediaUrl.file);
+      }
+
+      if (isEditing && editingId) {
+        // Call EditAssessment API
+        const response = await EditAssessment(editingId, formData);
+        if (response.status === 200) {
+          // Update the assessments state
+          setAssessments((prev) =>
+            prev.map((item) =>
+              item._id === editingId
+                ? { ...item, ...values, batchName: values.batch }
+                : item
+            )
+          );
+          message.success("Assessment updated successfully!");
+        } else {
+          message.error("Failed to update assessment.");
+        }
+      } else {
+        // Add Assessment logic (already in your code)
+        const response = await CreateAssessment(formData);
+        if (response.status === 200) {
+          setAssessments([
+            ...assessments,
+            {
+              ...values,
+              batchName: values.batch,
+            },
+          ]);
+          message.success("Assessment added successfully!");
+        } else {
+          message.error("Failed to add assessment.");
+        }
+      }
+
+      form.resetFields();
+      setIsModalVisible(false);
+      setIsEditing(false);
+      setEditingId(null);
+    } catch (error) {
+      console.error("Validation Failed:", error);
+      message.error("Please check your input and try again.");
+    }
+  };
+
+  const handleCancel = () => {
+    form.resetFields();
+    setIsModalVisible(false);
+    setIsEditing(false);
+    setEditingId(null);
   };
 
   return (
-    <div className="px-4 relative">
-      {selectedBatch ? (
-        <div>
-          <h2 className="text-xl font-semibold mb-4">
-            Selected Batch: {selectedBatch.name}
-          </h2>
-          <button
-            className="mt-4 flex items-center gap-2 bg-blue-500 text-white px-3 py-1 rounded-2xl hover:bg-blue-600 transition-colors duration-300"
-            onClick={toggleDropdown}
-          >
-            <IoIosAdd className="text-white text-xl" />
-            <span className="text-lg font-medium">Create</span>
-          </button>
+    <div className="p-4">
+      <button
+        className="bg-orange-500 px-3 py-1 text-white rounded-lg mb-4"
+        onClick={() => {
+          setIsModalVisible(true);
+          setIsEditing(false);
+          form.resetFields();
+        }}
+      >
+        Add Assessment
+      </button>
 
-          <div
-            className={`bg-white border border-gray-200 rounded-lg shadow-md w-32 py-3 absolute z-10 transition-all duration-300 ${
-              isDropdownOpen
-                ? "opacity-100 translate-y-4"
-                : "opacity-0 -translate-y-1"
-            }`}
-            style={{
-              top: "85%",
-              left: "15px",
-            }}
-          >
-            <ul>
-              <li
-                className="hover:bg-gray-100 p-2 cursor-pointer"
-                onClick={() => openModal("Assignment")}
-              >
-                Assignment
-              </li>
-              <li
-                className="hover:bg-gray-100 p-2 cursor-pointer"
-                onClick={() => openModal("Quiz")}
-              >
-                Quiz
-              </li>
-              <li
-                className="hover:bg-gray-100 p-2 cursor-pointer"
-                onClick={() => openModal("Material")}
-              >
-                Material
-              </li>
-            </ul>
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {batches.map((batch, index) => (
-            <div
-              key={index}
-              className="bg-white shadow-md border border-gray-200 rounded-lg text-center hover:shadow-lg transition-shadow duration-300"
-            >
-              <img
-                src={batch.image}
-                alt={batch.name}
-                className="w-full h-64 object-cover rounded-md mb-2"
-              />
-              <div className="text-left p-2">
-                <h2 className="text-xl font-semibold">{batch.name}</h2>
-                <p className="text-gray-600 mt-2">
-                  Total Students: {batch.studentCount}
-                </p>
-                <button
-                  className="mt-4 bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors duration-300"
-                  onClick={() => handleBatchSelect(batch)}
-                >
-                  Select Batch
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        data={assessments}
+        pagination
+        customStyles={customStyles}
+        highlightOnHover
+        responsive
+        className="rounded-lg border shadow-md"
+      />
 
       <Modal
+        title={isEditing ? "Edit Assessment" : "Add Assessment"}
         visible={isModalVisible}
-        onCancel={closeModal}
-        footer={null}
-        width="100%"
-        bodyStyle={{
-          height: "90vh",
-          padding: "0",
-        }}
-        centered
+        onOk={handleOk}
+        onCancel={handleCancel}
+        destroyOnClose
       >
-        <div className="w-full border-b border-orange-300 text-white p-4 ">
-          <h1 className="text-2xl font-semibold text-gray-600">
-            {modalContent}
-          </h1>
-        </div>
+        <Form form={form} layout="vertical">
+          <Form.Item
+            label="Assessment Title"
+            name="assessmentTitle"
+            rules={[
+              { required: true, message: "Please input the assessment title!" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
 
-        <div className="flex  ">
-          <div className="flex-1 p-8 overflow-y-auto bg-gray-100 ">
-            <Form
-              layout="vertical"
-              className="border p-6 bg-white rounded-xl"
-              onFinish={() => {}}
-            >
-              <Form.Item label="Title">
-                <Input
-                  type="text"
-                  placeholder="Enter Title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="h-12 bord"
-                />
-              </Form.Item>
+          <Form.Item
+            label="Batch"
+            name="batch"
+            rules={[{ required: true, message: "Please select a batch!" }]}
+          >
+            <Select placeholder="Select a batch">
+              {batches.map((batch) => (
+                <Option key={batch.batchName} value={batch.batchName}>
+                  {batch.batchName}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
 
-              <Form.Item label="Content">
-                <ReactQuill
-                  value={editorContent}
-                  onChange={handleEditorChange}
-                  className="h-32 mb-4 "
-                  placeholder="Start writing here..."
-                />
-              </Form.Item>
-            </Form>
+          <Form.Item
+            label="Media File"
+            name="mediaUrl"
+            valuePropName="file"
+            rules={[{ required: true, message: "Please upload a media file!" }]}
+          >
+            <Upload beforeUpload={handleMediaUpload} maxCount={1}>
+              <Button icon={<UploadOutlined />}>Upload Media</Button>
+            </Upload>
+          </Form.Item>
 
-            <div className=" flex justify-center items-center gap-8 mt-8 bg-white rounded-xl border-gray-300">
-              <div className="flex flex-col items-center  py-4 gap-2">
-                <div className="flex items-center justify-center bg-white border border-gray-300 w-14 h-14 rounded-full">
-                  <MdOutlineFileUpload size={28} />
-                </div>
+          <Form.Item
+            label="Assessment Timing"
+            name="assessmentTiming"
+            rules={[
+              {
+                required: true,
+                message: "Please input the assessment timing!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
 
-                <Button>Upload</Button>
-              </div>
-              <div className="flex flex-col items-center  py-4 gap-2">
-
-              <div className="flex items-center justify-center bg-white border border-gray-300 w-14 h-14 rounded-full">
-                <FaLink size={24}/>
-              </div>
-              <Button >
-                Link
-              </Button>
-            </div>
-            </div>
-            {/* <Form.Item>
-                <Button type="primary" htmlType="submit" className="mt-4">
-                  Submit
-                </Button>
-              </Form.Item> */}
-          </div>
-          <Sidebar />
-        </div>
+          <Form.Item
+            label="Subject"
+            name="subject"
+            rules={[{ required: true, message: "Please select a subject!" }]}
+          >
+            <Select placeholder="Select a subject">
+              {[
+                "Html/Css",
+                "Javascript",
+                "J-Query",
+                "React.Js",
+                "Node.Js/Mongodb",
+                "Python",
+                "Figma",
+                "PHP",
+                "Flutter",
+              ].map((subject) => (
+                <Option key={subject} value={subject}>
+                  {subject}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </Form>
       </Modal>
+      <Modal
+  title={<h2 className="text-xl font-semibold text-gray-700">View Assessment</h2>}
+  visible={isViewModalVisible}
+  onCancel={() => setIsViewModalVisible(false)}
+  footer={null}
+  destroyOnClose
+  className="rounded-lg shadow-lg"
+>
+  {selectedAssessment && (
+    <div className="p-4 bg-gray-50 rounded-lg space-y-6">
+      <div className="flex flex-col">
+        <span className="font-medium text-gray-600">Assessment Title:</span>
+        <span className="text-lg font-semibold text-gray-800">
+          {selectedAssessment.assessmentTitle || "N/A"}
+        </span>
+      </div>
+
+      <div className="flex flex-col">
+        <span className="font-medium text-gray-600">Batch:</span>
+        <span className="text-lg font-semibold text-gray-800">
+          {selectedAssessment.batchName || "N/A"}
+        </span>
+      </div>
+
+      <div className="flex flex-col">
+        <span className="font-medium text-gray-600">Media URL:</span>
+        {selectedAssessment.mediaUrl ? (
+          <a
+            href={selectedAssessment.mediaUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 underline hover:text-blue-700"
+          >
+            View Media
+          </a>
+        ) : (
+          <span className="text-lg font-semibold text-gray-800">No Media</span>
+        )}
+      </div>
+
+      <div className="flex flex-col">
+        <span className="font-medium text-gray-600">Timing:</span>
+        <span className="text-lg font-semibold text-gray-800">
+          {selectedAssessment.assessmentTiming || "N/A"}
+        </span>
+      </div>
+
+      <div className="flex flex-col">
+        <span className="font-medium text-gray-600">Subject:</span>
+        <span className="text-lg font-semibold text-gray-800">
+          {selectedAssessment.subject || "N/A"}
+        </span>
+      </div>
+    </div>
+  )}
+</Modal>
     </div>
   );
 };

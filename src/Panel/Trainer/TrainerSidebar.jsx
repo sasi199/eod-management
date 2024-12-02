@@ -227,12 +227,12 @@ const TrainerSidebar = () => {
             <MdAssignment/>
             Assessment
           </Link>
-          <Link 
+          {/* <Link 
             to="/trainersidebar/attendance" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
             <FaCalendarAlt />
             Attendance
-          </Link>
+          </Link> */}
           <Link 
             to="/trainersidebar/syllabus" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">

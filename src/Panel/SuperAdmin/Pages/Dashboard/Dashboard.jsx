@@ -412,7 +412,7 @@ const Dashboard = () => {
                 onChange={(e) => setSelectedRole(e.target.value)}
               >
                 <option value="HR">HR</option>
-                <option value="Coordinators">Coordinators</option>
+                <option value="SuperAdmin">Super Admin</option>
                 <option value="Employees">Employees</option>
               </select>
               <select

@@ -23,9 +23,9 @@ const Trainee = () => {
   const [students, setStudents] = useState([]);
   const [form] = Form.useForm();
   const [batches, setBatches] = useState([]);
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);  // State for Add Student modal
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false); // State for Edit Student modal
-  const [isViewModalVisible, setIsViewModalVisible] = useState(false); // State for View Student modal
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);  
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false); 
+  const [isViewModalVisible, setIsViewModalVisible] = useState(false); 
   const [selectedTrainee, setSelectedTrainee] = useState(null);
 
   useEffect(() => {
@@ -56,16 +56,14 @@ const Trainee = () => {
     setIsAddModalVisible(true);
   };
   const handleEdit = (trainee) => {
-    // Format the dob before setting the form values
     const traineeWithFormattedDOB = {
       ...trainee,
-      dob: trainee.dob ? moment(trainee.dob) : null, // Ensure the dob is a moment object or null
+      dob: trainee.dob ? moment(trainee.dob) : null, 
     };
   
-    // Set the form values with the formatted `dob`
-    form.setFieldsValue(traineeWithFormattedDOB); // Pre-fill the form with the trainee data
+    form.setFieldsValue(traineeWithFormattedDOB);
     setSelectedTrainee(trainee);
-    setIsEditModalVisible(true); // Show the edit modal
+    setIsEditModalVisible(true); 
   };
   
 
@@ -90,16 +88,15 @@ const Trainee = () => {
       });
 
       if (selectedTrainee) {
-        // Editing existing trainee
+        
         await EditTrainee(selectedTrainee._id, formData);
         message.success("Trainee updated successfully!");
       } else {
-        // Adding new trainee
+       
         await AddTrainee(formData);
         message.success("Trainee added successfully!");
       }
 
-      // After success, close modal and fetch updated data
       setStudents([...students]);
       setIsAddModalVisible(false);
       setIsEditModalVisible(false);
