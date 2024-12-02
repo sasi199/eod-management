@@ -245,8 +245,8 @@
 // export default Schedule;
 
 import React, { useEffect, useState } from 'react';
-import { Button, Modal, Form, Input, TimePicker, Select, DatePicker, message } from 'antd';
-import { AllStaffs, CreateSyllabus, GetBatches } from '../../../../services';
+import { Button, Modal, Form, Input, TimePicker, Select, DatePicker, message, Table } from 'antd';
+import { AllStaffs, GetBatches, getSchedule, createSchedule } from '../../../../services';
 
 const { Option } = Select;
 
@@ -254,6 +254,7 @@ const Schedule = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [batches, setBatches] = useState([]);
   const [staffs, setStaffs] = useState([]);
+  const [scheduleData, setScheduleData] = useState([]); // State to store fetched schedule data
   const [form] = Form.useForm();
 
   // Open and close modal handlers
@@ -262,17 +263,15 @@ const Schedule = () => {
 
   // Handle form submission
   const handleSubmit = async (values) => {
-    console.log("Form Values:", values); // Add this to debug
-    
-    // Ensure values are correctly formatted and not empty
+    console.log("Form Values:", values);
     if (!values.batch || !values.date || !values.timeTable) {
       message.error('Please ensure all required fields are filled!');
       return;
     }
-  
+
     const payload = {
       batch: values.batch,
-      date: values.date.format('YYYY-MM-DD'), // Ensure the date is formatted
+      date: values.date.format('YYYY-MM-DD'),
       timeTable: values.timeTable.map((item) => ({
         trainer: item.trainer,
         startTime: item.startTime.format('HH:mm'),
@@ -280,16 +279,17 @@ const Schedule = () => {
         subject: item.subject,
       })),
     };
-  
-    console.log('Payload:', payload); // Add this to verify payload
-  
+
+    console.log('Payload:', payload);
+
     try {
-      const response = await CreateSyllabus(payload);
-  
+      const response = await createSchedule(payload);
+
       if (response.status === 200) {
         message.success('Schedule added successfully!');
         form.resetFields();
         handleCloseModal();
+        fetchSchedule(); // Refetch schedule data after successfully adding
       } else {
         message.error('Failed to add schedule. Please try again.');
       }
@@ -298,9 +298,8 @@ const Schedule = () => {
       message.error('Failed to add schedule. Please try again.');
     }
   };
-  
 
-  // Fetch batches and staffs on component mount
+  // Fetch batches, staffs, and schedules on component mount
   useEffect(() => {
     const fetchBatches = async () => {
       try {
@@ -311,10 +310,7 @@ const Schedule = () => {
         console.error('Error fetching batches:', error.message);
       }
     };
-    fetchBatches();
-  }, []);
 
-  useEffect(() => {
     const fetchStaffs = async () => {
       try {
         const response = await AllStaffs();
@@ -324,8 +320,94 @@ const Schedule = () => {
         console.error('Error fetching staffs:', error.message);
       }
     };
+
+    const fetchSchedule = async () => {
+      try {
+        const response = await getSchedule(); // Fetch schedule data
+        setScheduleData(response.data); // Set schedule data to state
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error fetching schedule:', error.message);
+      }
+    };
+
+    fetchBatches();
     fetchStaffs();
+    fetchSchedule(); // Call the function to fetch schedule data
   }, []);
+
+  // Define columns for the timetable
+  const columns = [
+    {
+      title: 'Batch',
+      dataIndex: 'batchName',
+      key: 'batchName',
+    },
+    {
+      title: 'Course Name',
+      dataIndex: 'courseName',
+      key: 'courseName',
+    },
+    {
+      title: 'Batch Timings',
+      dataIndex: 'batchTimings',
+      key: 'batchTimings',
+    },
+    {
+      title: 'Trainer',
+      dataIndex: 'trainer',
+      key: 'trainer',
+      render: (trainerId) => {
+        const trainer = staffs.find((staff) => staff._id === trainerId);
+        return trainer ? (
+          <div className="flex items-center">
+            <img src={trainer.profilePic} alt={trainer.fullName} className="w-10 h-10 rounded-full object-cover mr-2" />
+            {trainer.fullName}
+          </div>
+        ) : 'N/A';
+      },
+    },
+    {
+      title: 'Trainees',
+      dataIndex: 'trainees',
+      key: 'trainees',
+      render: (traineeList) => (
+        <div>
+          {traineeList.map((trainee) => (
+            <div key={trainee._id} className="flex items-center">
+              <img
+                src={trainee.profilePic}
+                alt={trainee.fullName}
+                className="w-8 h-8 rounded-full object-cover mr-2"
+              />
+              {trainee.fullName}
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      title: 'Date',
+      dataIndex: 'date',
+      key: 'date',
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: () => <Button type="link">View More</Button>,
+    },
+  ];
+
+  // Prepare the schedule data for the table
+  const timetableData = scheduleData.map((schedule) => ({
+    key: schedule._id,
+    batchName: schedule.batchName,
+    courseName: schedule.courseName,
+    batchTimings: schedule.batchTimings,
+    trainer: schedule.trainerDetails[0]?._id, // Assuming each batch has only one trainer
+    trainees: schedule.traineeDetails, // List of trainees
+    date: schedule.date,
+  }));
 
   return (
     <div className="p-4">
@@ -365,7 +447,7 @@ const Schedule = () => {
             </Select>
           </Form.Item>
 
-          {/* Select Date (Dynamic Date Picker) */}
+          {/* Select Date */}
           <Form.Item
             label="Date"
             name="date"
@@ -374,30 +456,12 @@ const Schedule = () => {
             <DatePicker format="YYYY-MM-DD" className="w-full" />
           </Form.Item>
 
-          {/* Select Day */}
-          {/* <Form.Item
-            label="Day"
-            name="day"
-            rules={[{ required: true, message: 'Please select the day!' }]}
-          >
-            <Select placeholder="Select day">
-              <Option value="Monday">Monday</Option>
-              <Option value="Tuesday">Tuesday</Option>
-              <Option value="Wednesday">Wednesday</Option>
-              <Option value="Thursday">Thursday</Option>
-              <Option value="Friday">Friday</Option>
-              <Option value="Saturday">Saturday</Option>
-              <Option value="Sunday">Sunday</Option>
-            </Select>
-          </Form.Item> */}
-
           {/* Add Subjects, Trainers, Start Time, and End Time */}
           <Form.List name="timeTable">
             {(fields, { add, remove }) => (
               <div className="space-y-4">
                 {fields.map(({ key, name, fieldKey, ...restField }) => (
                   <div key={key} className="border px-4 rounded-md">
-                    {/* Grid Layout for Horizontal Fields */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-1">
                       {/* Subject */}
                       <Form.Item
@@ -448,7 +512,7 @@ const Schedule = () => {
                         fieldKey={[fieldKey, 'startTime']}
                         rules={[{ required: true, message: 'Please select start time!' }]}
                       >
-                        <TimePicker className="w-full" />
+                        <TimePicker className="w-full" format="HH:mm" />
                       </Form.Item>
 
                       {/* End Time */}
@@ -459,25 +523,27 @@ const Schedule = () => {
                         fieldKey={[fieldKey, 'endTime']}
                         rules={[{ required: true, message: 'Please select end time!' }]}
                       >
-                        <TimePicker className="w-full" />
+                        <TimePicker className="w-full" format="HH:mm" />
                       </Form.Item>
                     </div>
 
-                    {/* Remove Time Slot Button */}
                     <Button
-                      danger
-                      type="link"
+                      type="dashed"
                       onClick={() => remove(name)}
-                      className=""
+                      icon={<MinusCircleOutlined />}
                     >
-                      Remove Time Slot
+                      Remove
                     </Button>
                   </div>
                 ))}
 
-                {/* Add Another Subject Button */}
-                <Button type="dashed" onClick={() => add()} className="w-full">
-                  + Add Another Subject
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  icon={<PlusOutlined />}
+                  className="w-full"
+                >
+                  Add timetable entry
                 </Button>
               </div>
             )}
@@ -486,13 +552,25 @@ const Schedule = () => {
           {/* Submit Button */}
           <Form.Item>
             <Button type="primary" htmlType="submit" className="w-full">
-              Submit Schedule
+              Add Schedule
             </Button>
           </Form.Item>
         </Form>
       </Modal>
+
+      {/* Timetable */}
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold">Timetable</h2>
+        <Table
+          dataSource={timetableData}
+          columns={columns}
+          rowKey="key"
+          pagination={false}
+        />
+      </div>
     </div>
   );
 };
 
 export default Schedule;
+

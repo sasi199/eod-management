@@ -35,24 +35,6 @@ const TraineeReports = () => {
   }, []);
 
   // Fetch report data
-  useEffect(() => {
-    const fetchReportsData = async () => {
-      try {
-        const response = await GetReportAll();
-        if (response?.data) {
-          setGetReports(response.data.data);
-          console.log(response.data.data);
-        }
-      } catch (error) {
-        console.error("Error fetching report data:", error);
-        notification.error({
-          message: "Error",
-          description: "Unable to fetch report data.",
-        });
-      }
-    };
-    fetchReportsData();
-  }, []);
 
   const showModal = () => {
     setIsReportOpen(true);
@@ -147,6 +129,7 @@ const TraineeReports = () => {
     { name: "S.No", selector: (_, index) => index + 1, center: true },
     { name: "Report Title", selector: (row) => row.title, sortable: true, center: true },
     { name: "Status", selector: (row) => row.status || "Pending", sortable: true, center: true },
+    { name: "Replay", selector: (row) => row.replay || "Pending", sortable: true, center: true },
     {
       name: "Actions",
       cell: (row) => (
