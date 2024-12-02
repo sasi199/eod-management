@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Button,
@@ -11,46 +11,50 @@ import {
   Row,
   Col,
   Divider,
-  Typography
+  Typography,
+  Tag
 } from "antd";
 import DataTable from "react-data-table-component";
 import { FaEye, FaEdit, FaTrash, FaCalendarAlt } from "react-icons/fa";
 import moment from "moment";
 import { FaBook, FaClipboardList, FaUser } from "react-icons/fa6";
+import { createStudentTask, GetAllStudentTask, GetBatches } from "../../../../services";
 const { Title, Text } = Typography;
 
 const StudentTask = () => {
-  const initialTaskState = {
-    id: null,
-    taskTitle: "",
-    batch: "",
-    student: "",
-    dueDate: "",
-    status: "",
-    description: "",
-  };
-
   const [tasks, setTasks] = useState([
     {
       id: 1,
-      taskTitle: "Math Assignment",
-      batch: "Batch A",
+      title: "Math Assignment",
+      batchId: "Batch A",
       student: "John Doe",
       dueDate: "2024-12-01",
-      status: "Pending",
+      priority: "Pending",
       description: "Solve all algebra questions.",
     },
     {
       id: 2,
-      taskTitle: "Science Project",
-      batch: "Batch B",
+      title: "Science Project",
+      batchId: "Batch B",
       student: "Jane Smith",
       dueDate: "2024-12-05",
-      status: "Completed",
+      priority: "Completed",
       description: "Create a volcano model.",
     },
   ]);
+  const initialTaskState = {
+    title: "",
+    batchId: "",
+    trainerId:"774095d5-5de9-428f-b457-b8c7a2558fcb",
+    dueDate: "",
+    priority: "",
+    description: "",
+  };
 
+
+  const [taskData, setTaskData] = useState(initialTaskState);
+  const [createTaskModalVisible, setCreateTaskModalVisible] = useState(false);
+  const [listTaskData, setListTaskData] = useState([]);
   const [modals, setModals] = useState({
     create: false,
     view: false,
@@ -58,8 +62,17 @@ const StudentTask = () => {
     delete: false,
   });
   const [selectedTask, setSelectedTask] = useState(initialTaskState);
-
+  const [batches, setBatches] = useState([]);
   const [form] = Form.useForm();
+
+
+  const handleOnChange = (name, value) => {
+    // const {key, value} = e.target
+    setTaskData((prev)=>({
+      ...prev,
+      [name]: value
+    }))
+  }
 
   const handleModalToggle = (modalType, task = null) => {
     setSelectedTask(task || initialTaskState);
@@ -98,19 +111,35 @@ const StudentTask = () => {
     },
     {
       name: "Task Title",
-      selector: (row) => row.taskTitle,
+      selector: (row) => row.title,
       sortable: true,
       center: true,
     },
     {
       name: "Batch",
-      selector: (row) => row.batch,
+      selector: (row) => row.batchId,
       sortable: true,
       center: true,
     },
     {
-      name: "Student",
-      selector: (row) => row.student,
+      name: "DueDate",
+      selector: (row) =>  moment(row.dueDate).utcOffset("+05:30").format("DD-MM-YYYY"),
+      sortable: true,
+      center: true,
+    },
+    {
+      name: "Priority",
+      selector: (row) =>{
+        const color =
+        row.priority === 'high'
+          ? 'red'
+          : row.priority === 'medium'
+          ? 'orange'
+          : row.priority === 'normal'
+          ?'green'
+          :'blue';
+      return <Tag color={color} style={{width:60, display:'flex', alignItems:'center', justifyContent:'center'}}>{row.priority}</Tag>
+      },
       sortable: true,
       center: true,
     },
@@ -160,11 +189,104 @@ const StudentTask = () => {
     },
   };
 
+  // const handleBatchOptions = () => {
+  //    setBatches.map((batch,i)=>{
+  //     return(
+  //       <label htmlFor="">{batch.batchName}</label>
+  //       value= {batch._id}
+  //     )
+  //   })
+    
+  // };
+
+  const handlePriorityOptions = () => {
+    return [ {label:(
+      <span style={{ color: "red" }}>
+        High
+      </span>
+    ), value:"high"},
+    {label:(
+      <span style={{ color: "orange" }}>
+        Medium
+      </span>
+    ), value:"medium"},
+    {label:(
+      <span style={{ color: "green",  }}>
+        Normal
+      </span>
+    ), value:"normal"},
+    {label: (
+      <span style={{ color: "blue", }}>
+        Low
+      </span>
+    ), value:"low"}
+    ]
+  };
+
+  const fetchGetBatch = async () => {
+    try {
+      const response = await GetBatches();
+      console.log("response in batch",response)
+      if(response.data.status){
+        setBatches(response.data.data)
+      }
+    } catch (error) {
+      console.error("err in batches",error);
+    }
+  };
+
+  useEffect(()=>{
+    fetchGetBatch()
+  },[]);
+
+//create task
+
+  const handleCreateTaskSubmit = async (values) => {
+    const payload = {
+      ...values,
+      trainerId:taskData.trainerId
+    }
+    try {
+      const response = await createStudentTask(payload);
+      console.log("response", response)
+      if(response.data.status){
+        setTaskData(initialTaskState);
+        form.resetFields();
+        fetchGetAllTask();
+        message.success("Student task created successfully");
+        setCreateTaskModalVisible(false);
+      }
+    } catch (error) {
+      console.error("error in stu task",error);
+      message.error(error?.response?.data?.message || "Failed to create student task");
+    }
+  }
+
+  //list task all
+  const fetchGetAllTask = async() => {
+    try {
+      const response = await GetAllStudentTask();
+      console.log("res in all task")
+      if(response.data.data){
+        setListTaskData(response.data.data)
+      }
+    } catch (error) {
+      console.error("err in all task", error);
+      message.error(error?.response?.data?.message || "Failed to list tasks")
+    }
+  }
+
+useEffect(()=>{
+fetchGetAllTask();
+},[]);
+
+
+
   return (
     <div className="p-4">
       <button
         type="primary"
-        onClick={() => handleModalToggle("create")}
+        onClick={() => setCreateTaskModalVisible(true)}
         className="mb-4 bg-orange-500 border text-white hover:border-orange-500 hover:text-orange-500 hover:bg-white transition-all transform duration-300 px-3 py-1 rounded-lg"
       >
         Create Task
@@ -172,7 +294,7 @@ const StudentTask = () => {
 
       <DataTable
         columns={columns}
-        data={tasks}
+        data={listTaskData}
         customStyles={customStyles}
         pagination
         highlightOnHover
@@ -182,29 +304,39 @@ const StudentTask = () => {
       {/* Create Task Modal */}
       <Modal
         title="Create Task"
-        visible={modals.create}
-        onCancel={() => handleModalToggle("create")}
+        // visible={modals.create}
+        open={createTaskModalVisible}
+        onCancel={() => setCreateTaskModalVisible(false)}
         footer={null}
       >
-        <Form form={form} layout="vertical" onFinish={handleCreateTask}>
+        <Form form={form} layout="vertical" onFinish={handleCreateTaskSubmit} initialValues={{...initialTaskState}}>
           <Form.Item
             label="Task Title"
-            name="taskTitle"
+            name="title"
             rules={[{ required: true, message: "Please enter task title!" }]}
           >
             <Input placeholder="Enter task title" />
           </Form.Item>
           <Form.Item
             label="Batch"
-            name="batch"
+            name="batchId"
             rules={[{ required: true, message: "Please select a batch!" }]}
           >
-            <Select placeholder="Select Batch">
-              <Select.Option value="Batch A">Batch A</Select.Option>
-              <Select.Option value="Batch B">Batch B</Select.Option>
+            <Select placeholder="Select Batch"
+            // onChange={handleOnChange}
+            // options={}
+            >
+             {batches.map((batch,i)=>(
+                 <Select.Option key={i} value={batch._id} >
+                  {console.log("select batch",batch)}
+                 {batch.batchName}
+               </Select.Option>
+             ))
+
+             }
             </Select>
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             label="Student"
             name="student"
             rules={[{ required: true, message: "Please select a student!" }]}
@@ -213,7 +345,7 @@ const StudentTask = () => {
               <Select.Option value="John Doe">John Doe</Select.Option>
               <Select.Option value="Jane Smith">Jane Smith</Select.Option>
             </Select>
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item
             label="Due Date"
             name="dueDate"
@@ -226,6 +358,9 @@ const StudentTask = () => {
               }
             />
           </Form.Item>
+          <Form.Item label="Priority" name="priority">
+      <Select options={handlePriorityOptions()} placeholder="Select Priority" />
+    </Form.Item>
           <Form.Item label="Description" name="description">
             <Input.TextArea placeholder="Enter task description" />
           </Form.Item>
@@ -258,7 +393,7 @@ const StudentTask = () => {
           <FaBook size={20} color="#1890ff" />
         </Col>
         <Col>
-          <Text strong>Title:</Text> {selectedTask.taskTitle}
+          <Text strong>Title:</Text> {selectedTask.title}
         </Col>
       </Row>
     </Col>
@@ -270,7 +405,7 @@ const StudentTask = () => {
           <FaClipboardList size={20} color="#1890ff" />
         </Col>
         <Col>
-          <Text strong>Batch:</Text> {selectedTask.batch}
+          <Text strong>Batch:</Text> {selectedTask.batchId}
         </Col>
       </Row>
     </Col>
@@ -347,7 +482,7 @@ const StudentTask = () => {
       <Col span={24}>
         <Form.Item
           label="Task Title"
-          name="taskTitle"
+          name="title"
           rules={[{ required: true, message: "Please enter task title!" }]}
         >
           <Input placeholder="Enter task title" />
@@ -356,7 +491,7 @@ const StudentTask = () => {
       <Col span={12}>
         <Form.Item
           label="Batch"
-          name="batch"
+          name="batchId"
           rules={[{ required: true, message: "Please select a batch!" }]}
         >
           <Select placeholder="Select Batch">
@@ -395,8 +530,8 @@ const StudentTask = () => {
       <Col span={12}>
         <Form.Item
           label="Status"
-          name="status"
-          rules={[{ required: true, message: "Please select a status!" }]}
+          name="priority"
+          rules={[{ required: true, message: "Please select a priority!" }]}
         >
           <Select placeholder="Select Status">
             <Select.Option value="Pending">Pending</Select.Option>
@@ -434,7 +569,7 @@ const StudentTask = () => {
         okText="Delete"
         okButtonProps={{ danger: true }}
       >
-        Are you sure you want to delete the task **{selectedTask.taskTitle}**?
+        Are you sure you want to delete the task **{selectedTask.title}**?
       </Modal>
     </div>
   );

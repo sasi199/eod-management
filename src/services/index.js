@@ -250,6 +250,19 @@ export const DeleteTaskById = async (taskId) => {
 }
 
 
+//studentTask or batch task
+
+export const createStudentTask = async (data)=>{
+  const res= await interceptors.post('/traineeTask/createTraineeTask',data);
+  return res;
+}
+
+export const GetAllStudentTask = async ()=>{
+  const res= await interceptors.get('/traineeTask//getTraineeTaskAll');
+  return res;
+}
+
+
 //scuhdule
 
 export const createSchedule = async (data)=>{

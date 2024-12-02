@@ -615,14 +615,14 @@ const handleUpdate = async() => {
         visible={isModalVisible}
         onCancel={handleModalClose}
         footer={null}
-        width="50%"
+        width="60%"
         centered
         className='relative'
       >
     {selectedTask && (
  <div className="flex justify-between gap-6 p-6">
  {/* Task Details Section */}
- <div className="bg-white p-6 space-y-6 max-w-4xl w-[65%] rounded-lg shadow-md">
+ <div className="bg-white p-6 space-y-6 max-w-4xl w-1/2  rounded-lg shadow-md">
    {/* Task Header */}
    <div className="flex justify-between items-center pb-4 border-b">
     {/* Edit title */}
@@ -794,8 +794,8 @@ const handleUpdate = async() => {
 
 
  {/* Activity Section */}
- <div className="bg-gray-50 w-[35%] rounded-lg p-6 shadow-md overflow-y-auto">
-   <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Activity</h3>
+ <div className="bg-gray-50 w-1/2  rounded-lg p-6 shadow-md h-[400px] overflow-y-scroll">
+   <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2 ">Activity</h3>
    <ul className="space-y-4">
      {selectedTask.activities.map((activity, index) => (
        <li
