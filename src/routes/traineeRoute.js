@@ -2,6 +2,7 @@ const express = require('express');
 const traineeController = require("../controller/traineeController");
 const uploads = require("../middlewares/multer");
 const { verifyAuthToken } = require('../middlewares/jwt.config');
+const httpStatus = require('http-status');
 
 const Router = express.Router();
 
