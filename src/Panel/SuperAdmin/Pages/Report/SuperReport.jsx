@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
-import { FaEye, FaTrash } from "react-icons/fa";
-import { Button, Modal, Form, Select, Input, Avatar } from "antd";
-import { GetReportAll } from "../../../../services";
+import { FaEye, FaTrash, FaReply } from "react-icons/fa";
+import { Button, Modal, Input } from "antd";
+import { GetReportAll, replyReport } from "../../../../services";
 
-const { Option } = Select;
 const { TextArea } = Input;
 
 const SuperReports = () => {
-  const [isReportOpen, setIsReportOpen] = useState(false); 
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false); 
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [reports, setReports] = useState([]);
-  const [selectedReport, setSelectedReport] = useState(null); 
-  const [selectedPerson, setSelectedPerson] = useState(null);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [reply, setReply] = useState("");
 
   useEffect(() => {
     const fetchReportsData = async () => {
@@ -22,7 +22,7 @@ const SuperReports = () => {
           setReports(response.data.data);
         }
       } catch (error) {
-        console.error('Error fetching staff data:', error);
+        console.error('Error fetching reports data:', error);
       }
     };
     fetchReportsData();
@@ -34,7 +34,6 @@ const SuperReports = () => {
 
   const closeModal = () => {
     setIsReportOpen(false);
-    setSelectedPerson(null);
   };
 
   const showViewModal = (report) => {
@@ -45,6 +44,35 @@ const SuperReports = () => {
   const closeViewModal = () => {
     setIsViewModalOpen(false);
     setSelectedReport(null);
+  };
+
+  const showReplyModal = (report) => {
+    setSelectedReport(report);
+    setIsReplyModalOpen(true);
+  };
+
+  const closeReplyModal = () => {
+    setIsReplyModalOpen(false);
+    setReply("");
+  };
+
+  const handleDelete = (id) => {
+    setReports((prevReports) => prevReports.filter((report) => report.id !== id));
+  };
+
+  const handleReplySubmit = async () => {
+    if (!reply) {
+      alert("Please enter a reply before submitting.");
+      return;
+    }
+    try {
+      await replyReport(selectedReport._id, { replay: reply });
+      alert("Reply sent successfully.");
+      closeReplyModal();
+    } catch (error) {
+      console.error("Error sending reply:", error);
+      alert("Failed to send reply.");
+    }
   };
 
   const columns = [
@@ -68,29 +96,23 @@ const SuperReports = () => {
           <FaEye
             className="text-blue-500 cursor-pointer"
             title="View Report"
-            onClick={() => showViewModal(row)} 
+            onClick={() => showViewModal(row)}
           />
           <FaTrash
             className="text-red-500 cursor-pointer"
             title="Delete Report"
             onClick={() => handleDelete(row.id)}
           />
+          <FaReply
+            className="text-green-500 cursor-pointer"
+            title="Reply to Report"
+            onClick={() => showReplyModal(row)} // Open reply modal
+          />
         </div>
       ),
       center: true,
     },
   ];
-
-  const handleDelete = (id) => {
-    setReports((prevReports) =>
-      prevReports.filter((report) => report.id !== id)
-    );
-  };
-
-  const handleFormSubmit = (values) => {
-    console.log("Form values:", values);
-    closeModal();
-  };
 
   const customStyles = {
     headCells: {
@@ -102,6 +124,7 @@ const SuperReports = () => {
       },
     },
   };
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
@@ -125,70 +148,43 @@ const SuperReports = () => {
         onCancel={closeViewModal}
       >
         {selectedReport && (
-          <div>
-            <p><strong>Reported By:</strong> {selectedReport.reporter}</p>
-            <p><strong>Status:</strong> {selectedReport.title}</p>
-            <p><strong>Content:</strong></p>
-            <TextArea rows={4} value={selectedReport.reportContent} readOnly />
+          <div className="bg-orange-500 text-white p-6 rounded-md shadow-md max-w-lg mx-auto">
+            <h2 className="text-2xl font-bold mb-4 text-center">Report Details</h2>
+            <div className="space-y-4">
+              <p className="text-lg">
+                <strong className="font-semibold">Reported By:</strong> {selectedReport.reporter}
+              </p>
+              <p className="text-lg">
+                <strong className="font-semibold">Status:</strong> {selectedReport.title}
+              </p>
+              <p className="text-lg">
+                <strong className="font-semibold">Content:</strong> {selectedReport.content}
+              </p>
+            </div>
           </div>
         )}
       </Modal>
 
-      {/* Modal for Adding Report */}
+      {/* Modal for Replying to Report */}
       <Modal
-        title="Add Report"
-        open={isReportOpen}
-        footer={null}
-        onCancel={closeModal}
+        title="Reply to Report"
+        open={isReplyModalOpen}
+        onCancel={closeReplyModal}
+        footer={[
+          <Button key="cancel" onClick={closeReplyModal}>
+            Cancel
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleReplySubmit}>
+            Submit Reply
+          </Button>,
+        ]}
       >
-        <Form layout="vertical" onFinish={handleFormSubmit}>
-          <Form.Item
-            label="Reported To"
-            name="reportedPerson"
-            rules={[{ required: true, message: "Please select the reported person!" }]}
-          >
-            <Select
-              placeholder="Select person"
-              onChange={(value) => setSelectedPerson(value)}
-            >
-              <Option value="hr">HR</Option>
-              <Option value="coordinator">Coordinator</Option>
-              <Option value="admin">Admin</Option>
-              <Option value="trainer">Trainer</Option>
-            </Select>
-          </Form.Item>
-
-          {selectedPerson && (
-            <Form.Item
-              label={`Select ${selectedPerson.charAt(0).toUpperCase() + selectedPerson.slice(1)}`}
-              name={`${selectedPerson}Name`}
-              rules={[{ required: true, message: `Please select a ${selectedPerson}!` }]}
-            >
-              <Select placeholder={`Select ${selectedPerson}`}>
-                {personOptions[selectedPerson].map((person, index) => (
-                  <Option key={index} value={person.name}>
-                    <Avatar src={person.image} size={32} className="mr-2" />
-                    {person.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-          )}
-
-          <Form.Item
-            label="Report"
-            name="reportContent"
-            rules={[{ required: true, message: "Please enter the report content!" }]}
-          >
-            <TextArea rows={4} placeholder="Type your report here" />
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit" className="w-full">
-              Submit Report
-            </Button>
-          </Form.Item>
-        </Form>
+        <TextArea
+          rows={4}
+          value={reply}
+          onChange={(e) => setReply(e.target.value)}
+          placeholder="Enter your reply"
+        />
       </Modal>
     </div>
   );

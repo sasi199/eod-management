@@ -166,7 +166,7 @@ console.log(students);
           <button onClick={() => handleEdit(row)} className="text-orange-500">
             <FaEdit size={16} />
           </button>
-          <button onClick={() => handleDelete(row)} className="text-red-500">
+          <button onClick={() => handleDelete(row._id)} className="text-red-500">
             <FaTrash size={16} />
           </button>
         </div>

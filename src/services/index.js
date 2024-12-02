@@ -19,6 +19,14 @@ export const logout = async () => {
   return res;
 };
 
+//report
+
+export const replyReport = async (id,data)=>{
+  const res = await interceptors.post(`/report/replayReport/${id}`,data)
+  return res;
+}
+
+
 //staffs
 
 //add staffs
@@ -198,6 +206,10 @@ export const GetReportAll = async () => {
   const res = await interceptors.get("/report/getReportAll");
   return res;
 };
+export const GetReportId = async () => {
+  const res = await interceptors.get("/report/getReportId");
+  return res;
+};
 
 export const EditReport = async(id,data)=>{
   const res = await interceptors.put(`report/editReport/${id}`,data);
@@ -267,5 +279,10 @@ export const GetAllStudentTask = async ()=>{
 
 export const createSchedule = async (data)=>{
   const res= await interceptors.post('/schedule/createSchedule',data);
+  return res;
+}
+
+export const getSchedule = async ()=>{
+  const res = await interceptors.get("/schedule/getScheduleAll")
   return res;
 }
