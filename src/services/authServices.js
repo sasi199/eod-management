@@ -1,4 +1,5 @@
 const config = require("../config/config");
+const { AssignedBatchModel } = require("../models/assignedBatchesModel");
 const AttendanceModel = require("../models/attendance");
 const Auth = require("../models/authModel");
 const ApiError = require("../utils/apiError");
@@ -9,8 +10,8 @@ const jwt = require('jsonwebtoken');
 
 
 exports.loginByEmailAndLogId = async(req)=>{
-    const { email,role, password, latitude,longitude,} = req.body
-    const user = await Auth.findOne({email,role});
+    const { email, password, latitude,longitude,} = req.body
+    const user = await Auth.findOne({email});
     if (!user) {
         throw new ApiError(httpStatus.UNAUTHORIZED, {message:"Invalid credantials",status:false,});
       }
@@ -162,4 +163,5 @@ exports.authUpdate = async(req) =>{
 
     return authUpdate
 }
+
 

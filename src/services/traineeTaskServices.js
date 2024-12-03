@@ -239,20 +239,15 @@ exports.deleteTraineeTask = async(req)=>{
 
 
 exports.updateTraineeStatus = async(req, res) => {
-    const { status } = req.body;
+    const { status, traineeId } = req.body;
     const { _id } = req.params;
-    const { authId } = req;
-
-    console.log("Auth ID:", authId); // Should match traineeId: "f0b0853d-8c27-4245-a7ef-195cea971295"
-console.log("Task ID:", _id);   // Should match taskId: "36b1db22-1b13-470e-82cf-80b83404a73f"
-
-    
-
     if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task id not found"});
     }
+    const trainee = await TraineeModel.findOne({traineeId})
+    console.log(trainee,"ajajjaja");
     
-    if (!authId) {
+    if (!trainee) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Auth id not found"});
     }
     
@@ -261,9 +256,9 @@ console.log("Task ID:", _id);   // Should match taskId: "36b1db22-1b13-470e-82cf
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid status not found"});
     }
 
-    const progressEntry = await StudentProgressModel.find({
+    const progressEntry = await StudentProgressModel.findOne({
         taskId:_id,
-        traineeId: authId
+        traineeId: trainee._id
     });
 
     console.log("progressss",progressEntry);
@@ -278,7 +273,7 @@ console.log("Task ID:", _id);   // Should match taskId: "36b1db22-1b13-470e-82cf
 
     
     const task = await TraineeTaskModel.findById(_id);
-    const notificationContent = `Trainee ${authId} updated task status to ${status}`;
+    const notificationContent = `Trainee ${trainee} updated task status to ${status}`;
     
     const notification = new NotificationModel({
         title: "Alert",
@@ -294,7 +289,7 @@ console.log("Task ID:", _id);   // Should match taskId: "36b1db22-1b13-470e-82cf
     if (socketId) {
         req.io.to(socketId).emit("statusUpdateNotification", {
             taskId: _id,
-            traineeId: authId,
+            traineeId: trainee,
             status: status,
             message: notificationContent,
         });
