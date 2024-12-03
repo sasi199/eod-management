@@ -242,15 +242,18 @@ exports.updateTraineeStatus = async(req, res) => {
     const { status } = req.body;
     const { _id } = req.params;
     const { authId } = req;
+
+    console.log("Auth ID:", authId); // Should match traineeId: "f0b0853d-8c27-4245-a7ef-195cea971295"
+console.log("Task ID:", _id);   // Should match taskId: "36b1db22-1b13-470e-82cf-80b83404a73f"
+
     
 
     if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task id not found"});
     }
-    const trainee = await Auth.findOne({accountId:authId});
-    console.log(trainee,"oaooaoa");
-    if (!trainee) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainee id not found"});
+    
+    if (!authId) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Auth id not found"});
     }
     
     const validStatuses = ['not attended', 'in progress', 'complete'];
@@ -258,10 +261,13 @@ exports.updateTraineeStatus = async(req, res) => {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid status not found"});
     }
 
-    const progressEntry = await StudentProgressModel.findOne({
+    const progressEntry = await StudentProgressModel.find({
         taskId:_id,
-        traineeId: trainee
+        traineeId: authId
     });
+
+    console.log("progressss",progressEntry);
+    
 
     if (!progressEntry) {
         throw new ApiError(httpStatus.NOT_FOUND, { message: "Progress entry not found for this trainee and task" });
@@ -272,7 +278,7 @@ exports.updateTraineeStatus = async(req, res) => {
 
     
     const task = await TraineeTaskModel.findById(_id);
-    const notificationContent = `Trainee ${trainee} updated task status to ${status}`;
+    const notificationContent = `Trainee ${authId} updated task status to ${status}`;
     
     const notification = new NotificationModel({
         title: "Alert",
@@ -284,10 +290,11 @@ exports.updateTraineeStatus = async(req, res) => {
     await notification.save();
 
     
-    const socketId = req.io.connectedUsers ? req.io.connectedUsers[trainee] : null;
+    const socketId = req.io.connectedUsers ? req.io.connectedUsers[task.trainerId] : null;
     if (socketId) {
         req.io.to(socketId).emit("statusUpdateNotification", {
             taskId: _id,
+            traineeId: authId,
             status: status,
             message: notificationContent,
         });
