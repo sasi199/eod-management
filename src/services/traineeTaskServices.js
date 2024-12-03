@@ -8,6 +8,7 @@ const Auth = require("../models/authModel");
 const StaffModel = require("../models/staffModel");
 const { formatDistanceToNow } = require('date-fns');
 const {AssignedBatchModel} = require("../models/assignedBatchesModel");
+const TraineeModel = require("../models/traineeModel");
 
 
 
@@ -134,13 +135,56 @@ exports.getTraineeTaskId = async(req)=>{
     if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task Id required"});
     }
+    const task = await TraineeTaskModel.aggregate([
+        {
+            $match:{_id: _id},
+        },
+        {
+            $lookup:{
+                from:'Batch',
+                localField:'batchId',
+                foreignField:'_id',
+                as:'batchDetails'
+            }
+        },
+        {
+            $lookup: {
+                from: "StudentProgress",
+                localField: "_id",
+                foreignField: "taskId",
+                as: "progressDetails",
+            },
+        },
+        {
+            $lookup: {
+                from: "Trainee",
+                localField: "progressDetails.traineeId",
+                foreignField: "_id",
+                as: "traineeDetails",
+            },
+        },
+        {
+            $project: {
+                title: 1,
+                description: 1,
+                dueDate: 1,
+                priority: 1,
+                batchDetails: {
+                    _id: 1,
+                    batchName: 1,
+                },
+                progressDetails: 1,
+                traineeDetails: {
+                    _id: 1,
+                    fullName: 1,
+                    profilePic: 1,
+                },
+            },
+        },
+    ]);
 
-    const task = await TaskModel.findById(_id).populate({
-        path:'assignees',
-        select:'fullName profilePic role'
-    });
-    if (!task) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task not found"});
+    if (!task || task.length === 0) {
+        throw new ApiError(httpStatus.NOT_FOUND, { message: "Task not found" });
     }
 
     return task;
@@ -154,87 +198,29 @@ exports.editTraineeTask = async(req)=>{
     }
 
     const updateData = {...req.body}
-    const task = await TaskModel.findById(_id)
+    const task = await TraineeTaskModel.findById(_id)
+    const progress = await StudentProgressModel.find({taskId:_id})
     console.log(task,'kakakakak');
     
     if (!task) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task not found"});
     }
 
-    const activities = [];
-    const now = new Date();
-
-    if (updateData.title && updateData.title !== task.title) {
-        activities.push({
-            type: 'updated',
-            activity: `Title changed from ${task.title} to ${updateData.title}`,
-            date: now,
-            timeAgo: formatDistanceToNow(now, { addSuffix: true }),
-        });
-    }
-
-    if (updateData.description && updateData.description !== task.description) {
-        activities.push({
-            type: 'updated',
-            activity: `Description updated`,
-            date: now,
-            timeAgo: formatDistanceToNow(now, { addSuffix: true }),
-        });
-    }
-
-    if (updateData.priority && updateData.priority !== task.priority) {
-        activities.push({
-            type: 'updated',
-            activity: `Priority changed from ${task.priority} to ${updateData.priority}`,
-            date: now,
-            timeAgo: formatDistanceToNow(now, { addSuffix: true }),
-        });
-    }
-
-    if (updateData.status && updateData.status !== task.status) {
-        activities.push({
-            type: 'updated',
-            activity: `Status changed from ${task.status} to ${updateData.status}`,
-            date: now,
-            timeAgo: formatDistanceToNow(now, { addSuffix: true }),
-        });
-    }
-
-
-    if (updateData.dueDate && updateData.dueDate !== task.dueDate.toISOString()) {
-        activities.push({
-            type: 'updated',
-            activity: `Due date changed from ${task.dueDate.toISOString().split('T')[0]} to ${updateData.dueDate}`,
-            date: now,
-            timeAgo: formatDistanceToNow(now, { addSuffix: true }),
-        });
-    }
-
-    // task.activities.push(...activities);
-
-    // Object.assign(task, updateData);
-
-    if (activities.length > 0) {
-        await TaskModel.findByIdAndUpdate(
-            _id,
-            {
-                $push: { activities: { $each: activities } },
-            }
-        );
-    }
-    
-    const updatedTask = await TaskModel.findByIdAndUpdate(
+    const updatedTask = await TraineeTaskModel.findByIdAndUpdate(
         _id,
         { $set: updateData },
         { new: true }
     );
     
-
-    await task.save();
+    const updateProgress = await StudentProgressModel.findOneAndUpdate({taskId:_id},
+        { $set: updateData },
+        { new: true }
+    )
+    await updatedTask.save();
 
     req.io.emit("dashboardUpdate", { message: "Task updated", task });
 
-    return task;
+    return updatedTask;
 
 }
 
@@ -253,12 +239,20 @@ exports.deleteTraineeTask = async(req)=>{
 
 
 exports.updateTraineeStatus = async(req, res) => {
-    const { traineeId, status } = req.body;
+    const { status } = req.body;
     const { _id } = req.params;
+    const { authId } = req;
+    
 
     if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task id not found"});
     }
+    const trainee = await Auth.findOne({accountId:authId});
+    console.log(trainee,"oaooaoa");
+    if (!trainee) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainee id not found"});
+    }
+    
     const validStatuses = ['not attended', 'in progress', 'complete'];
     if (!validStatuses.includes(status)) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid status not found"});
@@ -266,11 +260,11 @@ exports.updateTraineeStatus = async(req, res) => {
 
     const progressEntry = await StudentProgressModel.findOne({
         taskId:_id,
-        traineeId: traineeId
+        traineeId: trainee
     });
 
     if (!progressEntry) {
-        
+        throw new ApiError(httpStatus.NOT_FOUND, { message: "Progress entry not found for this trainee and task" });
     }
 
     progressEntry.status = status;
@@ -278,7 +272,7 @@ exports.updateTraineeStatus = async(req, res) => {
 
     
     const task = await TraineeTaskModel.findById(_id);
-    const notificationContent = `Trainee ${traineeId} updated task status to ${status}`;
+    const notificationContent = `Trainee ${trainee} updated task status to ${status}`;
     
     const notification = new NotificationModel({
         title: "Alert",
@@ -290,7 +284,7 @@ exports.updateTraineeStatus = async(req, res) => {
     await notification.save();
 
     
-    const socketId = req.io.connectedUsers ? req.io.connectedUsers[traineeId] : null;
+    const socketId = req.io.connectedUsers ? req.io.connectedUsers[trainee] : null;
     if (socketId) {
         req.io.to(socketId).emit("statusUpdateNotification", {
             taskId: _id,

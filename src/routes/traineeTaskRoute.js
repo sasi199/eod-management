@@ -1,6 +1,7 @@
 const express = require('express');
 const traineeTaskComtroller = require("../controller/traineeTaskController");
 const uploads = require("../middlewares/multer");
+const { verifyAuthToken } = require('../middlewares/jwt.config');
 
 const Router = express.Router();
 
@@ -10,7 +11,7 @@ Router.route("/getTraineeTaskId/:_id").get(traineeTaskComtroller.getTraineeTaskI
 Router.route("/editTraineeTask/:_id").put(traineeTaskComtroller.editTraineeTask);
 Router.route("/deleteTraineeTask/:_id").delete(traineeTaskComtroller.deleteTraineeTask);
 
-Router.route("/updateTraineeStatus/:_id").put(traineeTaskComtroller.updateTraineeStatus);
+Router.route("/updateTraineeStatus/:_id").put(verifyAuthToken,traineeTaskComtroller.updateTraineeStatus);
 
 module.exports = Router;
 
