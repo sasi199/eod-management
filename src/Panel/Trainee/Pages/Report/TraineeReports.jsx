@@ -166,13 +166,13 @@ const TraineeReports = () => {
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Trainee Reports</h2>
-        <Button
-          type="primary"
-          className="bg-orange-500 text-white hover:bg-orange-600"
+        <button
+         
+          className="bg-orange-500 text-white hover:bg-orange-600 px-3 py-1 rounded-md"
           onClick={showModal}
         >
           Add Report
-        </Button>
+        </button>
       </div>
 
       <DataTable
@@ -241,9 +241,9 @@ const TraineeReports = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="w-full">
+            <button  htmlType="submit" className="w-full bg-orange-500 text-white hover:bg-orange-600 px-3 py-1 rounded-md">
               {editingReport ? "Update Report" : "Submit Report"}
-            </Button>
+            </button>
           </Form.Item>
         </Form>
       </Modal>

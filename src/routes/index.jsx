@@ -1,8 +1,8 @@
 import React from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { pages } from "./routes";
-import { PageNotFound } from "../components/notfound";
-import { UnauthorizedAccess } from "../components/unauthorized";
+// import { PageNotFound } from "../components/notfound";
+// import { UnauthorizedAccess } from "../components/unauthorized";
 import { Navbar } from "../components/navbar";
 import { Footer } from "../components/footer";
 

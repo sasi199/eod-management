@@ -417,6 +417,12 @@ const Batches = () => {
       content: "This action cannot be undone.",
       okText: "Yes",
       cancelText: "No",
+      okButtonProps: {
+        className: "bg-orange-500 text-white hover:bg-orange-600",
+      },
+      cancelButtonProps: {
+        className: "bg-gray-500 text-white hover:bg-gray-600",
+      },
       onOk: async () => {
         try {
           await DeleteBatches(id);
@@ -569,19 +575,7 @@ const Batches = () => {
         title={editingBatch ? "Edit Batch" : "Add New Batch"}
         open={isModalOpen}
         onCancel={handleCancel}
-        footer={[
-          <Button key="cancel" onClick={handleCancel}>
-            Cancel
-          </Button>,
-          <Button
-            key="submit"
-            type="primary"
-            onClick={handleOk}
-            className="bg-orange-500 text-white hover:bg-orange-600"
-          >
-            {editingBatch ? "Save Changes" : "Add"}
-          </Button>,
-        ]}
+        footer={null}
         centered
       >
         <Form form={form} layout="vertical">
@@ -648,6 +642,19 @@ const Batches = () => {
   </Select>
 </Form.Item>
         </Form>
+        <div className="flex justify-end items-center gap-1">
+        <button key="cancel" onClick={handleCancel} className="border px-4 py-1 rounded-lg border-gray-300 hover:border-orange-500 hover:text-orange-500 ">
+            Cancel
+          </button>,
+          <button
+            key="submit"
+            type="primary"
+            onClick={handleOk}
+            className="bg-orange-500 px-4 py-1 rounded-lg  text-white hover:bg-orange-600"
+          >
+            {editingBatch ? "Save Changes" : "Add"}
+          </button>
+          </div>
       </Modal>
       <Modal
         title="Batch Details"

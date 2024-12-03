@@ -207,21 +207,21 @@ const Course = () => {
       center: true,
       selector: (row) => (
         <div className="flex gap-2">
-          <Button className="border border-green-500 text-green-500 px-2" onClick={()=>viewModal(row)}>
+          <button className="border border-green-500 text-green-500 px-2 py-2 rounded-md hover:border-green-600" onClick={()=>viewModal(row)}>
             <FaEye />
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={() => handleEditClick(row)}
-            className="border border-blue-500 text-blue-500 px-2"
+            className="border border-blue-500 text-blue-500 px-2 py-2 rounded-md hover:border-blue-600"
           >
             <FaEdit />
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={() => handleDeleteClick(row)}
-            className="border border-red-500 text-red-500 px-2"
+            className="border border-red-500 text-red-500 px-2 py-2 rounded-md hover:border-red-600"
           >
             <FaTrash />
-          </Button>
+          </button>
         </div>
       ),
     },
@@ -247,9 +247,9 @@ const Course = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Syllabus Management</h2>
-        <Button className="bg-orange-500 text-white" onClick={showModal}>
+        <button className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-md" onClick={showModal}>
           Add Syllabus
-        </Button>
+        </button>
       </div>
 
       {/* DataTable to Display Syllabus */}
@@ -309,8 +309,15 @@ const Course = () => {
         visible={deleteModal}
         onCancel={() => SetDeleteModal(false)}
         onOk={handleDeleteCourse}
+        cancelButtonProps={{
+          className: "bg-gray-500 text-white hover:bg-gray-600 border-none rounded",
+          
+        }}
+        okButtonProps={{
+          className: "bg-orange-500 text-white hover:bg-orange-600 border-none rounded",
+        }}
       >
-        Are ouy erus?
+        <p>This action cannot be undone.</p>
       </Modal>
 
       <Modal
@@ -377,12 +384,12 @@ const Course = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button
+            <button
               htmlType="submit"
-              className="w-full bg-orange-500 text-white hover:bg-orange-600"
+              className="w-full py-1 rounded-md bg-orange-500 text-white hover:bg-orange-600"
             >
               Submit Syllabus
-            </Button>
+            </button>
           </Form.Item>
         </Form>
       </Modal>
@@ -475,12 +482,12 @@ const Course = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button
+            <button
               htmlType="submit"
-              className="w-full bg-orange-500 text-white hover:bg-orange-600"
+              className="w-full bg-orange-500 text-white hover:bg-orange-600 py-1 rounded-md"
             >
               Submit Syllabus
-            </Button>
+            </button>
           </Form.Item>
         </Form>
       </Modal>

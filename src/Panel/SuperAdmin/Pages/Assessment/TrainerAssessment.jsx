@@ -86,6 +86,12 @@ const TrainerAssessment = () => {
       content: "This action cannot be undone.",
       okText: "Yes",
       cancelText: "No",
+      okButtonProps: {
+        className: "bg-orange-500 text-white hover:bg-orange-600",
+      },
+      cancelButtonProps: {
+        className: "bg-gray-500 text-white hover:bg-gray-600",
+      },
       onOk: async () => {
         try {
           await DeleteAssessment(id);
@@ -276,8 +282,8 @@ const TrainerAssessment = () => {
       <Modal
         title={isEditing ? "Edit Assessment" : "Add Assessment"}
         visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
+      onCancel={handleCancel}
+        footer={null}
         destroyOnClose
       >
         <Form form={form} layout="vertical">
@@ -352,6 +358,12 @@ const TrainerAssessment = () => {
               ))}
             </Select>
           </Form.Item>
+          <div className="flex items-center justify-end
+          ">
+          <button className=" mr-3 border border-gray-500 hover:border-orange-500 hover:text-orange-500 rounded-md px-3 py-1" onClick={handleCancel}>Cancel</button>
+          
+          <button className=" bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-md" onClick={handleOk}>Add</button>
+          </div>
         </Form>
       </Modal>
       <Modal

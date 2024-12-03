@@ -206,7 +206,7 @@ const Attendance = () => {
       status: item.status || "N/A",
       checkIn: new Date(item.checkIn).toLocaleTimeString() || "N/A",
       checkOut: new Date(item.checkOut).toLocaleTimeString() || "N/A",
-      late
+    
     }));
   
     const options = {
@@ -215,8 +215,8 @@ const Attendance = () => {
         {
           sheetData: processedData,
           sheetName: "Attendance",
-          sheetFilter: ["fullName", "role", "status","isLate", "checkIn", "checkOut"],
-          sheetHeader: ["Name", "Role", "Status","Late", "Check-In", "Check-Out"],
+          sheetFilter: ["fullName", "role", "status", "checkIn", "checkOut"],
+          sheetHeader: ["Name", "Role", "Status", "Check-In", "Check-Out"],
         },
       ],
     };

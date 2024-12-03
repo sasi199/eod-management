@@ -201,7 +201,7 @@ const Sidebar = () => {
                 isActive("/sidebar/dashboard") ? "text-orange-600 bg-white" : ""
               }`}
             >
-              <FaTachometerAlt />
+              <FaTachometerAlt size={24}/>
               Dashboard
             </Link>
 
@@ -211,7 +211,7 @@ const Sidebar = () => {
                 isActive("/sidebar/batches") ? "text-orange-600 bg-white" : ""
               }`}
             >
-              <FaClipboardList />
+              <FaClipboardList size={24} />
               Batches
             </Link>
 
@@ -221,8 +221,8 @@ const Sidebar = () => {
                 isActive("/sidebar/courses") ? "text-orange-600 bg-white" : ""
               } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
             >
-              <FaBook />
-              Courses
+              <FaBook size={24}/>
+              Syllabus
             </Link>
 
             <div>
@@ -233,7 +233,7 @@ const Sidebar = () => {
                   isActive("/sidebar/staffs") ? "text-orange-600 bg-white" : ""
                 } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
               >
-                <FaUsers />
+                <FaUsers size={24}/>
                 Staffs
                 {/* <FaChevronDown
                 className={`${
@@ -261,7 +261,7 @@ const Sidebar = () => {
                 isActive("/sidebar/trainee") ? "text-orange-600 bg-white" : ""
               } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
             >
-              <FaUserGraduate />
+              <FaUserGraduate size={24} />
               Trainee
             </Link>
             <Link
@@ -280,7 +280,7 @@ const Sidebar = () => {
                 isActive("/sidebar/task") ? "text-orange-600 bg-white" : ""
               } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
             >
-              <MdAssignment />
+              <MdAssignment size={24}/>
               Task
             </Link>
             <Link
@@ -291,7 +291,7 @@ const Sidebar = () => {
                   : ""
               } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
             >
-              <GiNotebook />
+              <GiNotebook size={24}/>
               Assessment
             </Link>
             <Link
@@ -302,7 +302,7 @@ const Sidebar = () => {
                   : ""
               } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
             >
-              <FaBell />
+              <FaBell size={24} />
               Notifications
             </Link>
             <Link
@@ -311,7 +311,7 @@ const Sidebar = () => {
                 isActive("/sidebar/chat") ? "text-orange-600 bg-white" : ""
               } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
             >
-              <FaComment />
+              <FaComment size={24}/>
               Chat
             </Link>
             <Link
@@ -320,7 +320,7 @@ const Sidebar = () => {
                 isActive("/sidebar/schedule") ? "text-orange-600 bg-white" : ""
               } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
             >
-              <FaCalendarAlt />
+              <FaCalendarAlt size={24}/>
               Schedule
             </Link>
             <Link
@@ -329,7 +329,7 @@ const Sidebar = () => {
                 isActive("/sidebar/report") ? "text-orange-600 bg-white" : ""
               } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
             >
-              <FaFileAlt />
+              <FaFileAlt size={24}/>
               Reports
             </Link>
           </div>

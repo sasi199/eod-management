@@ -118,6 +118,12 @@ const Trainee = () => {
       content: "This action cannot be undone.",
       okText: "Yes",
       cancelText: "No",
+      okButtonProps: {
+        className: "bg-orange-500 text-white hover:bg-orange-600",
+      },
+      cancelButtonProps: {
+        className: "bg-gray-500 text-white hover:bg-gray-600",
+      },
       onOk: async () => {
         try {
           await DeleteTrainee(id);
@@ -184,10 +190,12 @@ console.log(students);
             value={batchFilter}
             onChange={(e) => setBatchFilter(e.target.value)}
           >
-            <option value="">All Batches</option>
-            <option value="Batch A">Batch A</option>
-            <option value="Batch B">Batch B</option>
-            <option value="Batch C">Batch C</option>
+           <option value="">All Batches</option>
+      {batches.map((batch) => (
+        <option key={batch.id} value={batch._id}>
+          {batch.batchName}
+        </option>
+      ))}
           </select>
           <input
             type="text"
@@ -376,12 +384,12 @@ console.log(students);
           </Row>
 
           <div className="flex justify-end">
-            <Button onClick={handleModalCancel} className="mr-4">
+            <button onClick={handleModalCancel} className="mr-4 border border-gray-500  px-3 py-1 hover:border-orange-500 hover:text-orange-500 rounded-md ">
               Cancel
-            </Button>
-            <Button type="primary" htmlType="submit">
+            </button>
+            <button className="bg-orange-500  text-white hover:bg-orange-600 px-3 py-1 rounded-md" htmlType="submit">
               Submit
-            </Button>
+            </button>
           </div>
         </Form>
       </Modal>
@@ -550,13 +558,13 @@ console.log(students);
           </Row>
 
           <div className="flex justify-end">
-            <Button onClick={handleModalCancel} className="mr-4">
+            <button onClick={handleModalCancel} className="mr-4 border border-gray-500  px-3 py-1 hover:border-orange-500 hover:text-orange-500 rounded-md ">
               Cancel
-            </Button>
-            <Button type="primary" htmlType="submit">
+            </button>
+            <button type="primary"  className="bg-orange-500  text-white hover:bg-orange-600 px-3 py-1 rounded-md" htmlType="submit">
               Submit
-            </Button>
-          </div>
+            </button>
+          </div>  
         </Form>
       </Modal>
 

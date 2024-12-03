@@ -57,14 +57,14 @@ const TraineeSidebar = () => {
           <Link 
             to="/traineesidebar/dashboard" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
-            <FaTachometerAlt />
+            <FaTachometerAlt size={24} />
             Dashboard
           </Link>
           
           <Link 
             to="/traineesidebar/syllabus" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
-            <FaClipboardList />
+            <FaClipboardList size={24}/>
             Syllabus
           </Link>
        
@@ -75,7 +75,7 @@ const TraineeSidebar = () => {
           <Link 
             to="/traineesidebar/assessment" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
-            <FaUserGraduate />
+            <FaUserGraduate size={24}/>
             Assessment
           </Link>
           {/* <Link 
@@ -87,14 +87,14 @@ const TraineeSidebar = () => {
           <Link 
             to="/traineesidebar/task" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
-            <MdAssignment/>
+            <MdAssignment size={24}/>
             Task
           </Link>
           
           <Link 
             to="/traineesidebar/notifications" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
-            <FaBell />
+            <FaBell size={24}/>
             Notifications
           </Link>
           {/* <Link 
@@ -107,7 +107,7 @@ const TraineeSidebar = () => {
           <Link 
             to="/traineesidebar/reports" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
-            <FaFileAlt />
+            <FaFileAlt size={24}/>
             Reports
           </Link>
         </div>

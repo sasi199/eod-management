@@ -186,6 +186,13 @@ const Staffs = () => {
       content: "This action cannot be undone.",
       okText: "Yes",
       cancelText: "No",
+      okButtonProps: {
+        className: "bg-orange-500 text-white hover:bg-orange-600",
+      },
+      cancelButtonProps: {
+        className: "bg-gray-500 text-white hover:bg-gray-600",
+      },
+      
       onOk: async () => {
         try {
           // Pass the correct ID to delete
@@ -467,9 +474,9 @@ const Staffs = () => {
           )}
 
           <Form.Item className="col-span-2">
-            <Button type="primary" htmlType="submit" className="w-full">
+            <button  htmlType="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-md">
               Add Staff
-            </Button>
+            </button>
           </Form.Item>
         </Form>
       </Modal>
@@ -778,9 +785,9 @@ const Staffs = () => {
             </Form.Item>
 
             <Form.Item className="col-span-2">
-              <Button type="primary" htmlType="submit" className="w-full">
+              <button  htmlType="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white py-1 rounded-md">
                 Add Staff
-              </Button>
+              </button>
             </Form.Item>
           </Form>
         )}
