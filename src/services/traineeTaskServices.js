@@ -7,7 +7,7 @@ const NotificationModel = require("../models/notificationModel");
 const Auth = require("../models/authModel");
 const StaffModel = require("../models/staffModel");
 const { formatDistanceToNow } = require('date-fns');
-const AssignedBatchModel = require("../models/assignedBatchesModel");
+const {AssignedBatchModel} = require("../models/assignedBatchesModel");
 
 
 
@@ -16,7 +16,7 @@ exports.createTraineeTask = async(req)=>{
     const { title, description, dueDate, priority, trainerId, batchId} = req.body;
 
     const traineeData = await AssignedBatchModel.find({batchId, trainee:{$exists:true}}).populate('trainee'); 
-    const trainerData = await AssignedBatchModel.findOne({batchId,trainer:trainerId});
+    const trainerData = await AssignedBatchModel.find({batchId,trainer:trainerId});
   
     if ( !trainerData) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Batch not found for trainer'}); 
@@ -50,6 +50,7 @@ exports.createTraineeTask = async(req)=>{
         recipientId: doc.trainee._id,
         status: "Unread",
     }));
+
     await NotificationModel.insertMany(notifications);
 console.log("trinnn",traineeData)
    
@@ -73,27 +74,60 @@ console.log("trinnn",traineeData)
 
 }
 
-exports.getTraineeTaskAll = async(req)=>{
-    const task = await TraineeTaskModel.find({}).populate({
-        path:'batchId',
-        populate:{
-            path: 'trainee',
-            select: 'fullName profilepic'
-        }
-    });
-    if (!task) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainer not found"});
+exports.getTraineeTaskAll = async (req) => {
+    const tasks = await TraineeTaskModel.aggregate([
+        {
+            $lookup: {
+                from: "Batch",
+                localField: "batchId",
+                foreignField: "_id",
+                as: "batchDetails",
+            },
+        },
+        {
+            $lookup: {
+                from: "StudentProgress",
+                localField: "_id",
+                foreignField: "taskId",
+                as: "progressDetails",
+            },
+        },
+        {
+            $lookup: {
+                from: "Trainee",
+                localField: "progressDetails.traineeId",
+                foreignField: "_id",
+                as: "traineeDetails",
+            },
+        },
+
+        {
+            $project: {
+                title: 1,
+                description: 1,
+                dueDate: 1,
+                priority: 1,
+                batchDetails:{
+                    _id: 1,
+                    batchName: 1,
+                },
+                progressDetails: 1,
+                traineeDetails:{
+                    _id: 1,
+                    fullName: 1,
+                    profilePic: 1,
+                },
+            },
+        },
+    ]);
+
+    if (!tasks || tasks.length === 0) {
+        throw new Error("No tasks found");
     }
 
-    if (!task || task.length === 0) {
-        throw new ApiError(httpStatus.NOT_FOUND, { message: "No tasks found" });
-    }
+    return tasks;
+};
 
-    // Step 2: Fetch progress for each task
-    const taskIds = task.map(tasks => tasks._id); // Extract all task IDs
-    const progressData = await StudentProgressModel.find({ taskId: { $in: taskIds } });
-    return task;
-}
 
 exports.getTraineeTaskId = async(req)=>{
     const { _id } = req.params;
@@ -216,3 +250,52 @@ exports.deleteTraineeTask = async(req)=>{
     req.io.emit("dashboardUpdate", { message: "Task deleted", taskId });
 
 }
+
+
+exports.updateTraineeStatus = async(req, res) => {
+    const { traineeId, status } = req.body;
+    const { _id } = req.params;
+
+    if (!_id) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task id not found"});
+    }
+    const validStatuses = ['not attended', 'in progress', 'complete'];
+    if (!validStatuses.includes(status)) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid status not found"});
+    }
+
+    const progressEntry = await StudentProgressModel.findOne({
+        taskId:_id,
+        traineeId: traineeId
+    });
+
+    if (!progressEntry) {
+        
+    }
+
+    progressEntry.status = status;
+    await progressEntry.save();
+
+    
+    const task = await TraineeTaskModel.findById(_id);
+    const notificationContent = `Trainee ${traineeId} updated task status to ${status}`;
+    
+    const notification = new NotificationModel({
+        title: "Alert",
+        content: notificationContent,
+        recipientId: task.trainerId,
+        status: "Unread",
+    });
+
+    await notification.save();
+
+    
+    const socketId = req.io.connectedUsers ? req.io.connectedUsers[traineeId] : null;
+    if (socketId) {
+        req.io.to(socketId).emit("statusUpdateNotification", {
+            taskId: _id,
+            status: status,
+            message: notificationContent,
+        });
+    }
+};

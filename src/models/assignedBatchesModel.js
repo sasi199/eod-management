@@ -17,4 +17,4 @@ const assignedBatchSchema = new mongoose.Schema({
 
 const AssignedBatchModel = mongoose.model('AssignedBatch',assignedBatchSchema);
 
-module.exports = AssignedBatchModel;
+module.exports = {AssignedBatchModel};

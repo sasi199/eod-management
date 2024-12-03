@@ -97,7 +97,7 @@ exports.logoutUser = async (req) => {
     date: { $gte: startOfDay, $lte: endOfDay },
   })
 
-  console.log(attendance,"alallalal");
+  console.log(attendance,"atten");
   
 
   if (!attendance) {

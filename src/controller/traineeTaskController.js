@@ -27,3 +27,8 @@ exports.deleteTraineeTask = catchAsync(async(req,res)=>{
     const response = await traineeTaskServices.deleteTraineeTask(req);
     res.status(200).json({status:true, message:"Task deleted succesfully", data: response})
 })
+
+exports.updateTraineeStatus = catchAsync(async(req,res)=>{
+    const response = await traineeTaskServices.updateTraineeStatus(req);
+    res.status(200).json({status:true, message:"Task updated succesfully", data: response})
+})
