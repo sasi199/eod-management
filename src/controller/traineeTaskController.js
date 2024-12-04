@@ -32,3 +32,8 @@ exports.updateTraineeStatus = catchAsync(async(req,res)=>{
     const response = await traineeTaskServices.updateTraineeStatus(req);
     res.status(200).json({status:true, message:"Status updated succesfully", data: response})
 })
+
+exports.getTraineeTask = catchAsync(async(req,res)=>{
+    const response = await traineeTaskServices.getTraineeTask(req);
+    res.status(200).json({status:true, message:"Trainee task get succesfully", data: response})
+})

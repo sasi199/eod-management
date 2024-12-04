@@ -295,3 +295,19 @@ exports.updateTraineeStatus = async(req, res) => {
         });
     }
 };
+
+
+exports.getTraineeTask = async(req)=>{
+    const {_id } = req.params
+    if (!_id) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Batch id not found"});
+    }
+    const tasks = await TraineeTaskModel.find({batchId:_id});
+    console.log("task",tasks);
+    
+    if (!tasks || tasks.length === 0) {
+        throw new ApiError(httpStatus.NOT_FOUND, { message: "No tasks found for the given batch ID" });
+    }
+
+    return tasks;
+}
