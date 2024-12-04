@@ -14,10 +14,13 @@ const TraineeModel = require("../models/traineeModel");
 
 
 exports.createTraineeTask = async(req)=>{
-    const { title, description, dueDate, priority, trainerId, batchId} = req.body;
+    const { title, description, dueDate, priority, batchId} = req.body;
+    const { accountId } = req;
+    console.log(accountId,"ajajakaakakaal");
+    
 
     const traineeData = await AssignedBatchModel.find({batchId, trainee:{$exists:true}}).populate('trainee'); 
-    const trainerData = await AssignedBatchModel.find({batchId,trainer:trainerId});
+    const trainerData = await AssignedBatchModel.find({batchId,trainer:accountId});
   
     if ( !trainerData) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Batch not found for trainer'}); 
@@ -32,31 +35,33 @@ exports.createTraineeTask = async(req)=>{
         title,
         description,
         dueDate,
-        trainerId,
+        trainerId:accountId,
         batchId
     });
 
 
-    const progressEntries = traineeData.map((data) => ({
+    const progressEntries = traineeData
+    .filter((data) => data.trainee)
+    .map((data) => ({
         taskId: newTask._id,
         traineeId: data.trainee._id,
         status: 'not attended',
     }));
-    await StudentProgressModel.insertMany(progressEntries);
+
+await StudentProgressModel.insertMany(progressEntries);
 
  
     const notifications = traineeData.map((doc) => ({
         title: "Alert",
         content: `You have been assigned a new task: ${title}`,
-        recipientId: doc.trainee._id,
+        recipientId: doc.trainee,
         status: "Unread",
     }));
 
     await NotificationModel.insertMany(notifications);
-console.log("trinnn",traineeData)
    
     traineeData.forEach((doc) => {
-        const traineeId = doc.trainee._id;
+        const traineeId = doc.trainee;
         const socketId = req.io.connectedUsers ? req.io.connectedUsers[traineeId] : null
         if (socketId) {
             req.io.to(socketId).emit("taskNotification", {
@@ -239,19 +244,20 @@ exports.deleteTraineeTask = async(req)=>{
 
 
 exports.updateTraineeStatus = async(req, res) => {
-    const { status, traineeId } = req.body;
+    const { status } = req.body;
     const { _id } = req.params;
+    const { accountId } = req
     if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task id not found"});
     }
-    const trainee = await TraineeModel.findOne({traineeId})
+    const trainee = await Auth.findOne({accountId:accountId})
     console.log(trainee,"ajajjaja");
     
     if (!trainee) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Auth id not found"});
     }
     
-    const validStatuses = ['not attended', 'in progress', 'complete'];
+    const validStatuses = ['not attended', 'in progress', 'completed'];
     if (!validStatuses.includes(status)) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid status not found"});
     }

@@ -5,7 +5,7 @@ const { verifyAuthToken } = require('../middlewares/jwt.config');
 
 const Router = express.Router();
 
-Router.route("/createTraineeTask").post(traineeTaskComtroller.createTraineeTask);
+Router.route("/createTraineeTask").post(verifyAuthToken,traineeTaskComtroller.createTraineeTask);
 Router.route("/getTraineeTaskAll").get(traineeTaskComtroller.getTraineeTaskAll);
 Router.route("/getTraineeTaskId/:_id").get(traineeTaskComtroller.getTraineeTaskId);
 Router.route("/editTraineeTask/:_id").put(traineeTaskComtroller.editTraineeTask);
@@ -13,7 +13,7 @@ Router.route("/deleteTraineeTask/:_id").delete(traineeTaskComtroller.deleteTrain
 
 Router.route("/getTraineeTask").get(verifyAuthToken,traineeTaskComtroller.getTraineeTask);
 
-Router.route("/updateTraineeStatus/:_id").put(traineeTaskComtroller.updateTraineeStatus);
+Router.route("/updateTraineeStatus/:_id").put(verifyAuthToken,traineeTaskComtroller.updateTraineeStatus);
 
 module.exports = Router;
 
