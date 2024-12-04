@@ -311,7 +311,7 @@ const StudentTask = () => {
   const fetchTaskById = async (selectedTaskData) => {
     console.log("selected",selectedTaskData)
     try {
-      const response = await GetStudentTaskById(selectedTaskData._id);
+      const response = await GetStudentTaskById();
       if(response.data.status){
         setListTaskDataById(response.data.data);
       }

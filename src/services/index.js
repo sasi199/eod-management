@@ -270,12 +270,12 @@ export const createStudentTask = async (data)=>{
 }
 
 export const GetAllStudentTask = async ()=>{
-  const res= await interceptors.get('/traineeTask//getTraineeTaskAll');
+  const res= await interceptors.get('/traineeTask/getTraineeTaskAll');
   return res;
 }
 
-export const GetStudentTaskById = async (taskId)=>{
-  const res= await interceptors.get(`traineeTask/getTraineeTaskId/${taskId}`);
+export const GetStudentTaskById = async ()=>{
+  const res= await interceptors.get(`traineeTask/getTraineeTaskId`);
   return res;
 }
 
