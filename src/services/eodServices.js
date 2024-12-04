@@ -7,7 +7,7 @@ const uploadCloud = require("../utils/uploadCloud");
 
 
 exports.createEod = async(req)=>{
-    const { project, department,descryption} = req.body
+    const { project, department,description, links} = req.body
     const { accountId } = req
 
     const projects = await ProjectModel.findOne({projectName:project});
@@ -21,27 +21,39 @@ exports.createEod = async(req)=>{
     }
 
     let uploadFile =[]
-    if (req.files && req.files.files && req.files.files.length > 0) {
-        for(const file of req.files.files){
-            console.log(`Uploading file: ${file.originalname}`);
+    if (req.files.uploadFile && req.files.uploadFile && req.files.uploadFile.length > 0) {
+
+        const uploadPromises = req.files.uploadFile.map(async(file)=>{
             const fileExtension = file.originalname.split('.').pop();
             const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExtension}`;
-            const uploadedFileUrl = await uploadCloud(`Eod/${fileName}`, file);
-            uploadFile.push(uploadedFileUrl);
-            console.log(`Uploaded URL: ${uploadedFileUrl}`);
-        }
-    }
-    
-    if (uploadFile.length === 0) {
+           return await uploadCloud(`Eod/${fileName}`, file);
+        });
+
+        const uploadFiles = await Promise.all(uploadPromises);
+        uploadFile.push(...uploadFiles);
+         if (uploadFile.length === 0) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "No files uploaded" });
     }
+    }
+
+    let linkArray = [];
+    if(links){
+      
+        linkArray = Array.isArray(links) ? links : JSON.parse(links);
+        if (linkArray.length === 0) {
+            throw new ApiError(httpStatus.BAD_REQUEST, { message: "No links uploaded" });
+        }
+      }
+
+
 
     const newEod = new EodModel({
         project,
         userName: user,
         department,
         uploadFile,
-        descryption
+        description,
+        link:linkArray
     })
 
     await newEod.save();

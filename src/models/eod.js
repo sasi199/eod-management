@@ -13,7 +13,10 @@ const eodSchema = new mongoose.Schema({
         type: [String],
         required: true,
     },
-    descryption: schemaFields.requiredAndString,
+    description: schemaFields.requiredAndString,
+    link:{
+        type:[String],
+    },
     project:{
         type:String,
         ref:'Project'
