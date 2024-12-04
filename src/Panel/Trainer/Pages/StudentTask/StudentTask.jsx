@@ -12,13 +12,17 @@ import {
   Col,
   Divider,
   Typography,
-  Tag
+  Tag,
+  Card,
+  Avatar,
+  Badge
 } from "antd";
 import DataTable from "react-data-table-component";
-import { FaEye, FaEdit, FaTrash, FaCalendarAlt } from "react-icons/fa";
+import { FaEye, FaEdit, FaTrash, FaCalendarAlt, FaTimesCircle, FaCheckCircle } from "react-icons/fa";
 import moment from "moment";
-import { FaBook, FaClipboardList, FaUser } from "react-icons/fa6";
-import { createStudentTask, GetAllStudentTask, GetBatches } from "../../../../services";
+import { FaBook, FaClipboardList, FaSpinner, FaUser } from "react-icons/fa6";
+import { createStudentTask, GetAllStudentTask, GetBatches, GetStudentTaskById, UpdateStudentTaskById } from "../../../../services";
+import { split } from "postcss/lib/list";
 const { Title, Text } = Typography;
 
 const StudentTask = () => {
@@ -53,8 +57,13 @@ const StudentTask = () => {
 
 
   const [taskData, setTaskData] = useState(initialTaskState);
+  const [selectedTaskData, setSelectedTaskData] = useState([]);
   const [createTaskModalVisible, setCreateTaskModalVisible] = useState(false);
+  const [listTaskModalVisible, setListTaskModalVisible] = useState(false);
+  const [updateTaskModalVisible, setUpdateTaskModalVisible] = useState(false);
   const [listTaskData, setListTaskData] = useState([]);
+  const [listTaskDataById, setListTaskDataById] = useState([]);
+  const [updateTaskData, setUpdateTaskData] = useState([]);
   const [modals, setModals] = useState({
     create: false,
     view: false,
@@ -102,6 +111,27 @@ const StudentTask = () => {
     handleModalToggle("delete");
   };
 
+
+  const handleListTask = (tasks) => {
+    setListTaskModalVisible(true)
+    setSelectedTaskData(tasks);
+  }
+
+  const handleListTaskCancel = (tasks) => {
+    setListTaskModalVisible(false)
+    setSelectedTaskData([]);
+  }
+
+  const handleUpdateTaskModal = (tasks) => {
+    setUpdateTaskModalVisible(true);
+    setSelectedTaskData(tasks);
+  }
+
+  const handleUpdateTaskModalCancel = (tasks) => {
+    setUpdateTaskModalVisible(false);
+    setSelectedTaskData([]);
+  }
+
   const columns = [
     {
       name: "S.No",
@@ -117,7 +147,7 @@ const StudentTask = () => {
     },
     {
       name: "Batch",
-      selector: (row) => row.batchId,
+      selector: (row) => row.batchDetails[0].batchName,
       sortable: true,
       center: true,
     },
@@ -150,7 +180,7 @@ const StudentTask = () => {
           <Tooltip title="View">
             <Button
               className="text-green-500 border border-green-500"
-              onClick={() => handleModalToggle("view", row)}
+              onClick={()=>handleListTask(row)}
             >
               <FaEye />
             </Button>
@@ -158,19 +188,19 @@ const StudentTask = () => {
           <Tooltip title="Edit">
             <Button
               className="text-blue-500 border border-blue-500"
-              onClick={() => handleModalToggle("update", row)}
+              onClick={() => handleUpdateTaskModal(row)}
             >
               <FaEdit />
             </Button>
           </Tooltip>
-          <Tooltip title="Delete">
+          {/* <Tooltip title="Delete">
             <Button
               className="text-red-500 border border-red-500"
               onClick={() => handleModalToggle("delete", row)}
             >
               <FaTrash />
             </Button>
-          </Tooltip>
+          </Tooltip> */}
         </div>
       ),
       center: true,
@@ -226,12 +256,12 @@ const StudentTask = () => {
   const fetchGetBatch = async () => {
     try {
       const response = await GetBatches();
-      console.log("response in batch",response)
+      //console.log("response in batch",response)
       if(response.data.status){
-        setBatches(response.data.data)
+        setBatches(response.data.data);
       }
     } catch (error) {
-      console.error("err in batches",error);
+      //console.error("err in batches",error);
     }
   };
 
@@ -248,7 +278,7 @@ const StudentTask = () => {
     }
     try {
       const response = await createStudentTask(payload);
-      console.log("response", response)
+      //console.log("response", response)
       if(response.data.status){
         setTaskData(initialTaskState);
         form.resetFields();
@@ -257,7 +287,7 @@ const StudentTask = () => {
         setCreateTaskModalVisible(false);
       }
     } catch (error) {
-      console.error("error in stu task",error);
+      //console.error("error in stu task",error);
       message.error(error?.response?.data?.message || "Failed to create student task");
     }
   }
@@ -266,19 +296,207 @@ const StudentTask = () => {
   const fetchGetAllTask = async() => {
     try {
       const response = await GetAllStudentTask();
-      console.log("res in all task")
-      if(response.data.data){
+      //console.log("res in all task", response)
+      if(response.data.status){
         setListTaskData(response.data.data)
+      
       }
     } catch (error) {
-      console.error("err in all task", error);
+      //console.error("err in all task", error);
       message.error(error?.response?.data?.message || "Failed to list tasks")
     }
   }
 
+
+  const fetchTaskById = async (selectedTaskData) => {
+    console.log("selected",selectedTaskData)
+    try {
+      const response = await GetStudentTaskById();
+      if(response.data.status){
+        setListTaskDataById(response.data.data);
+      }
+    } catch (error) {
+      
+    }
+  }
+
+  useEffect(()=>{
+    fetchTaskById(selectedTaskData)
+  },[selectedTaskData])
+
 useEffect(()=>{
 fetchGetAllTask();
 },[]);
+
+
+//updatetask by id
+
+const handleUpdateTaskByIdSubmit = async (values) => {
+try {
+  const response = await UpdateStudentTaskById(values,selectedTaskData._id);
+  if(response.data.status){
+    setUpdateTaskData(response.data.data);
+    setSelectedTaskData([]);
+    handleUpdateTaskModalCancel();
+    message.success("Task updated successfully");
+    fetchGetAllTask();
+  }
+} catch (error) {
+  message.error(error?.response?.data?.message || "Failed to update task");
+  console.error("error in update task", error);
+}
+} 
+
+const TaskProgressCards = () => {
+  const statusIcons = {
+    "not attended": <FaTimesCircle color="#ff4d4f" size={20} />,
+    "in progress": <FaSpinner color="#faad14" size={20} />,
+    completed: <FaCheckCircle color="#52c41a" size={20} />,
+  };
+
+  const statusTitles = {
+    "not attended": "Not Attended",
+    "in progress": "In Progress",
+    completed: "Completed",
+  };
+
+  // Mock Data
+  const groupedData = listTaskDataById.flatMap((task) =>
+    task.progressDetails.map((progressDetail) => {
+      const trainee = task.traineeDetails.find(
+        (trainee) => trainee._id === progressDetail.traineeId
+      );
+      return {
+        fullName: trainee?.fullName || "Unknown",
+        profilePic: trainee?.profilePic || "Default URL",
+        status: progressDetail.status,
+        startTime: progressDetail.startTime || "09:00 AM",
+        endTime: progressDetail.endTime || "05:00 PM",
+      };
+    })
+  );
+
+  const groupedByStatus = groupedData.reduce((acc, trainee) => {
+    const { status } = trainee;
+    if (!acc[status]) acc[status] = [];
+    acc[status].push(trainee);
+    return acc;
+  }, {});
+
+  const orderedStatuses = ["not attended", "in progress", "completed"];
+
+  return (
+    <div className="overflow-y-auto overflow-x-hidden">
+      {orderedStatuses.map((status) => {
+        // Check if there is data for the current status
+        const statusData = groupedByStatus[status];
+        if (!statusData || statusData.length === 0) return null; // Skip rendering if no data
+
+        return (
+          <div key={status}>
+            {/* Status Title */}
+            <Title
+              level={4}
+              style={{
+                textTransform: "capitalize",
+                marginBottom: "16px",
+                borderBottom: "2px solid #e0e0e0",
+                paddingBottom: "8px",
+                color:
+                  status === "not attended"
+                    ? "#ff4d4f"
+                    : status === "in progress"
+                    ? "#faad14"
+                    : "#52c41a",
+              }}
+            >
+              {statusTitles[status]}
+            </Title>
+
+
+            <Row gutter={[16, 16]}>
+              {statusData.map(
+                ({ fullName, profilePic, startTime, endTime }, index) => (
+                  <Col key={index} span={24}>
+                    <Card
+                      hoverable
+                      style={{
+                        borderRadius: "8px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-around",
+                          flex: "1",
+                          gap: "32px",
+                        }}
+                      >
+                        <Avatar size={50} src={profilePic} />
+                        <div
+                          style={{
+                            textAlign: "center",
+                            width: "120px",
+                            marginLeft: "10px",
+                          }}
+                        >
+                          <p
+                            style={{
+                              fontSize: "16px",
+                              fontWeight: "600",
+                              margin: 0,
+                            }}
+                          >
+                            {fullName}
+                          </p>
+                        </div>
+
+                        <div style={{ textAlign: "center", marginLeft: "40px" }}>
+                          <p
+                            style={{
+                              fontSize: "14px",
+                              margin: 0,
+                              color: "gray",
+                            }}
+                          >
+                            Start: {startTime}
+                          </p>
+                        </div>
+
+                        <div style={{ textAlign: "center", marginLeft: "40px" }}>
+                          <p
+                            style={{
+                              fontSize: "14px",
+                              margin: 0,
+                              color: "gray",
+                            }}
+                          >
+                            End: {endTime}
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+                  </Col>
+                )
+              )}
+            </Row>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+
+
+
 
 
 
@@ -328,24 +546,15 @@ fetchGetAllTask();
             >
              {batches.map((batch,i)=>(
                  <Select.Option key={i} value={batch._id} >
-                  {console.log("select batch",batch)}
-                 {batch.batchName}
+                  {/* {//console.log("select batch",batch)} */}
+                 {`${batch.batchName} (${batch.batchId.split('-')[0]})`}
                </Select.Option>
              ))
 
              }
             </Select>
           </Form.Item>
-          {/* <Form.Item
-            label="Student"
-            name="student"
-            rules={[{ required: true, message: "Please select a student!" }]}
-          >
-            <Select placeholder="Select Student">
-              <Select.Option value="John Doe">John Doe</Select.Option>
-              <Select.Option value="Jane Smith">Jane Smith</Select.Option>
-            </Select>
-          </Form.Item> */}
+ 
           <Form.Item
             label="Due Date"
             name="dueDate"
@@ -375,79 +584,17 @@ fetchGetAllTask();
 {/* View Task Modal */}
 <Modal
   // title="View Task"
-  visible={modals.view}
-  onCancel={() => handleModalToggle("view")}
+  open={listTaskModalVisible}
+  onCancel={handleListTaskCancel}
+  // onClose={()=>setListTaskModalVisible(false)}
   footer={null}
-  width={600}
-  style={{ padding: "20px" }}
->
-  <Row gutter={[16, 16]}>
-    <Col span={24}>
-      <Title level={4}>Task Details</Title>
-    </Col>
-
-    {/* Task Title */}
-    <Col span={24}>
-      <Row align="middle">
-        <Col flex="32px">
-          <FaBook size={20} color="#1890ff" />
-        </Col>
-        <Col>
-          <Text strong>Title:</Text> {selectedTask.title}
-        </Col>
-      </Row>
-    </Col>
-
-    {/* Batch */}
-    <Col span={24}>
-      <Row align="middle">
-        <Col flex="32px">
-          <FaClipboardList size={20} color="#1890ff" />
-        </Col>
-        <Col>
-          <Text strong>Batch:</Text> {selectedTask.batchId}
-        </Col>
-      </Row>
-    </Col>
-
-    {/* Student */}
-    <Col span={24}>
-      <Row align="middle">
-        <Col flex="32px">
-          <FaUser size={20} color="#1890ff" />
-        </Col>
-        <Col>
-          <Text strong>Student:</Text> {selectedTask.student}
-        </Col>
-      </Row>
-    </Col>
-
-    {/* Due Date */}
-    <Col span={24}>
-      <Row align="middle">
-        <Col flex="32px">
-          <FaCalendarAlt size={20} color="#1890ff" />
-        </Col>
-        <Col>
-          <Text strong>Due Date:</Text> {selectedTask.dueDate}
-        </Col>
-      </Row>
-    </Col>
-
-    {/* Description */}
-    <Col span={24}>
-      <Divider />
-      <Row align="middle">
-        <Col flex="32px">
-          <FaClipboardList size={20} color="#1890ff" />
-        </Col>
-        <Col>
-          <Text strong>Description:</Text>
-        </Col>
-      </Row>
-      <Text>{selectedTask.description}</Text>
-    </Col>
-  </Row>
+  width="50%"
+  centered
+  >
+    <div style={{ padding: "20px" }}>
+    <Title level={4} className="pb-4">Task Progress</Title>
+    <TaskProgressCards />
+  </div>
 </Modal>
 
 
@@ -465,17 +612,18 @@ fetchGetAllTask();
       </Button> */}
     </div>
   }
-  visible={modals.update}
-  onCancel={() => handleModalToggle("update")}
+  // visible={modals.update}
+  open={updateTaskModalVisible}
+  onCancel={handleUpdateTaskModalCancel}
   footer={null}
 >
   <Form
     form={form}
     layout="vertical"
-    onFinish={handleUpdateTask}
+    onFinish={handleUpdateTaskByIdSubmit}
     initialValues={{
-      ...selectedTask,
-      dueDate: selectedTask.dueDate ? moment(selectedTask.dueDate) : null,
+      ...selectedTaskData,
+      dueDate: selectedTaskData.dueDate ? moment(selectedTaskData.dueDate) : null,
     }}
   >
     <Row gutter={[16, 16]}>
@@ -494,13 +642,22 @@ fetchGetAllTask();
           name="batchId"
           rules={[{ required: true, message: "Please select a batch!" }]}
         >
-          <Select placeholder="Select Batch">
-            <Select.Option value="Batch A">Batch A</Select.Option>
-            <Select.Option value="Batch B">Batch B</Select.Option>
-          </Select>
+           <Select placeholder="Select Batch"
+            // onChange={handleOnChange}
+            // options={}
+            >
+             {batches.map((batch,i)=>(
+                 <Select.Option key={i} value={batch._id} >
+                  {/* {//console.log("select batch",batch)} */}
+                 {`${batch.batchName} (${batch.batchId.split('-')[0]})`}
+               </Select.Option>
+             ))
+
+             }
+            </Select>
         </Form.Item>
       </Col>
-      <Col span={12}>
+      {/* <Col span={12}>
         <Form.Item
           label="Student"
           name="student"
@@ -511,7 +668,7 @@ fetchGetAllTask();
             <Select.Option value="Jane Smith">Jane Smith</Select.Option>
           </Select>
         </Form.Item>
-      </Col>
+      </Col> */}
       <Col span={12}>
         <Form.Item
           label="Due Date"
@@ -529,14 +686,11 @@ fetchGetAllTask();
       </Col>
       <Col span={12}>
         <Form.Item
-          label="Status"
+          label="Priority"
           name="priority"
           rules={[{ required: true, message: "Please select a priority!" }]}
         >
-          <Select placeholder="Select Status">
-            <Select.Option value="Pending">Pending</Select.Option>
-            <Select.Option value="Completed">Completed</Select.Option>
-          </Select>
+             <Select options={handlePriorityOptions()} placeholder="Select Priority" />
         </Form.Item>
       </Col>
       <Col span={24}>

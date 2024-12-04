@@ -13,26 +13,7 @@ const { TabPane } = Tabs;
 
 const ProjectTask = () => {
 
-  // Drag-and-drop handling
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
-
-    const sourceStatus = result.source.droppableId;
-    const destStatus = result.destination.droppableId;
-
-    const taskIndex = result.source.index;
-    const task = listData.find(
-      (item) => item.task === boardData[sourceStatus][taskIndex]
-    );
-
-    // Remove task from source and add to destination
-    boardData[sourceStatus].splice(taskIndex, 1);
-    boardData[destStatus].splice(result.destination.index, 0, task.task);
-
-    // Update task status
-    task.status = destStatus;
-    setListData([...listData]);
-  };
+  
 
   const [boardData, setBoardData] = useState({
   });
@@ -62,11 +43,6 @@ const [task, setTask] = useState(taskInitialValues);
   const [form] = Form.useForm();
   const projectId = useSelector((state) => state.trainer.projectId);
 
-  // const formatDate = (isoDate) =>{
-  //   const date = new Date(isoDate);
-  //   return date.toLocaleDateString('en-GB');
-  // }
-
   function formatToReadableDateTime(isoDateString) {
     const date = new Date(isoDateString);
   
@@ -84,6 +60,56 @@ const [task, setTask] = useState(taskInitialValues);
   
     return `${formattedDate} ${formattedTime}`;
   }
+
+
+
+  // Drag-and-drop handling
+  const handleDragEnd = async (result) => {
+    const { source, destination, draggableId } = result;
+
+    if (!destination) return;
+
+    if (source.droppableId === destination.droppableId) {
+      return; // Do nothing if the task is dropped in the same column
+    }
+
+    console.log("source", source.droppableId)
+
+    const sourceColumn = boardData[source.droppableId];
+    const destColumn = boardData[destination.droppableId];
+    const task = sourceColumn[source.index];
+
+    // Update UI
+    const updatedSourceColumn = [...sourceColumn];
+    updatedSourceColumn.splice(source.index, 1);
+
+    const updatedDestColumn = [...destColumn];
+    updatedDestColumn.splice(destination.index, 0, {
+      ...task,
+      status: destination.droppableId === "To Do"
+      ? "todo"
+      : destination.droppableId.toLowerCase()
+    });
+
+    const updatedBoardData = {
+      ...boardData,
+      [source.droppableId]: updatedSourceColumn,
+      [destination.droppableId]: updatedDestColumn,
+    };
+    setBoardData(updatedBoardData);
+
+    // Update backend
+    try {
+     const result =  await EditTaskById({ ...task, status:  destination.droppableId === "To Do"
+      ? "todo"
+      : destination.droppableId.toLowerCase() }, task._id);
+     console.log("result darag", result)
+      message.success("Task status updated successfully");
+      fetchTasksOfProject(projectId); // Refetch data for consistency
+    } catch (error) {
+      message.error("Failed to update task status");
+    }
+  };
   
   const showModal = (task) => {
     setSelectedTask(task);
@@ -175,12 +201,7 @@ const [task, setTask] = useState(taskInitialValues);
   dataIndex: 'status',
   key: 'status',
   render: (status) => {
-    // console.log("sttttt", status); // Logs the correct value
-
-    // Convert the first character to uppercase and keep the rest lowercase
     const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
-
-    // Define colors for each status
     const colors = {
       todo: 'purple',
       'in progress': 'orange',
@@ -198,8 +219,6 @@ const [task, setTask] = useState(taskInitialValues);
 }
 
   ];
-
- 
 
   const fetchAllAssignee = async() => {
     try {
@@ -284,9 +303,6 @@ const handlePriorityOptions = () => {
   ]
 }
 
-
-
-
   const handleTaskChange = (e) => {
     const {name, value} = e.target;
     setTask((prevTask)=>({
@@ -329,32 +345,21 @@ const fetchTasksOfProject = async(projectId) => {
   console.log("projectIdddd",projectId)
   try {
     const response = await GetTaskByProjectId(projectId);
-    // console.log("fetch taskssss",response)
+    console.log("project tasks", response);
     if(response.data.status){
-      // console.log("fetch taskssss",response)
       setListData(response.data.data)
       const tasks = response.data.data;
-
-      // Transform the response into boardData format
       const transformedData = {
         'To Do': tasks.filter((task) => task.status === 'todo'),
         'In Progress': tasks.filter((task) => task.status === 'in progress'),
         'Completed': tasks.filter((task) => task.status === 'completed'),
       };
-
-      // Update the boardData state
       setBoardData(transformedData);
-      // message.success("fetch task");
-
     }
   } catch (error) {
-    console.log("error in tasks", error)
+    console.log(error?.response?.data?.message || "Failed to list project tasks");
   }
 }
-
-useEffect(()=>{
-  console.log("board",boardData)
-},[boardData])
 
 useEffect(() => {
   if (projectId) {
@@ -371,25 +376,18 @@ useEffect(()=>{
   }
 },[selectedTask])
 
-useEffect(()=>{
-console.log("task fffff",formValues)
-},[formValues])
-
 //update
 const handleUpdate = async() => {
-  console.log("trigger update")
   try {
     const response = await EditTaskById(formValues,formValues._id);
     if(response.data.status){
-      console.log("fetch update", response);
       handleModalClose();
       message.success("Task updated successfully");
       fetchTasksOfProject(projectId);
       setIsEditing({});
     }
   } catch (error) {
-    // message.error(error?.response?.data?.message);
-    console.error("error iin update",error)
+    message.error(error?.response?.data?.message || "Failed to update the task");
   }
 }
 
@@ -439,8 +437,8 @@ const handleUpdate = async() => {
                 >
                   {boardData[status].map((task, index) => (
                     <Draggable
-                      key={task.task}
-                      draggableId={task.task}
+                      key={task._id}
+                      draggableId={task._id}
                       index={index}
                     >
                       {(provided) => (
@@ -525,13 +523,6 @@ const handleUpdate = async() => {
             name="status"
             rules={[{required:true, message:"Please enter task status"}]}
             >
-              {/* <Input
-              type="text"
-              placeholder='Enter task status'
-              value={task.status}
-              name='status'
-              onChange={handleTaskChange}
-              /> */}
               <Select
               placeholder="Select status"
               value={task.status}
@@ -860,10 +851,6 @@ const handleUpdate = async() => {
   }}>
     Save
   </Button>
- {/* ) */}
-
- {/* } */}
- {console.log("isEditing state: ", isEditing)}
  
  </div>
       </Modal>

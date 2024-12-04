@@ -262,7 +262,7 @@ export const DeleteTaskById = async (taskId) => {
 }
 
 
-//studentTask or batch task
+//traineeTask or batch task
 
 export const createStudentTask = async (data)=>{
   const res= await interceptors.post('/traineeTask/createTraineeTask',data);
@@ -270,9 +270,31 @@ export const createStudentTask = async (data)=>{
 }
 
 export const GetAllStudentTask = async ()=>{
-  const res= await interceptors.get('/traineeTask//getTraineeTaskAll');
+  const res= await interceptors.get('/traineeTask/getTraineeTaskAll');
   return res;
 }
+
+export const GetStudentTaskById = async ()=>{
+  const res= await interceptors.get(`traineeTask/getTraineeTaskId`);
+  return res;
+}
+
+export const UpdateStudentTaskById = async (data,taskId)=>{
+  const res= await interceptors.put(`traineeTask/editTraineeTask/${taskId}`,data);
+  return res;
+}
+
+export const GetStudentTask = async ()=>{
+  const res= await interceptors.get(`traineeTask/getTraineeTask`);
+  return res;
+}
+
+export const UpdateStudentStatusById = async (taskId)=>{
+  const res= await interceptors.put(`traineeTask/updateTraineeStatus/${taskId}`);
+  return res;
+}
+
+
 
 
 //scuhdule
