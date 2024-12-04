@@ -264,7 +264,7 @@ exports.updateTraineeStatus = async(req, res) => {
 
     const progressEntry = await StudentProgressModel.findOne({
         taskId:_id,
-        traineeId: trainee._id
+        traineeId: trainee.accountId
     });
 
     console.log("progressss",progressEntry);

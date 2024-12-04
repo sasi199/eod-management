@@ -7,7 +7,7 @@ const Router = express.Router();
 
 Router.route("/createTraineeTask").post(verifyAuthToken,traineeTaskComtroller.createTraineeTask);
 Router.route("/getTraineeTaskAll").get(traineeTaskComtroller.getTraineeTaskAll);
-Router.route("/getTraineeTaskId/").get(verifyAuthToken,traineeTaskComtroller.getTraineeTaskId);
+Router.route("/getTraineeTaskId").get(verifyAuthToken,traineeTaskComtroller.getTraineeTaskId);
 Router.route("/editTraineeTask/:_id").put(traineeTaskComtroller.editTraineeTask);
 Router.route("/deleteTraineeTask/:_id").delete(traineeTaskComtroller.deleteTraineeTask);
 
