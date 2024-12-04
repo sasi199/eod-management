@@ -302,7 +302,10 @@ exports.getTraineeTask = async(req)=>{
     if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Batch id not found"});
     }
-    const tasks = await TraineeTaskModel.find({batchId:_id});
+    const tasks = await TraineeTaskModel.find({batchId:_id}).populate({
+        path:'trainerId',
+        select:'fullName profilePic'
+    });
     console.log("task",tasks);
     
     if (!tasks || tasks.length === 0) {
