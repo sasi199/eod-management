@@ -14,6 +14,7 @@ const authSchema = new mongoose.Schema(
     accountId:{
       type: String
     },
+    batch: schemaFields.requiredAndString,
     hybrid: schemaFields.StringWithEnum(['Online','Offline','WFH']),
     role: {
       type: String,
@@ -36,9 +37,6 @@ const authSchema = new mongoose.Schema(
     // },
     // adminId: {
     //   type: String,
-    // },
-    // batch_id: {
-    //   type: String
     // },
     // trainerId:{
     //     type:String

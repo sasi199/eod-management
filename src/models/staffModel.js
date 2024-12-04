@@ -17,19 +17,18 @@ const staffSchema = new mongoose.Schema({
     designation:schemaFields.requiredAndString,
     qualification:schemaFields.requiredAndString,
     experience: schemaFields.StringWithEnumAndRequired(['0 to 1', '1 to 3', '3 to 5', '5+']),
-    role: schemaFields.StringWithEnumAndRequired(["Admin","HR","Coordinator","Employee"]),
+    role: schemaFields.StringWithEnumAndRequired(["Admin","HR","Coordinator","Employee","TL"]),
+    department: schemaFields.StringWithEnumAndRequired([
+        'DEV-Team',
+        'DM-Team',
+        'SALES-Team',
+        'MARKETING-Team',
+        'PLACEMENT-Team',
+    ]),
     isTrainer: schemaFields.BooleanWithDefault,
     createdBy:schemaFields.UUIDIdReference('superAdmin'),
     isArchive: schemaFields.BooleanWithDefault,
     hybrid: schemaFields.StringWithEnumAndRequired(['Online','Offline','WFH']),
-    // assignedBatches: [{
-    //     type: String,
-    //     ref: 'Batch'
-    // }],
-    // assignedSchedule: [{
-    //     type: String,
-    //     ref: 'Schedule'
-    // }],
     permission:{
         type: String,
         enum: ["read","write","manage","full-access"],

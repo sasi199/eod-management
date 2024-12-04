@@ -21,7 +21,7 @@ const traineeSchema = new mongoose.Schema({
     currentAddress: schemaFields.requiredAndString,
     // resumeUpload: schemaFields.requiredAndString,
     isActive: schemaFields.BooleanWithDefault,
-    hybrid: schemaFields.StringWithEnumAndRequired(['Online','WFH']),
+    hybrid: schemaFields.StringWithEnumAndRequired(['Online','Offline','WFH']),
     // assignedBatch:{
     //     type: String,
     //     ref: 'Batch'

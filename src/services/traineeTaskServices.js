@@ -298,11 +298,11 @@ exports.updateTraineeStatus = async(req, res) => {
 
 
 exports.getTraineeTask = async(req)=>{
-    const {_id } = req.params
-    if (!_id) {
+    const { batch } = req
+    if (!batch) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Batch id not found"});
     }
-    const tasks = await TraineeTaskModel.find({batchId:_id}).populate({
+    const tasks = await TraineeTaskModel.find({batchId:batch}).populate({
         path:'trainerId',
         select:'fullName profilePic'
     });

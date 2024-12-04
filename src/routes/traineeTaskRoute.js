@@ -11,7 +11,7 @@ Router.route("/getTraineeTaskId/:_id").get(traineeTaskComtroller.getTraineeTaskI
 Router.route("/editTraineeTask/:_id").put(traineeTaskComtroller.editTraineeTask);
 Router.route("/deleteTraineeTask/:_id").delete(traineeTaskComtroller.deleteTraineeTask);
 
-Router.route("/getTraineeTask/:_id").get(traineeTaskComtroller.getTraineeTask);
+Router.route("/getTraineeTask").get(verifyAuthToken,traineeTaskComtroller.getTraineeTask);
 
 Router.route("/updateTraineeStatus/:_id").put(traineeTaskComtroller.updateTraineeStatus);
 

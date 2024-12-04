@@ -6,7 +6,7 @@ const validator = require('validator');
 const uploadCloud = require("../utils/uploadCloud");
 const TraineeDetailsModel = require("../models/traineeDetails");
 const utils = require("../utils/utils");
-const AssignedBatchModel = require("../models/assignedBatchesModel");
+const {AssignedBatchModel} = require("../models/assignedBatchesModel");
 const BatchModel = require("../models/batchModel");
 
 
@@ -84,6 +84,7 @@ await newAssignBatch.save();
     fullName,
     logId,
     role,
+    batch,
     hybrid,
     password: hashedPassword
    })
