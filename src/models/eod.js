@@ -5,10 +5,15 @@ const { date } = require('joi');
 
 const eodSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
-    userName: schemaFields.requiredAndString,
+    userName:{
+        type: String
+    },
     department: schemaFields.requiredAndString,
-    uploadFile: schemaFields.requiredAndString,
-    descrption: schemaFields.requiredAndString,
+    uploadFile:{
+        type: [String],
+        required: true,
+    },
+    descryption: schemaFields.requiredAndString,
     project:{
         type:String,
         ref:'Project'
