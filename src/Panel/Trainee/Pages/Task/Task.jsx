@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Button,
@@ -17,6 +17,7 @@ import DataTable from "react-data-table-component";
 import { FaEye, FaEdit, FaTrash, FaCalendarAlt } from "react-icons/fa";
 import moment from "moment";
 import { FaBook, FaClipboardList, FaUser } from "react-icons/fa6";
+import { GetStudentTask } from "../../../../services";
 const { Title, Text } = Typography;
 
 const TraineeTask = () => {
@@ -58,6 +59,7 @@ const TraineeTask = () => {
     delete: false,
   });
   const [selectedTask, setSelectedTask] = useState(initialTaskState);
+  const [traineeTaskData, setTraineeTaskData] = useState([]);
 
   const [form] = Form.useForm();
 
@@ -160,6 +162,25 @@ const TraineeTask = () => {
     },
   };
 
+
+  //list trainee task based on batch id
+
+  const fetchTraineeTaskByBatchId = async () => {
+    try {
+      const response = await GetStudentTask();
+      console.log("response in trainee task", response)
+      if(response.data.status){
+        setTraineeTaskData(response.data.data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || "Failed to list trainee task");
+    }
+  };
+
+  useEffect(()=>{
+    fetchTraineeTaskByBatchId();
+  },[])
+
   return (
     <div className="p-4">
       {/* <button
@@ -248,7 +269,7 @@ const TraineeTask = () => {
 >
   <Row gutter={[16, 16]}>
     <Col span={24}>
-      <Title level={4}>Task Details</Title>
+      <Title level={4}>Task Detailssss</Title>
     </Col>
 
     {/* Task Title */}
