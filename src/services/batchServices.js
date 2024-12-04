@@ -1,4 +1,4 @@
-const AssignedBatchModel = require("../models/assignedBatchesModel");
+const {AssignedBatchModel} = require("../models/assignedBatchesModel");
 const BatchModel = require("../models/batchModel");
 const StaffModel = require("../models/staffModel");
 const TraineeModel = require("../models/traineeModel");
