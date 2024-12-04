@@ -9,8 +9,8 @@ const reportSchema = new mongoose.Schema({
     content: schemaFields.requiredAndString,
     reporter: { 
         type: String, 
-        ref: 'Auth', 
-        required: true 
+        ref: 'Auth',
+        required: true
     },
     reportTo: { 
         type: String, 

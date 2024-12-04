@@ -6,10 +6,13 @@ const httpStatus = require('http-status');
 
 
 exports.createReport = async(req)=>{
-    const {title, content, reportTo } = req.body
+    const {title, content, reportTo,} = req.body
+    const { accountId } = req;
 
-    const reportedToUser = await Auth.findOne({fullName:reportTo});
+    const reportedToUser = await Auth.findOne({accountId:reportTo});
+    const reporter = await Auth.findOne({accountId});
     console.log(reportedToUser,"zzzzz");
+    console.log(reporter,"lallalla");
     
     if (!reportedToUser) {
         throw new ApiError(httpStatus.BAD_REQUEST, "The user you're reporting to does not exist.");
@@ -17,7 +20,8 @@ exports.createReport = async(req)=>{
 
     const newReport = new ReportModel({
         ...req.body,
-        reportTo: reportedToUser._id
+        reportTo: reportedToUser.accountId,
+        reporter: reporter.accountId
     })
 
     await newReport.save();
@@ -25,24 +29,24 @@ exports.createReport = async(req)=>{
 }
 
 exports.getReportAll = async(req)=>{
-    const report = await ReportModel.find().populate({
+    const report = await ReportModel.find({}).populate({
         path:'reportTo',
         select:'fullName profilePic role'
     })
-    if (!report) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Report not found")
+    if (report.length === 0) {
+        throw new ApiError(httpStatus.NOT_FOUND, "No reports found");
     }
     return report;
 }
 
 exports.getReportId = async(req)=>{
-    const { _id } = req.params;
+    const { accountId } = req;
 
-    if (!_id) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Report id Required")
+    if (!accountId) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Account id Required")
     }
 
-    const report = await ReportModel.findById(_id)
+    const report = await ReportModel.find({reporter:accountId})
     if (!report) {
         throw new ApiError(httpStatus.BAD_REQUEST, "Report not found")
     }
