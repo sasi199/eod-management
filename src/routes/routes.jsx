@@ -37,7 +37,7 @@ import Login from "../components/login";
 import SuperAssessment from "../Panel/SuperAdmin/Pages/Assessment/TrainerAssessment";
 import SuperReports from "../Panel/SuperAdmin/Pages/Report/SuperReport";
 import Task from "../Panel/SuperAdmin/Pages/Task/Task";
-import EOD from "../Panel/SuperAdmin/Pages/Task/EOD";
+// import EOD from "../Panel/SuperAdmin/Pages/Task/EOD";
 import Course from "../Panel/SuperAdmin/Pages/Course/Course";
 import TraineeTask from "../Panel/Trainee/Pages/Task/Task";
 import TrainerTask from "../Panel/Trainer/Pages/Task/Task";
@@ -45,6 +45,10 @@ import ProjectTask from "../Panel/Trainer/Pages/Task/ProjectTask";
 import StudentTask from "../Panel/Trainer/Pages/StudentTask/StudentTask";
 import MyBatch from "../Panel/Trainer/Pages/MyBatch/MyBatch";
 import TraineeAssessment from "../Panel/Trainee/Pages/Assesment/TraineeAssessment";
+
+import Profile from "../Panel/Trainer/Pages/Profile/Profile";
+import Eod from "../Panel/Trainer/Pages/EOD/Eod";
+import TrainerEod from "../Panel/Trainer/Pages/EOD/Eod";
 
 // export default pages;
 
@@ -102,10 +106,7 @@ export const pages = [
         element: <Notifications />,
       },
 
-      {
-        path: "task/eod",
-        element: <EOD />,
-      },
+    
       {
         path: "task",
         element: <Task />,
@@ -196,6 +197,15 @@ export const pages = [
         path:"studenttask",
         element: <StudentTask/>
       },
+      {
+        path:"eod",
+        element: <TrainerEod/>
+      },
+    
+      {
+        path:"profile",
+        element:<Profile/>
+      },
 
       {
         path: "syllabus",
@@ -209,14 +219,7 @@ export const pages = [
         path: "assessment",
         element: <TrainerAssessment />,
       },
-      // {
-      //   path: "attendance",
-      //   element: <TrainerAttendace />,
-      // },
-      // {
-      //   path: "attendance/create",
-      //   element: <CreatePage />,
-      // },
+    
       {
         path: "notifications",
         element: <TrainerNotificaitons />,

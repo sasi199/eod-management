@@ -79,6 +79,13 @@ const Navbar = () => {
           />
           {dropdown && (
             <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded shadow-md">
+          <Link to="/trainersidebar/profile">
+              <button
+                className="w-full px-4 py-2 text-left text-sm text-orange-600 "
+              >
+                Profile
+              </button>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="w-full px-4 py-2 text-left text-sm text-orange-600 "
@@ -227,12 +234,13 @@ const TrainerSidebar = () => {
             <MdAssignment/>
             Assessment
           </Link>
-          {/* <Link 
-            to="/trainersidebar/attendance" 
+          <Link 
+            to="/trainersidebar/eod" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
-            <FaCalendarAlt />
-            Attendance
-          </Link> */}
+            <MdAssignment/>
+           Eod
+          </Link>
+        
           <Link 
             to="/trainersidebar/syllabus" 
             className="flex items-center gap-4 px-4 text-lg font-semibold py-2 rounded-md text-white hover:bg-white hover:text-orange-600 transition-all duration-200">
