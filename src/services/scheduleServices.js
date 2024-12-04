@@ -64,13 +64,7 @@ exports.createSchedule = async (req) => {
 
 
 exports.getScheduleAll = async(req)=>{
-    const schedule = await ScheduleModel.find({}).populate({
-        path:'timeTable',
-        populate:{
-            path: 'trainer',
-            select: 'fullName profilePic'
-        }
-    })
+    const schedule = await ScheduleModel.find({})
     if (!schedule) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Schedule not found"});
     }

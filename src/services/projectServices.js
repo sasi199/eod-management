@@ -6,7 +6,7 @@ const httpStatus = require('http-status');
 
 
 exports.createProject = async(req)=>{
-    const { projectName } = req.body;
+    const { projectName,department } = req.body;
 
     const project  = await ProjectModel.findOne({projectName})
     if (project) {
@@ -25,6 +25,16 @@ exports.getProjectAll = async(req)=>{
     const project = await ProjectModel.find({})
     if (!project) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Batch not found"});
+    }
+
+    return project;
+}
+
+exports.getProject = async(req)=>{
+    const { department } = req.body
+    const project = await ProjectModel.find({department:department})
+    if (!project) {
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Project not found"});
     }
 
     return project;

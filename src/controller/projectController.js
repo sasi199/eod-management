@@ -13,6 +13,11 @@ exports.getProjectAll = catchAsync(async(req,res)=>{
     res.status(200).json({status:true, message:'projects get succesfully',data:response,})
 })
 
+exports.getProject = catchAsync(async(req,res)=>{
+    const response = await projectServices.getProject(req);
+    res.status(200).json({status:true, message:'projects get succesfully',data:response,})
+})
+
 exports.getProjectId = catchAsync(async(req,res)=>{
     const response = await projectServices.getProjectId(req);
     res.status(200).json({status:true, message:'project get succesfully',data:response,})

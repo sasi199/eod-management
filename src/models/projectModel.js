@@ -5,6 +5,7 @@ const { string } = require('joi');
 const projectSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     projectName: schemaFields.requiredAndString,
+    department: schemaFields.requiredAndString,
     description:{
         type: String
     },

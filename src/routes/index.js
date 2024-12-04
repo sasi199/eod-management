@@ -16,6 +16,7 @@ const syllabusRouter = require("../routes/syllabusRoute");
 const chatRouter = require("../routes/chatRoute");
 const traineeTaskRouter = require("../routes/traineeTaskRoute");
 const studentAttendanceRouter = require("../routes/studentAttendanceRoute");
+const eodRouter = require("../routes/eodRoute");
 
 
 
@@ -83,6 +84,10 @@ const Routes = [
   {
     path: "/studentAttendance",
     route: studentAttendanceRouter,
+  },
+  {
+    path: "/eod",
+    route: eodRouter,
   },
 
 
