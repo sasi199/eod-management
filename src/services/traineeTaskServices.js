@@ -136,13 +136,13 @@ exports.getTraineeTaskAll = async (req) => {
 
 
 exports.getTraineeTaskId = async(req)=>{
-    const { _id } = req.params;
-    if (!_id) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Task Id required"});
+    const { accountId } = req;
+    if (!accountId) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"trainer id required"});
     }
     const task = await TraineeTaskModel.aggregate([
         {
-            $match:{_id: _id},
+            $match:{trainerId: accountId},
         },
         {
             $lookup:{
