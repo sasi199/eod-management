@@ -20,150 +20,15 @@ import DataTable from "react-data-table-component";
 import { FaEye, FaEdit, FaTrash, FaCalendarAlt } from "react-icons/fa";
 import moment from "moment";
 import { FaBook, FaClipboardList, FaUser } from "react-icons/fa6";
-import { GetStudentTask } from "../../../../services";
+import { GetStudentTask, UpdateStudentStatusById } from "../../../../services";
 const { Title, Text } = Typography;
 
 const TraineeTask = () => {
-  const initialTaskState = {
-    id: null,
-    taskTitle: "",
-    batch: "",
-    student: "",
-    dueDate: "",
-    status: "",
-    description: "",
-  };
-
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      taskTitle: "Math Assignment",
-      batch: "Batch A",
-      student: "John Doe",
-      dueDate: "2024-12-01",
-      status: "Pending",
-      description: "Solve all algebra questions.",
-    },
-    {
-      id: 2,
-      taskTitle: "Science Project",
-      batch: "Batch B",
-      student: "Jane Smith",
-      dueDate: "2024-12-05",
-      status: "Completed",
-      description: "Create a volcano model.",
-    },
-  ]);
-
-  const [modals, setModals] = useState({
-    create: false,
-    view: false,
-    update: false,
-    delete: false,
-  });
-  const [selectedTask, setSelectedTask] = useState(initialTaskState);
   const [traineeTaskData, setTraineeTaskData] = useState([]);
-
+  // const [selectedTaskData, setSelectedTaskData] = useState([]);
+  const [showCompleteButton, setShowCompleteButton] = useState(false);
+  const [taskStatus, setTaskStatus] = useState();
   const [form] = Form.useForm();
-
-  const handleModalToggle = (modalType, task = null) => {
-    setSelectedTask(task || initialTaskState);
-    setModals({ ...modals, [modalType]: !modals[modalType] });
-  };
-
-  const handleCreateTask = (values) => {
-    const newTask = { ...values, id: tasks.length + 1 };
-    setTasks([...tasks, newTask]);
-    message.success("Task created successfully!");
-    handleModalToggle("create");
-  };
-
-  const handleUpdateTask = (values) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === selectedTask.id ? { ...task, ...values } : task
-    );
-    setTasks(updatedTasks);
-    message.success("Task updated successfully!");
-    handleModalToggle("update");
-  };
-
-  const handleDeleteTask = () => {
-    const filteredTasks = tasks.filter((task) => task.id !== selectedTask.id);
-    setTasks(filteredTasks);
-    message.success("Task deleted successfully!");
-    handleModalToggle("delete");
-  };
-
-  const columns = [
-    {
-      name: "S.No",
-      selector: (row, index) => index + 1,
-      sortable: false,
-      center: true,
-    },
-    {
-      name: "Task Title",
-      selector: (row) => row.taskTitle,
-      sortable: true,
-      center: true,
-    },
-    {
-      name: "Batch",
-      selector: (row) => row.batch,
-      sortable: true,
-      center: true,
-    },
-    {
-      name: "Student",
-      selector: (row) => row.student,
-      sortable: true,
-      center: true,
-    },
-    {
-      name: "Actions",
-      cell: (row) => (
-        <div className="flex gap-2 pl-6">
-          <Tooltip title="View">
-            <Button
-              className="text-green-500 border border-green-500"
-              onClick={() => handleModalToggle("view", row)}
-            >
-              <FaEye />
-            </Button>
-          </Tooltip>
-          <Tooltip title="Edit">
-            <Button
-              className="text-blue-500 border border-blue-500"
-              onClick={() => handleModalToggle("update", row)}
-            >
-              <FaEdit />
-            </Button>
-          </Tooltip>
-          {/* <Tooltip title="Delete">
-            <Button
-              className="text-red-500 border border-red-500"
-              onClick={() => handleModalToggle("delete", row)}
-            >
-              <FaTrash />
-            </Button>
-          </Tooltip> */}
-        </div>
-      ),
-      center: true,
-    },
-  ];
-
-
-  const customStyles = {
-    headCells: {
-      style: {
-        backgroundColor: "#ffA500",
-        color: "#ffffff",
-        fontSize: "16px",
-        paddingRight: "0px",
-      },
-    },
-  };
 
 
   //list trainee task based on batch id
@@ -184,39 +49,89 @@ const TraineeTask = () => {
     fetchTraineeTaskByBatchId();
   },[])
 
+  //update status of the trainee
+
+
+  const handleUpdateStatus = async(status, task) => {
+ 
+    try {
+      console.log("status",status)
+      const taskId = task._id
+      const response = await UpdateStudentStatusById({status:status},taskId);
+      if(response.data.status){
+        message.success(`Task ${status} successfully`)
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || "Failed to update the status of task");
+      console.error(`error in update task ${status}`, error);
+    }
+  }
+
   return (
     <div className="p-4">
     
       <div className="p-6 min-h-screen">
       <h2 className="text-xl font-bold text-gray-700 mb-4">Trainee Task List</h2>
       <div className="space-y-4">
-        {traineeTaskData.map((item) => (
-          <div
-            key={item._id}
-            className="flex items-center bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
-          >
-         
-            <Avatar size={64} src={item.trainerId.profilePic} className="mr-4" />
+      {traineeTaskData.map((item) => (
+  <div
+    key={item._id}
+    className="flex items-center bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
+  >
+  
+    <Avatar size={64} src={item.trainerId.profilePic} className="mr-4" />
 
-            <div className="flex-grow">
-              <div className="flex justify-between items-center">
-             
-                <h3 className="text-lg font-semibold text-gray-800">{item.title}</h3>
-                <Tag color={item.priority === "high" ? "red": "medium"?"orange":"normal"?"green":"blue"}>
-                  {item.priority}
-                </Tag>
-              </div>
+  
+    <div className="flex justify-around w-full">
+    
+      <div className="flex flex-col justify-center items-start">
+        <h3 className="text-lg font-semibold text-gray-800">{item.title}</h3>
+        <span className="text-sm text-gray-600">Trainer: {item.trainerId.fullName}</span>
+      </div>
 
-           
-              <p className="text-gray-600">{item.description}</p>
+    
+      <div className="flex flex-col justify-center items-center">
+        <p className="text-gray-600">{item.description}</p>
+      </div>
 
-              <div className="text-sm text-gray-500 flex justify-between mt-2">
-                <span>Trainer: {item.trainerId.fullName}</span>
-                <span>Due: {new Date(item.dueDate).toLocaleDateString()}</span>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="flex flex-col justify-center items-center space-y-2">
+        {!showCompleteButton ?(
+            <button onClick={()=>{handleUpdateStatus("in progress",item); setShowCompleteButton(true)}} className="px-2 py-2 bg-orange-500 text-white w-24 rounded-md hover:bg-orange-600">
+            Start
+          </button>
+        ):(
+          <button onClick={()=>{handleUpdateStatus("completed",item); setShowCompleteButton(false)}} className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">
+          Complete
+        </button>
+        )
+
+        }
+      
+      
+     
+      </div>
+
+    
+      <div className="flex flex-col justify-center items-end">
+        <Tag
+          color={
+            item.priority === "high"
+              ? "red"
+              : item.priority === "medium"
+              ? "orange"
+              : item.priority === "normal"
+              ? "green"
+              : "blue"
+          }
+        >
+          {item.priority}
+        </Tag>
+        <span className="text-sm text-gray-500">Due: {new Date(item.dueDate).toLocaleDateString()}</span>
+      </div>
+    </div>
+  </div>
+))}
+
       </div>
     </div>
      

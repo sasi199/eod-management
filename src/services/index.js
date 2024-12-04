@@ -198,6 +198,7 @@ export const DeleteProject = async (_id) => {
 
 // report
 export const CreateReport = async (data) => {
+  console.log("data in edit",data)
   const res = await interceptors.post("/report/createReport", data);
   return res;
 };
@@ -289,8 +290,9 @@ export const GetStudentTask = async ()=>{
   return res;
 }
 
-export const UpdateStudentStatusById = async (taskId)=>{
-  const res= await interceptors.put(`traineeTask/updateTraineeStatus/${taskId}`);
+export const UpdateStudentStatusById = async (status,taskId)=>{
+  console.log("status req",status)
+  const res= await interceptors.put(`traineeTask/updateTraineeStatus/${taskId}`,status);
   return res;
 }
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import { Button, Modal, Form, Input, Avatar, Select, notification } from "antd";
-import { AllStaffs, CreateReport, DeleteReport, EditReport, GetReportAll } from "../../../../services";
+import { AllStaffs, CreateReport, DeleteReport, EditReport, GetReportAll, GetReportId } from "../../../../services";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -12,6 +12,8 @@ const TraineeReports = () => {
   const [reports, setReports] = useState([]);
   const [staffs, setStaffs] = useState([]);
   const [getReports, setGetReports] = useState([]);
+  const [listReport, setListReport] = useState(false);
+  const [selectedReport, setSelectedReport] = useState([]);
   const [editingReport, setEditingReport] = useState(null); 
   const [form] = Form.useForm();
 
@@ -63,6 +65,7 @@ const TraineeReports = () => {
             message: "Success",
             description: "Report updated successfully.",
           });
+          fetchReportById();
         }
       } else {
         const response = await CreateReport(values);
@@ -72,6 +75,7 @@ const TraineeReports = () => {
             message: "Success",
             description: "Report added successfully.",
           });
+          fetchReportById();
         }
       }
       closeModal();
@@ -90,38 +94,38 @@ const TraineeReports = () => {
     setIsReportOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    Modal.confirm({
-      title: "Are you sure you want to delete this report?",
-      content: "This action cannot be undone.",
-      okText: "Yes",
-      cancelText: "No",
-      onOk: async () => {
-        try {
-          await DeleteReport(id); // Assuming DeleteReport makes the API call
-          setReports((prevReports) =>
-            prevReports.filter((report) => report._id !== id)
-          );
-          notification.success({
-            message: "Success",
-            description: "Report deleted successfully.",
-          });
-        } catch (error) {
-          console.error("Error deleting report:", error);
-          notification.error({
-            message: "Error",
-            description: "Failed to delete the report. Please try again.",
-          });
-        }
-      },
-      onCancel: () => {
-        notification.info({
-          message: "Info",
-          description: "Deletion canceled.",
-        });
-      },
-    });
-  };
+  // const handleDelete = async (id) => {
+  //   Modal.confirm({
+  //     title: "Are you sure you want to delete this report?",
+  //     content: "This action cannot be undone.",
+  //     okText: "Yes",
+  //     cancelText: "No",
+  //     onOk: async () => {
+  //       try {
+  //         await DeleteReport(id); // Assuming DeleteReport makes the API call
+  //         setReports((prevReports) =>
+  //           prevReports.filter((report) => report._id !== id)
+  //         );
+  //         notification.success({
+  //           message: "Success",
+  //           description: "Report deleted successfully.",
+  //         });
+  //       } catch (error) {
+  //         console.error("Error deleting report:", error);
+  //         notification.error({
+  //           message: "Error",
+  //           description: "Failed to delete the report. Please try again.",
+  //         });
+  //       }
+  //     },
+  //     onCancel: () => {
+  //       notification.info({
+  //         message: "Info",
+  //         description: "Deletion canceled.",
+  //       });
+  //     },
+  //   });
+  // };
   
    
 
@@ -133,18 +137,18 @@ const TraineeReports = () => {
     {
       name: "Actions",
       cell: (row) => (
-        <div className="flex gap-4">
-          <FaEye className="text-blue-500 cursor-pointer" title="View Report" />
+        <div className="flex gap-4 ml-4">
+          {/* <FaEye className="text-blue-500 cursor-pointer" title="View Report"  onClick={()=>handleListReport(row)}/> */}
           <FaEdit
             className="text-green-500 cursor-pointer"
             title="Edit Report"
             onClick={() => handleEdit(row)}
           />
-          <FaTrash
+          {/* <FaTrash
             className="text-red-500 cursor-pointer"
             title="Delete Report"
             onClick={() => handleDelete(row._id)}
-          />
+          /> */}
         </div>
       ),
       center: true,
@@ -161,6 +165,28 @@ const TraineeReports = () => {
       },
     },
   };
+
+  const handleListReport = () => {
+    setListReport(false);
+    s
+  }
+
+  const fetchReportById = async() => {
+    try {
+      const response = await GetReportId();
+      console.log("report in",response)
+      if(response.data.status){
+        setGetReports(response.data.data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || "Failed to list the report");
+      console.error("error in list report",error);
+    }
+  };
+
+  useEffect(()=>{
+    fetchReportById();
+  },[])
 
   return (
     <div className="p-4">
@@ -217,13 +243,13 @@ const TraineeReports = () => {
             <TextArea rows={4} placeholder="Enter report content" />
           </Form.Item>
 
-          <Form.Item
+          {/* <Form.Item
             label="Reporter"
             name="reporter"
             rules={[{ required: true, message: "Please enter the reporter name!" }]}
           >
             <Input placeholder="Enter reporter name" />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item
             label="Report To"
@@ -232,7 +258,7 @@ const TraineeReports = () => {
           >
             <Select placeholder="Select person" allowClear>
               {staffs.map((staff) => (
-                <Option key={staff.id} value={staff.fullName}>
+                <Option key={staff.id} value={staff._id}>
                   <Avatar src={staff.profilePic} size={32} className="mr-2" />
                   {staff.fullName}
                 </Option>
@@ -246,6 +272,13 @@ const TraineeReports = () => {
             </button>
           </Form.Item>
         </Form>
+      </Modal>
+      <Modal
+      open={listReport}
+      onCancel={handleListReport}
+      footer={null}
+      >
+
       </Modal>
     </div>
   );
