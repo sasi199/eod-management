@@ -42,6 +42,7 @@ const Staffs = () => {
     qualification: "",
     dob: "",
     experience: "",
+    department: "",
     hybrid: "",
     role: "",
     password: "",
@@ -98,6 +99,7 @@ const Staffs = () => {
     formData.append("qualification", values.qualification);
     formData.append("dob", values.dob);
     formData.append("experience", values.experience);
+    formData.append("department", values.department);
     formData.append("hybrid", values.hybrid);
     formData.append("role", values.role);
     formData.append("password", values.password);
@@ -142,6 +144,7 @@ const Staffs = () => {
       qualification: staff.qualification,
       dob: staff.dob,
       experience: staff.experience,
+      department: staff.department,
       hybrid: staff.hybrid,
       role: staff.role,
       password: staff.password,
@@ -160,6 +163,7 @@ const Staffs = () => {
     editFormData.append("qualification", editStaff.qualification);
     editFormData.append("dob", editStaff.dob);
     editFormData.append("experience", editStaff.experience);
+    editFormData.append("department", editStaff.department);
     editFormData.append("hybrid", editStaff.hybrid);
     editFormData.append("role", editStaff.role);
     // editFormData.append("password", editStaff.password);
@@ -426,6 +430,19 @@ const Staffs = () => {
               <Option value="1 to 3">1 to 3</Option>
               <Option value="3 to 5">3 to 5</Option>
               <Option value="5+">5+</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="Department"
+            name="department"
+            className="col-span-1"
+          >
+            <Select className="w-full">
+              <Option value="DEV-Team">DEV-Team</Option>
+              <Option value="DM-Team">DM-Team</Option>
+              <Option value="SALES-Team">SALES-Team</Option>
+              <Option value="MARKETING-Team">MARKETING-Team</Option>
+              <Option value="PLACEMENT-Team">PLACEMENT-Team</Option>
             </Select>
           </Form.Item>
 
@@ -746,6 +763,22 @@ const Staffs = () => {
                 <Option value="5+">5+</Option>
               </Select>
             </Form.Item>
+            <Form.Item
+            label="Department"
+          
+            className="col-span-1"
+          >
+            <Select className="w-full"
+             value={editStaff.department}
+             onChange={(value)=> SetEditStaff({...editStaff, department: value})}
+             >
+              <Option value="DEV-Team">DEV-Team</Option>
+              <Option value="DM-Team">DM-Team</Option>
+              <Option value="SALES-Team">SALES-Team</Option>
+              <Option value="MARKETING-Team">MARKETING-Team</Option>
+              <Option value="PLACEMENT-Team">PLACEMENT-Team</Option>
+            </Select>
+          </Form.Item>
 
             <Form.Item
               label="Hybrid"
