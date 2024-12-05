@@ -49,6 +49,7 @@ import TraineeAssessment from "../Panel/Trainee/Pages/Assesment/TraineeAssessmen
 import Profile from "../Panel/Trainer/Pages/Profile/Profile";
 import Eod from "../Panel/Trainer/Pages/EOD/Eod";
 import TrainerEod from "../Panel/Trainer/Pages/EOD/Eod";
+import SuperEod from "../Panel/SuperAdmin/Pages/EOD/SuperEod";
 
 // export default pages;
 
@@ -87,6 +88,10 @@ export const pages = [
       {
         path: "trainer",
         element: <Trainer />,
+      },
+      {
+        path: "SuperEod",
+        element: <SuperEod />,
       },
       {
         path: "trainee",

@@ -295,6 +295,17 @@ const Sidebar = () => {
               Assessment
             </Link>
             <Link
+              to="/sidebar/SuperEod"
+              className={`${
+                isActive("/sidebar/SuperEod")
+                  ? "text-orange-600 bg-white"
+                  : ""
+              } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
+            >
+              <GiNotebook size={24}/>
+              EOD
+            </Link>
+            <Link
               to="/sidebar/notifications"
               className={`${
                 isActive("/sidebar/notifications")

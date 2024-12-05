@@ -252,14 +252,11 @@ import {
   Select,
   DatePicker,
   message,
-  Table,
 } from "antd";
-import {
-  AllStaffs,
-  GetBatches,
-  getSchedule,
-  createSchedule,
-} from "../../../../services";
+
+import { AllStaffs, GetBatches, createSchedule, getSchedule } from "../../../../services";
+import { MdOutlinePauseCircleOutline } from "react-icons/md";
+import { FaPlus } from "react-icons/fa";
 
 const { Option } = Select;
 
@@ -267,7 +264,7 @@ const Schedule = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [batches, setBatches] = useState([]);
   const [staffs, setStaffs] = useState([]);
-  const [scheduleData, setScheduleData] = useState([]); 
+  const[schedule,setSchedule] = useState([]);
   const [form] = Form.useForm();
 
   const handleOpenModal = () => setIsModalOpen(true);
@@ -300,7 +297,6 @@ const Schedule = () => {
         message.success("Schedule added successfully!");
         form.resetFields();
         handleCloseModal();
-        fetchSchedule(); 
       } else {
         message.error("Failed to add schedule. Please try again.");
       }
@@ -331,97 +327,25 @@ const Schedule = () => {
       }
     };
 
-    const fetchSchedule = async () => {
-      try {
-        const response = await getSchedule(); 
-        setScheduleData(response.data); 
-        console.log(response.data);
-      } catch (error) {
-        console.error("Error fetching schedule:", error.message);
-      }
-    };
-
     fetchBatches();
     fetchStaffs();
-    fetchSchedule(); 
   }, []);
 
-  const columns = [
-    {
-      title: "Batch",
-      dataIndex: "batchName",
-      key: "batchName",
-    },
-    {
-      title: "Course Name",
-      dataIndex: "courseName",
-      key: "courseName",
-    },
-    {
-      title: "Batch Timings",
-      dataIndex: "batchTimings",
-      key: "batchTimings",
-    },
-    {
-      title: "Trainer",
-      dataIndex: "trainer",
-      key: "trainer",
-      render: (trainerId) => {
-        const trainer = staffs.find((staff) => staff._id === trainerId);
-        return trainer ? (
-          <div className="flex items-center">
-            <img
-              src={trainer.profilePic}
-              alt={trainer.fullName}
-              className="w-10 h-10 rounded-full object-cover mr-2"
-            />
-            {trainer.fullName}
-          </div>
-        ) : (
-          "N/A"
-        );
-      },
-    },
-    {
-      title: "Trainees",
-      dataIndex: "trainees",
-      key: "trainees",
-      render: (traineeList) => (
-        <div>
-          {traineeList.map((trainee) => (
-            <div key={trainee._id} className="flex items-center">
-              <img
-                src={trainee.profilePic}
-                alt={trainee.fullName}
-                className="w-8 h-8 rounded-full object-cover mr-2"
-              />
-              {trainee.fullName}
-            </div>
-          ))}
-        </div>
-      ),
-    },
-    {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: () => <Button type="link">View More</Button>,
-    },
-  ];
-
-  const timetableData = scheduleData.map((schedule) => ({
-    key: schedule._id,
-    batchName: schedule.batchName,
-    courseName: schedule.courseName,
-    batchTimings: schedule.batchTimings,
-    trainer: schedule.trainerDetails[0]?._id, 
-    trainees: schedule.traineeDetails, 
-    date: schedule.date,
-  }));
+  useEffect(()=>{
+    const fetchSchedule = async ()=>{
+      try {
+        
+        const response = await getSchedule();
+        setSchedule(response.data.data);
+        console.log(response.data.data,"gopi");
+  
+      } catch (error) {
+        console.log("erro in getschedule",error.message);
+      }
+    }
+fetchSchedule();
+  },[])
+ 
 
   return (
     <div className="p-4">
@@ -576,7 +500,7 @@ const Schedule = () => {
                     <Button
                       type="dashed"
                       onClick={() => remove(name)}
-                      icon={<MinusCircleOutlined />}
+                      icon={<MdOutlinePauseCircleOutline />}
                     >
                       Remove
                     </Button>
@@ -586,7 +510,7 @@ const Schedule = () => {
                 <Button
                   type="dashed"
                   onClick={() => add()}
-                  icon={<PlusOutlined />}
+                  icon={<FaPlus />}
                   className="w-full"
                 >
                   Add timetable entry
@@ -602,16 +526,6 @@ const Schedule = () => {
           </Form.Item>
         </Form>
       </Modal>
-
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold">Timetable</h2>
-        <Table
-          dataSource={timetableData}
-          columns={columns}
-          rowKey="key"
-          pagination={false}
-        />
-      </div>
     </div>
   );
 };
