@@ -30,8 +30,10 @@ const attendanceSchema = new mongoose.Schema({
         default: 'Present'
     },
     islate: schemaFields.BooleanWithDefault,
-    // comments: {...schemaFields.requiredAndString},
-    // createdBy:schemaFields.UUIDIdReference('superAdmin'),
+    modifiedBy:{
+        type: String,
+        ref: 'Auth',
+    },
     permission:{
         type: String,
         enum: ["write"],

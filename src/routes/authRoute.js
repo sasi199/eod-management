@@ -7,6 +7,8 @@ const Router = express.Router();
 
 Router.route('/login').post(auth.authLogin);
 Router.route('/getAttendance').get(auth.getAttendance);
+Router.route('/getTraineeAttendance').get(verifyAuthToken,auth.getTraineeAttendance);
+Router.route('/editTraineeAttendance/:_id').put(verifyAuthToken,auth.editTraineeAttendance);
 Router.route('/logout').post(verifyAuthToken,auth.logoutUser);
 
 Router.route('/createAuth').post(auth.authCreation);

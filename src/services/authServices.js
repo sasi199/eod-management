@@ -2,6 +2,8 @@ const config = require("../config/config");
 const { AssignedBatchModel } = require("../models/assignedBatchesModel");
 const AttendanceModel = require("../models/attendance");
 const Auth = require("../models/authModel");
+const StaffModel = require("../models/staffModel");
+const TraineeModel = require("../models/traineeModel");
 const ApiError = require("../utils/apiError");
 const utils = require("../utils/utils");
 const httpStatus = require('http-status');
@@ -43,7 +45,7 @@ exports.loginByEmailAndLogId = async(req)=>{
       }   
 
         const newAttendance = new AttendanceModel({
-          user: user._id,
+          user: user.accountId,
           date: today,
           checkIn: now,
           status: workStart > now ? "Late" : "Present",
@@ -79,6 +81,73 @@ exports.getAttendance = async(req)=>{
   }
 
   return attendance;
+}
+
+exports.getTraineeAttendance = async(req)=>{
+  const { accountId } = req
+
+  const assignedBatches = await AssignedBatchModel.find({ trainer: accountId }).select('batchId');
+    if (!assignedBatches || assignedBatches.length === 0) {
+        throw new ApiError(httpStatus.NOT_FOUND, { message: "No batches assigned to this trainer" });
+    }
+
+    console.log(assignedBatches,"aaaaaaaaaa");
+
+    const batchIds = assignedBatches.map(batch => batch.batchId);
+
+    const trainees = await TraineeModel.find({batch:{$in:batchIds}}).select('_id');
+    if (!trainees || trainees.length === 0) {
+      throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainee not found"});
+    }
+    console.log(trainees,"ddddddddd");
+    
+    const traineeIds = trainees.map(trainee => trainee._id);
+
+    const authAccounts = await Auth.find({
+      accountId: { $in: traineeIds },
+  }).select('accountId');
+  
+  const authAccountIds = authAccounts.map(account => account._id);
+
+  const traineeAttendance = await AttendanceModel.find({
+    'user': {$in: authAccountIds},
+  }).populate({
+    path: 'user',
+    select: 'fullName profilePic role',
+  })
+
+  console.log(traineeAttendance,"lalalalalla");
+  
+
+  if (!traineeAttendance || traineeAttendance.length === 0) {
+    throw new ApiError(httpStatus.BAD_REQUEST, {message:"No attendance records found for these trainees"});
+  }
+
+  return traineeAttendance;
+}
+
+
+exports.editTraineeAttendance = async(req)=>{
+  const { date, status, } = req.body;
+  const { _id } = req.params;
+  const { accountId } = req;
+
+  const trainer = await StaffModel.findOne({ _id: accountId, isTrainer:true});
+    if (!trainer) {
+        throw new ApiError(httpStatus.FORBIDDEN, { message: "Only trainers can modify attendance" });
+    }
+
+    const attendance = await AttendanceModel.findById({ _id:_id, date });
+    if (!attendance) {
+        throw new ApiError(httpStatus.NOT_FOUND, { message: "Attendance record not found for the given trainee and date" });
+    }
+
+    if (status) attendance.status = status;
+    attendance.modifiedBy = trainer;
+
+    await attendance.save();
+
+    return attendance;
 }
 
 

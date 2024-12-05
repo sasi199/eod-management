@@ -37,3 +37,8 @@ exports.staffCount = catchAsync (async(req,res)=>{
     const response = await staffServices.staffCount(req)
     res.status(200).json({status:true, message:'Staff count get succesfully',data:response,})
 })
+
+exports.staffProfile = catchAsync (async(req,res)=>{
+    const response = await staffServices.staffProfile(req)
+    res.status(200).json({status:true, message:'Profile get succesfully',data:response,})
+})

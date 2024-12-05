@@ -204,3 +204,15 @@ exports.staffCount = async(req)=>{
 
     return staff;
 }
+
+exports.staffProfile = async (req)=>{
+    const { accountId } = req;
+
+    const staff = await  StaffModel.findById(accountId);
+
+    if (!staff) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainee not found"});
+    }
+
+    return staff;
+}
