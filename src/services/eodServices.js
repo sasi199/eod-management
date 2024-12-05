@@ -17,7 +17,7 @@ exports.createEod = async(req)=>{
     }
    }
 
-    const user = await Auth.findOne({accountId});
+    const user = await Auth.findOne({accountId:accountId});
     if (!user) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "User not found"});
     }
@@ -54,7 +54,7 @@ exports.createEod = async(req)=>{
 
     const newEod = new EodModel({
         project,
-        userName: user,
+        userName: user.accountId,
         department,
         uploadFile,
         description,
@@ -66,15 +66,23 @@ exports.createEod = async(req)=>{
     return newEod;
 }
 
-exports.getEodAll = async () => {
-    const eods = await EodModel.find().populate("userName").populate("project");
+exports.getEodAll = async (req) => {
+    const eods = await EodModel.find({}).populate("userName").populate("project");
     return eods;
 };
 
 
-exports.getEodById = async (id) => {
-    const eod = await EodModel.findById(id).populate("userName").populate("project");
-    if (!eod) {
+exports.getEodById = async (req) => {
+    const { accountId } = req
+    console.log("kakakaka",accountId);
+    
+    const eod = await EodModel.find({userName:accountId}).populate({
+        path:'userName',
+        select:'fullName profilePic'
+    })
+    console.log(eod,"ooooooo");
+    
+    if (!eod || eod.length === 0) {
         throw new ApiError(httpStatus.NOT_FOUND, { message: "EOD not found" });
     }
     return eod;

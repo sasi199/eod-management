@@ -116,7 +116,7 @@ const verifyAuthToken = async (req, res, next) => {
     req.user = result.user
     req.batch = result.user.batch
     req.accountId = result.user.accountId
-    console.log(result.userId,"ahsjsgbw");
+    console.log(result.userId,"aaaa");
     console.log(result.user,"resulteeee");
     console.log(result.user.batch,"batchee");
     console.log(result.user.accountId,"Acount");

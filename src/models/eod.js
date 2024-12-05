@@ -6,7 +6,8 @@ const { date } = require('joi');
 const eodSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     userName:{
-        type: String
+        type: String,
+        ref:'Auth'
     },
     department: schemaFields.requiredAndString,
     uploadFile:{

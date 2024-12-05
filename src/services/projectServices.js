@@ -2,6 +2,7 @@ const ProjectModel = require("../models/projectModel");
 const TaskModel = require("../models/taskModel");
 const ApiError = require("../utils/apiError");
 const httpStatus = require('http-status');
+const StaffModel = require('../models/staffModel');
 
 
 
@@ -41,6 +42,7 @@ exports.getProject = async(req)=>{
 }
 
 exports.getProjectId = async(req)=>{
+    const { accountId } = req
     const { _id } = req.params
     console.log(req.params,"nnnn");
     
@@ -48,8 +50,15 @@ exports.getProjectId = async(req)=>{
     if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Project id required"});
     }
+    
+    const user = await StaffModel.findOne({_id:accountId });
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, { message: "User not found" });
+    }
 
-    const project = await ProjectModel.findById(_id)
+    const userDepartment = user.department;
+
+    const projects = await ProjectModel.find({ department: userDepartment });
     return project;
 }
 
