@@ -1,8 +1,8 @@
 import Modal from 'antd/es/modal/Modal';
 import React, { useEffect, useState } from 'react';
-import { CreateProject, DeleteProject, EditProjectId, GetProjects } from '../../../../services';
+import { CreateProject, DeleteProject, EditProjectId, GetProjectById, GetProjects } from '../../../../services';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Input, message } from 'antd';
+import { Button, Form, Input, message, Select } from 'antd';
 import { FaDeleteLeft, FaFolderOpen } from 'react-icons/fa6';
 import { FaEdit } from 'react-icons/fa';
 import ProjectTask from './ProjectTask';
@@ -13,7 +13,8 @@ import { store } from '../../../../Redux/Store';
 const TrainerTask = () => {
 
   const projectInitialState = {
-    projectName:""
+    projectName:"",
+    department:""
   };
 
   const[isModalVisible, setIsModalVisible]=useState(false);//project modal
@@ -22,7 +23,7 @@ const TrainerTask = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [projectData, setProjectData] = useState([]);
   const [isDeleteModalVisible, setisDeleteModalVisible] = useState(false);
-  
+  const [form] = Form.useForm();
 
   const location = useLocation();
   let isProjectDataFetched = false;
@@ -43,7 +44,7 @@ const TrainerTask = () => {
    const fetchProjects = () => {
 
     console.warn("location",location.pathname)
-    GetProjects()
+    GetProjectById()
     .then((res)=>{
       setProjectData(res.data.data);
       isProjectDataFetched = true;
@@ -54,6 +55,21 @@ const TrainerTask = () => {
     })
   }
 
+  const handleInputChange = (e) => {
+  const  {name, value} = e.target;
+    setProjectName((prev)=>({
+      ...prev,
+      [name]:value
+    }))
+  };
+
+  const handleSelectChange = (fieldName, value) => {
+    setProjectName((prev)=>({
+      ...prev,
+      [fieldName]: value
+    }))
+  }
+
   //project create
   const handleOk = () => {
     console.log('Project add:', projectName);
@@ -62,7 +78,8 @@ const TrainerTask = () => {
     .then((res)=>{
       if(res.data.status){
        message.success("Project added successfully");
-       setProjectName(projectInitialState);
+      //  form.resetFields(); 
+       setProjectName(projectInitialState); 
       setIsModalVisible(false);
       fetchProjects();
       } 
@@ -107,7 +124,12 @@ const TrainerTask = () => {
   }
 
   const handleEditProject = (project) =>{
-    setSelectedProject(project);
+    console.log("project", project)
+    setSelectedProject({
+      ...project,
+      projectName: project.projectName,
+      department: project.department,
+    });
     setIsEditModalVisible(true);
     setProjectName({projectName:project.projectName});
   };
@@ -118,8 +140,9 @@ const TrainerTask = () => {
   }
 
   const handleCancel = () => {
+    form.resetFields(); 
     setIsModalVisible(false);
-    setProjectName(projectInitialState);
+    // setProjectName(projectInitialState); 
     
   };
 
@@ -237,24 +260,55 @@ const handleDeleteCancel = () => {
          onCancel={handleCancel}
          footer={null}
        >
+        <Form
+        layout='vertical'
+        onFinish={handleOk}
+        form={form}
+        initialValues={{
+          projectName:projectName?.projectName,
+          department:projectName?.department
+        }}
+        >
          <div className="space-y-4">
            <div>
-             <label className="block text-sm font-semibold mb-2 py-1">Project Name</label>
-             <Input
-             name='projectName'
-               value={projectName.projectName}
-               onChange={(e) =>  setProjectName({ ...projectName, projectName: e.target.value })}
-               placeholder="Enter project name"
-             />
+           <Form.Item
+  label="Project Name"
+  name="projectName"
+  rules={[{ required: true, message: "Please enter the project name" }]}
+>
+  <Input
+    name="projectName" // This ensures the correct form handling
+    value={selectedProject?.projectName} // Controlled input value
+    onChange={handleInputChange} // Updates the state on change
+    placeholder="Enter project name"
+  />
+</Form.Item>     
            </div>
+           
+           <Form.Item
+          label="Department"
+          name="department"
+          rules={[{ required: true, message: "Please choose your department" }]}
+        >
+          <Select placeholder="Select your department"
+          value={selectedProject?.department}
+          onChange={(value)=> handleSelectChange("department",value)}>
+            <Select.Option value="DEV-Team">Dev Team</Select.Option>
+            <Select.Option value="DM-Team">DM Team</Select.Option>
+            <Select.Option value="Marketing">Marketing</Select.Option>
+            <Select.Option value="Sales">Sales</Select.Option>
+            <Select.Option value="Placement">Placement</Select.Option>
+          </Select>
+        </Form.Item>
  
            <div className="flex justify-start gap-4 mt-6 pt-1 ">
              {/* <Button onClick={handleCancel}>Cancel</Button> */}
-             <Button type="primary" onClick={handleOk}>
+             <Button type="primary" htmlType='submit'>
                Create Project
              </Button>
            </div>
          </div>
+         </Form>
        </Modal>
     </div>
 
@@ -263,26 +317,61 @@ const handleDeleteCancel = () => {
         <Modal
          title="Edit Project"
          open={isEditModalVisible}
-         onOk={handleEditOk}
+        //  onOk={handleEditOk}
          onCancel={handleEditCancel}
          footer={null}
        >
          <div className="space-y-4">
            <div>
-             <label className="block text-sm font-semibold mb-2 py-1">Project Name</label>
-             <Input
-             name='projectName'
-               value={projectName.projectName}
-               onChange={(e) =>  setProjectName({ ...projectName, projectName: e.target.value })}
-               placeholder="Enter project name"
-             />
+           <Form
+        layout='vertical'
+        onFinish={handleEditOk}
+        form={form}
+        initialValues={{
+          projectName:selectedProject?.projectName,
+          department:selectedProject?.department
+        }}
+        >
+         <div className="space-y-4">
+           <div>
+           <Form.Item
+  label="Project Name"
+  name="projectName"
+  rules={[{ required: true, message: "Please enter the project name" }]}
+>
+  <Input
+    name="projectName" // This ensures the correct form handling
+    value={selectedProject?.projectName} // Controlled input value
+    onChange={handleInputChange} // Updates the state on change
+    placeholder="Enter project name"
+  />
+</Form.Item>     
            </div>
+           
+           <Form.Item
+          label="Department"
+          name="department"
+          rules={[{ required: true, message: "Please choose your department" }]}
+        >
+          <Select placeholder="Select your department"
+          value={selectedProject?.department}
+          onChange={(value)=> handleSelectChange("department",value)}>
+            <Select.Option value="DEV-Team">Dev Team</Select.Option>
+            <Select.Option value="DM-Team">DM Team</Select.Option>
+            <Select.Option value="Marketing">Marketing</Select.Option>
+            <Select.Option value="Sales">Sales</Select.Option>
+            <Select.Option value="Placement">Placement</Select.Option>
+          </Select>
+        </Form.Item>
  
            <div className="flex justify-start gap-4 mt-6 pt-1 ">
              {/* <Button onClick={handleCancel}>Cancel</Button> */}
-             <Button type="primary" onClick={handleEditOk}>
+             <Button type="primary" htmlType='submit'>
                Update Project
              </Button>
+           </div>
+         </div>
+         </Form>
            </div>
          </div>
        </Modal>

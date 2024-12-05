@@ -181,8 +181,8 @@ export const GetProjects = async () => {
   return res;
 };
 
-export const GetProjectById = async (id) => {
-  const res = await interceptors.get(`/project/getProjectId/:${id}`);
+export const GetProjectById = async () => {
+  const res = await interceptors.get(`project/getProjectId`);
   return res;
 }
 
@@ -310,3 +310,26 @@ export const getSchedule = async ()=>{
   const res = await interceptors.get("/schedule/getScheduleAll")
   return res;
 }
+
+
+//EOD
+
+export const CreateEod = async(data) => {
+  const res = await interceptors.post("eod/createEod",data);
+  return res;
+}
+
+export const GetEodAll = async() => {
+  const res = await interceptors.get("eod/getEodAll");
+  return res;
+}
+export const GetEodById = async() => {
+  const res = await interceptors.get("eod/getEodId");
+  return res;
+}
+
+export const EditEodById = async(data,eodId) => {
+  const res = await interceptors.get(`eod/editEod/${eodId}`, data);
+  return res;
+}
+
