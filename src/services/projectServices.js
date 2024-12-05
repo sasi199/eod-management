@@ -43,22 +43,15 @@ exports.getProject = async(req)=>{
 
 exports.getProjectId = async(req)=>{
     const { accountId } = req
-    const { _id } = req.params
-    console.log(req.params,"nnnn");
-    
-    
-    if (!_id) {
-        throw new ApiError(httpStatus.BAD_REQUEST,{message: "Project id required"});
-    }
-    
-    const user = await StaffModel.findOne({_id:accountId });
+
+    const user = await StaffModel.findOne({accountId});
     if (!user) {
         throw new ApiError(httpStatus.NOT_FOUND, { message: "User not found" });
     }
 
     const userDepartment = user.department;
 
-    const projects = await ProjectModel.find({ department: userDepartment });
+    const project = await ProjectModel.find({ department: userDepartment });
     return project;
 }
 
