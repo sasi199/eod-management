@@ -7,7 +7,7 @@ const eodSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     userName:{
         type: String,
-        ref:'Auth'
+        ref:'Staff'
     },
     department: schemaFields.requiredAndString,
     uploadFile:{
