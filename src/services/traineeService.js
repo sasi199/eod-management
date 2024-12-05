@@ -21,7 +21,6 @@ const generateTraineeLogId = async () => {
  };
 
 
-
 exports.createTrainee = async(req)=>{
     const {auth} = req;
     const { email, fullName, password,role,hybrid,batch} = req.body
@@ -198,4 +197,17 @@ exports.traineeCount = async(req)=>{
     }
 
     return trainee;
+}
+
+
+exports.traineeProfile = async(req)=>{
+    const { accountId } = req
+
+    const trainee = await TraineeModel.findById(accountId);
+    if (!trainee) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainee not found"});
+    }
+
+    return trainee;
+
 }

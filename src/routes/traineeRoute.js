@@ -22,6 +22,7 @@ Router.route('/getTraineeId/:_id').get(traineeController.getTraineeId);
 Router.route('/editTrainee/:_id').put(uploads.single('profilePic'),traineeController.editTrainee);
 Router.route('/deleteTrainee/:_id').delete(traineeController.deleteTrainee);
 Router.route('/traineeCount').get(traineeController.traineeCount);
+Router.route('/traineeProfile').get(verifyAuthToken,traineeController.traineeProfile);
 
 
 module.exports = Router;

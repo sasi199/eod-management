@@ -30,21 +30,25 @@ const generateBatchId = async (courseName)=>{
     return `${prefix}-ID-${formattedId}`
 }
 
-const generateBatchName = () =>{
+const generateBatchName = async() =>{
     const now = new Date();
     const options = { month: 'short'};
     const month = new Intl.DateTimeFormat('en-us', options).format(now);
     const date = now.getDate();
     const year = now.getFullYear();
 
-    return `${month}-${date}-${year}`
+     const baseName = `${month}-${date}-${year}`;
+
+     const count = await BatchModel.countDocuments({ batchName: { $regex: `^${baseName}` } });
+
+     return `${baseName}-${count + 1}`;
 }
 
 
 exports.createBatch = async(req)=>{
     const { authId } = req
     
-    const { courseName, courseDuration, batchTimings, trainer, trainee } = req.body
+    const { courseName, courseDuration, batchTimings, trainer,} = req.body
     console.log(req.body,"eeeeeeeeee");
     
 

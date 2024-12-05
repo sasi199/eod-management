@@ -32,3 +32,8 @@ exports.traineeCount = catchAsync(async(req,res)=>{
     const response = await traineeService.traineeCount(req)
     res.status(200).json({status:true, message:'Trainee count get succesfully',data:response,})
 })
+
+exports.traineeProfile = catchAsync(async(req,res)=>{
+    const response = await traineeService.traineeProfile(req)
+    res.status(200).json({status:true, message:'TraineeProfile  get succesfully',data:response,})
+})

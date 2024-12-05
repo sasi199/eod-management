@@ -67,8 +67,16 @@ exports.createEod = async(req)=>{
 }
 
 exports.getEodAll = async (req) => {
-    const eods = await EodModel.find({}).populate("userName").populate("project");
-    return eods;
+    const eod = await EodModel.find({}).populate({
+        path:'userName',
+        select:'fullName profilePic'
+    })
+
+    if (!eod) {
+        throw new ApiError(httpStatus.NOT_FOUND, { message: "EOD not found" });
+    }
+    
+    return eod;
 };
 
 
