@@ -94,8 +94,14 @@ exports.editEod = async(req)=>{
     const { accountId } = req;
     const { _id } = req.params;
 
-    const eod = await EodModel.findById(id);
-    if (!eod) {
+    const user = await EodModel.findOne({userName:accountId});
+    console.log(user,"alalal");
+    
+    const eod = await EodModel.findById(_id);
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, { message: "this user not found that eod" });
+    }
+    if (!_id) {
         throw new ApiError(httpStatus.NOT_FOUND, { message: "EOD not found" });
     }
 
