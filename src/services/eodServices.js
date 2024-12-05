@@ -9,11 +9,13 @@ const uploadCloud = require("../utils/uploadCloud");
 exports.createEod = async(req)=>{
     const { project, department,description, links} = req.body
     const { accountId } = req
-
+    if ((department === 'Dev-Team' || department === 'DM-Team') && project) {
+       
     const projects = await ProjectModel.findOne({projectName:project});
     if (!projects) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Project not found"});
     }
+   }
 
     const user = await Auth.findOne({accountId});
     if (!user) {
@@ -21,7 +23,7 @@ exports.createEod = async(req)=>{
     }
 
     let uploadFile =[]
-    if (req.files.uploadFile && req.files.uploadFile && req.files.uploadFile.length > 0) {
+    if (req.files?.uploadFile?.length > 0)  {
 
         const uploadPromises = req.files.uploadFile.map(async(file)=>{
             const fileExtension = file.originalname.split('.').pop();
@@ -35,13 +37,16 @@ exports.createEod = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "No files uploaded" });
     }
     }
-
+    
+    // if (uploadFile.length === 0) {
+    //     throw new ApiError(httpStatus.BAD_REQUEST, { message: "No files uploaded" });
+    // }
     let linkArray = [];
     if(links){
       
         linkArray = Array.isArray(links) ? links : JSON.parse(links);
         if (linkArray.length === 0) {
-            throw new ApiError(httpStatus.BAD_REQUEST, { message: "No links uploaded" });
+            throw new ApiError(httpStatus.BAD_REQUEST, { message: "No files uploaded" });
         }
       }
 
