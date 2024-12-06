@@ -121,9 +121,9 @@ class Utils {
     return await bcrypt.compare(password, hashedPassword);
   }
 
-  sendEmail(sendTo,subject,htmlData){
+  async sendEmail(fromEmail,subject,htmlData){
 
-    if(!sendTo){
+    if(!fromEmail){
       return {status:false, message: "Mail id is not provided" }
     }
     if(!htmlData){
@@ -135,12 +135,14 @@ class Utils {
     });
 
     const emailOption = {
-      from: config.email.smtp.auth.from,
-      to: sendTo,
-      subject: subject||"Mail from isthri kart",
+      from: config.email.from,
+      to: config.email.hrEmail,
+      subject: subject,
       html: htmlData}
 
-      const isMailSent =  transport.sendMail(emailOption);
+      const isMailSent = await transport.sendMail(emailOption);
+      console.log(isMailSent,"lllll");
+      
       if (!isMailSent) {
         return {status:false, message: "Unable to sent the Email" };
       }

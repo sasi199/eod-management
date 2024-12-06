@@ -31,7 +31,7 @@ exports.createTask = async(req)=>{
     const newTask = new TaskModel({
         ...req.body,
         projectId: project._id,
-        assignees: assigneeId._id
+        assignees: [assigneeId._id]
     })
 
     await newTask.save();
