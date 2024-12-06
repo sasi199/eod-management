@@ -45,7 +45,7 @@ exports.loginByEmailAndLogId = async(req)=>{
       }   
 
         const newAttendance = new AttendanceModel({
-          user: user.accountId,
+          user: user._id,
           date: today,
           checkIn: now,
           status: workStart > now ? "Late" : "Present",
@@ -206,8 +206,11 @@ exports.authCreation = async(req)=>{
 
     const newAuth = await Auth.create({
         ...req.body,
-        password: hashedPassword
+        password: hashedPassword,
     })
+
+    newAuth.accountId = newAuth._id;
+
     await newAuth.save();
     return newAuth;
 }

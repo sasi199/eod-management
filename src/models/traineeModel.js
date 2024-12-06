@@ -22,11 +22,11 @@ const traineeSchema = new mongoose.Schema({
     // resumeUpload: schemaFields.requiredAndString,
     isActive: schemaFields.BooleanWithDefault,
     hybrid: schemaFields.StringWithEnumAndRequired(['Online','Offline','WFH']),
-    // assignedBatch:{
-    //     type: String,
-    //     ref: 'Batch'
-    // },
     // designation:schemaFields.requiredAndString,
+    department: schemaFields.StringWithEnumAndRequired([
+        'FSD-Trainee',
+        'DM-Trainee',
+    ]),
     qualification:schemaFields.requiredAndString,
     experience: schemaFields.StringWithEnumAndRequired(['0 to 1', '1 to 3', '3 to 5', '5+']),
     role: schemaFields.StringWithEnumAndRequired(["Admin","SuperAdmin","Trainer","Trainee"]),

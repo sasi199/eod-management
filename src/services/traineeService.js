@@ -81,6 +81,7 @@ await newAssignBatch.save();
     email,
     profilePic,
     fullName,
+    department,
     logId,
     role,
     batch,

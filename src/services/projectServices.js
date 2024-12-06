@@ -7,6 +7,7 @@ const StaffModel = require('../models/staffModel');
 
 
 exports.createProject = async(req)=>{
+    const { accountId } = req
     const { projectName,department } = req.body;
 
     const project  = await ProjectModel.findOne({projectName})

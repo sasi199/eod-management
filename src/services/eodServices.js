@@ -7,7 +7,7 @@ const uploadCloud = require("../utils/uploadCloud");
 
 
 exports.createEod = async(req)=>{
-    const { project, department,description, links} = req.body
+    const { project, department,description, links, } = req.body
     const { accountId } = req
     if ((department === 'Dev-Team' || department === 'DM-Team') && project) {
        
@@ -67,7 +67,11 @@ exports.createEod = async(req)=>{
 }
 
 exports.getEodAll = async (req) => {
-    const eod = await EodModel.find({}).populate({
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const eod = await EodModel.find({}).skip(skip).limit(limit).populate({
         path:'userName',
         select:'fullName profilePic'
     })
@@ -84,7 +88,7 @@ exports.getEodById = async (req) => {
     const { accountId } = req
     console.log("kakakaka",accountId);
     
-    const eod = await EodModel.find({userName:accountId}).populate({
+    const eod = await EodModel.find({userName:accountId}).limit(10).populate({
         path:'userName',
         select:'fullName profilePic'
     })
