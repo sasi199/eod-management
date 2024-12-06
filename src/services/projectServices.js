@@ -10,13 +10,19 @@ exports.createProject = async(req)=>{
     const { accountId } = req
     const { projectName,department } = req.body;
 
+    const user = await StaffModel.findById(accountId);
+    if (!user) {
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: "User not found"});
+    }
+
     const project  = await ProjectModel.findOne({projectName})
     if (project) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "project already exist"});
     }
 
     const newProject = new ProjectModel({
-        ...req.body
+        ...req.body,
+        userId: user
     })
 
     await newProject.save();
@@ -24,7 +30,10 @@ exports.createProject = async(req)=>{
 }
 
 exports.getProjectAll = async(req)=>{
-    const project = await ProjectModel.find({})
+    const project = await ProjectModel.find({}).populate({
+        path:'userId',
+        select:'fullName'
+    })
     if (!project) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Batch not found"});
     }
@@ -59,12 +68,17 @@ console.log("aallalal",accountId);
 }
 
 exports.editProject = async(req)=>{
+    const { accountId } = req
     const { _id } = req.params
     
     if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Project id required"});
     }
 
+    const user = await StaffModel.findById(accountId);
+    if (!user) {
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: "User not found"});
+    }
     const project = await ProjectModel.findById(_id)
     if (!project) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "project not found"});
@@ -80,10 +94,16 @@ exports.editProject = async(req)=>{
 }
 
 exports.deleteProject = async(req)=>{
-    const { _id } = req.params
+    const { accountId } = req;
+    const { _id } = req.params;
     
     if (!_id) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: "Batch id required"});
+    }
+
+    const user = await StaffModel.findById(accountId);
+    if (!user) {
+        throw new ApiError(httpStatus.BAD_REQUEST,{message: "User not found"});
     }
 
     const project = await ProjectModel.findById(_id)

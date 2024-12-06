@@ -7,7 +7,7 @@ const uploadCloud = require("../utils/uploadCloud");
 
 
 exports.createEod = async(req)=>{
-    const { project, department,description, links, } = req.body
+    const { project, description, links, } = req.body
     const { accountId } = req
     if ((department === 'Dev-Team' || department === 'DM-Team') && project) {
        
@@ -55,7 +55,6 @@ exports.createEod = async(req)=>{
     const newEod = new EodModel({
         project,
         userName: user.accountId,
-        department,
         uploadFile,
         description,
         link:linkArray

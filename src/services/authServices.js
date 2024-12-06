@@ -66,7 +66,7 @@ exports.loginByEmailAndLogId = async(req)=>{
         // {expiresIn: config.jwt.accessExpirationMinutes}
       )
 
-      return token;
+      return {token,role:user.role};
 }
 
 

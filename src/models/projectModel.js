@@ -6,6 +6,10 @@ const projectSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     projectName: schemaFields.requiredAndString,
     department: schemaFields.requiredAndString,
+    userId:{
+        type: String,
+        ref: 'Staff'
+    },
     description:{
         type: String
     },
