@@ -329,7 +329,7 @@ export const GetEodById = async() => {
 }
 
 export const EditEodById = async(data,eodId) => {
-  const res = await interceptors.get(`eod/editEod/${eodId}`, data);
+  const res = await interceptors.put(`eod/editEod/${eodId}`, data);
   return res;
 }
 

@@ -33,10 +33,11 @@ const Login = () => {
             console.log("Login Response:", response);
 
             if (response.data.status === true) {
-              localStorage.setItem("authToken", response.data.data);
+              localStorage.setItem("authToken", response.data.data.token);
+              const role = response.data.data.role
               setEmail("");
               setPassword("");
-              setRole("");
+              setRole(role);
 
               console.log("User Role:", role);
 
@@ -108,7 +109,7 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <select
+              {/* <select
                 className="border-orange-200 border-b-2 mt-2 outline-none p-1 bg-white"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
@@ -120,7 +121,7 @@ const Login = () => {
                 <option value="Admin">Admin</option>
                 <option value="Employee">Employee</option>
                 <option value="Trainee">Trainee</option>
-              </select>
+              </select> */}
             </div>
             <div className="text-center ">
               <button

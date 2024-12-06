@@ -3,6 +3,7 @@ import { Button, Modal, Form, Input, Upload, DatePicker, Select, Space, message 
 import { UploadOutlined,MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { CreateEod, EditEodById, GetEodById, GetProjects } from "../../../../services";
+import TextArea from "antd/es/input/TextArea";
 
 const TrainerEod = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,16 +19,63 @@ const [isEditing, setIsEditing] = useState({
   description: false,
   uploadFile: false,
   links: false,
-  projectName: false,
+  project: false,
 });
 
-const handleEdit = (field) => {
-  setIsEditing((prev) => ({ ...prev, [field]: true }));
+const handleToggleEdit = (id,field) => {
+  setIsEditing((prev) => ({
+    ...prev,
+   [id] :{ ...prev[id], [field]: !prev[id]?.[field] }
+}));
 };
 
-const handleChange = (field, value) => {
-  setFields((prev) => ({ ...prev, [field]: value }));
+// const handleChange = (id, field, value) => {
+//   setFields((prev) => ({
+//     ...prev, 
+//    [id]: { ...prev[id], [field]: value }
+//   }));
+// };
+const handleChange = (id, field, value, originalLinks = []) => {
+  setFields((prev) => {
+    // Check if the field is related to the links array (e.g., links[0], links[1], etc.)
+    if (field.startsWith("links")) {
+      const index = parseInt(field.match(/\d+/)[0], 10); // Extract index from 'links[0]', 'links[1]', etc.
+
+      // Initialize the links array by preserving original links if no edits are made yet
+      const updatedLinks = prev[id]?.links ? [...prev[id].links] : [...originalLinks];
+
+      // Update only the specific index while keeping other links intact
+      updatedLinks[index] = value;
+
+      return {
+        ...prev,
+        [id]: {
+          ...prev[id],
+          links: updatedLinks, // Update the links array with the modified link
+        },
+      };
+    }
+
+    // For other fields (non-links), update the field value directly
+    return {
+      ...prev,
+      [id]: {
+        ...prev[id],
+        [field]: value,
+      },
+    };
+  });
 };
+
+
+
+
+
+
+
+
+
+
 
   const todayDate = dayjs().format("DD-MM-YYYY");
 
@@ -117,17 +165,36 @@ fetchEodById();
 
 //Edit eod by id
 
-const handleEditEodById = async () => {
+const handleEditEodById = async (id) => {
   try {
-    const response = await EditEodById(fields, fields._id);
-    if(response.data.status){
-      message.success("Eod updated successfully")
+    const updatedFields = fields[id];
+    if (updatedFields) {
+      // Format the file list if the `uploadFile` field is updated
+      if (updatedFields.uploadFile) {
+        updatedFields.uploadFile = updatedFields.uploadFile.map((file) =>
+          file.response ? file.response.url : file.url // Handle newly uploaded and existing files
+        );
+      }
+
+      const response = await EditEodById(updatedFields, id);
+
+      if (response.data.status) {
+        message.success("EOD updated successfully");
+        fetchEodById(); // Refresh EOD list
+        setIsEditing((prev) => ({ ...prev, [id]: {} })); // Reset editing state for the specific ID
+        setFields((prev) => ({ ...prev, [id]: {} })); // Reset fields for the specific ID
+      }
     }
   } catch (error) {
-    message.error(error?.response?.data?.message || "Failed to updated eod");
-    console.error("err in edit eod",error)
+    message.error(error?.response?.data?.message || "Failed to update EOD");
+    console.error("Error in editing EOD", error);
   }
-}
+};
+
+const handleSaveButtonClick = (id) => {
+  console.log("Save button clicked for EOD ID: ", id);
+  handleEditEodById(id);
+};
 
 
   return (
@@ -168,31 +235,55 @@ const handleEditEodById = async () => {
               </div>
              <div className="flex  justify-between items-start">
             <div className="">
+              {isEditing[eod._id]?.project ? (<>
+              <p className="text-lg font-semibold">Project: <span className="text-md font-normal ">
+              <Select
+  placeholder="Select project"
+  loading={!allProjectsData}
+  value={fields[eod._id]?.project || eod.project}
+  onChange={(value) => handleChange(eod._id, "project", value)}
+>
+  {allProjectsData[eod.department]?.map((projectName, index) => (
+    <Select.Option key={index} value={projectName}>
+      {projectName}
+    </Select.Option>
+  )) || <Select.Option disabled>No projects available</Select.Option>}
+</Select>
+
+                </span></p>
+              </>):(<>
               
-             <p className="text-lg font-semibold">
-  Project: <span className="text-md font-normal ">{eod.project}</span>
+              
+             <p className="text-lg font-semibold" onClick={()=>handleToggleEdit(eod._id,"project")} >
+  Project: <span className="text-md font-normal ">{eod.project}</span></p>
+              </>)}
   <p className="text-lg font-semibold ">
               Name: <span className="text-md font-normal">{eod?.userName?.fullName}</span> 
               </p>
              
-</p>
-{eod.link && ( eod.link.map((link,i)=>(
-  <>
+              {eod.link && eod.link.map((link, i) => (
+  <div key={i}>
+    {isEditing[eod._id]?.links ? (
+      <p className="flex text-lg font-semibold">
+        Link:
+        <Input
+          value={fields[eod._id]?.links?.[i] || link} // Preserve the correct value
+          onChange={(e) => handleChange(eod._id, `links[${i}]`, e.target.value, eod.link)} // Pass original links here
+          onBlur={() => handleToggleEdit(eod._id, "links")} // Exit edit mode
+        />
+      </p>
+    ) : (
+      <p
+        onClick={() => handleToggleEdit(eod._id, "links")}
+        className="text-lg font-semibold"
+      >
+        Link: {link}
+      </p>
+    )}
+  </div>
+))}
 
-                <p key={i} className="text-lg font-semibold">
-                  Link:{" "}
-                  <a
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline text-blue-500"
-                  >
-                    {link}
-                  </a>
-                </p>
-                </>
-))
-              )}
+
 </div>
 
 
@@ -202,31 +293,68 @@ const handleEditEodById = async () => {
               </div>
             
              <div className=" mt-12">
-                 <p className="text-lg font-semibold flex flex-col  ">
+              {isEditing[eod._id]?.description ? (<>
+              <p className="text-lg font-semibold flex flex-col  ">Description
+              <TextArea
+              value={fields[eod._id]?.description || eod.description}
+              onChange={(e)=> handleChange(eod._id, "description", e.target.value)}
+              onBlur={()=> handleToggleEdit(eod._id, "description")}
+              />
+              </p>
+              </>):(<>
+                 <p onClick={()=> handleToggleEdit(eod._id,"description")} className="text-lg font-semibold flex flex-col  ">
             
             Description: <span className="text-md font-normal"> {eod.description}</span>
           </p>
+              </>)}
           </div>
              
 
           <div className="mb-4">
   <div className="grid grid-cols-2 gap-4 mt-2">
-    {eod.uploadFile.map((file, index) => (
-      <div key={index} className="w-full h-[500px] overflow-hidden border rounded-md">
-        {console.log("uploading....",file)}
+  {eod.uploadFile.map((file, index) => (
+  <div key={index}>
+    {isEditing[eod._id]?.uploadFile ? (
+     
+     <Upload
+  
+  listType="picture-card"
+  defaultFileList={
+    eod.uploadFile?.map((url, index) => ({
+      uid: index,
+      name: `File-${index + 1}`,
+      status: "done",
+      url,
+    })) || []
+  }
+  onChange={({ fileList }) => handleChange(eod._id, "uploadFile", fileList)}
+/>
+    ) : (
+      <div
+        className="w-full h-[500px] overflow-hidden border rounded-md"
+        // onClick={() => handleToggleEdit(eod._id, "uploadFile")}
+      >
         <img
           src={file}
-          alt={file}
-          className="object-cover w-full h-full"
+          alt={`Uploaded file ${index + 1}`}
+          className="object-cover w-full h-full cursor-pointer"
         />
       </div>
-    ))}
+    )}
+  </div>
+))}
+
+    
   </div>
 </div>
 
-
+<Button type="primary" onClick={() => handleSaveButtonClick(eod._id)}>
+              Save
+            </Button>
              
             </div>
+
+          
           ))}
         </div>
       ) : (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Select, DatePicker, Input, Pagination, message } from "antd";
+import { Select, DatePicker, Input, Pagination, message, Modal } from "antd";
 import dayjs from "dayjs";
 import { GetEodAll } from "../../../../services";
 
@@ -14,9 +14,29 @@ const SuperEod = () => {
     name: "",
   });
   const [currentPage, setCurrentPage] = useState(1);
+  const [visibleDetailedEod, setVisibleDetailedEod] = useState(false);
+  const [selectedEod, setSelectedEod] = useState([]);
 
   const itemsPerPage = 9;
 
+  const showDetailedModal = () => {
+    setVisibleDetailedEod(true)
+  }
+
+  const cancelDetailedModal = () => {
+    setVisibleDetailedEod(false);
+  }
+
+  const handleSelectEod = (eod) => {
+    console.log("select eod",eod)
+    setSelectedEod(eod);
+    setVisibleDetailedEod(true)
+  }
+
+//   useEffect(()=>{
+// console.log("sell",selectedEod)
+// console.log("ssss",selectedEod.project)
+//   },[selectedEod])
   // Fetch Data from Backend
   const fetchAllEod = async () => {
     try {
@@ -69,6 +89,7 @@ const SuperEod = () => {
   );
 
   return (
+    <>
     <div className="p-6 space-y-4">
       {/* Filters */}
       <div className="flex flex-wrap gap-4">
@@ -136,7 +157,7 @@ const SuperEod = () => {
       {/* EOD Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {paginatedEods.map((eod, index) => (
-          <div key={index} className="p-4 border shadow-md rounded-md bg-white">
+          <div key={index} className="p-4 border shadow-md rounded-md bg-white" onClick={()=>handleSelectEod(eod)}>
             <div className="flex">
               <img
                 src={eod.userName.profilePic}
@@ -172,6 +193,103 @@ const SuperEod = () => {
         className="text-center mt-4"
       />
     </div>
+    <Modal
+  open={visibleDetailedEod}
+  onCancel={cancelDetailedModal}
+  footer={null}
+  centered
+  width={900}
+>
+  <div className="p-6 bg-gray-50 rounded-lg shadow-lg">
+    <h2 className="text-3xl font-bold mb-6 text-gray-700 text-center">
+      EOD Report Details
+    </h2>
+
+    {selectedEod && (
+      <div className="p-6 bg-white rounded-lg shadow-md">
+        {/* Header */}
+        <div className="flex justify-between items-center border-b pb-4 mb-4">
+          <h3 className="text-2xl font-semibold text-gray-800">
+            {selectedEod.department}
+          </h3>
+          <p className="text-lg font-medium text-gray-600">
+            {dayjs(selectedEod.date).format("DD-MM-YYYY")}
+          </p>
+        </div>
+
+        {/* Project and User Info */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+          <div>
+            <p className="text-lg font-medium text-gray-700">
+              <strong>Project:</strong>{" "}
+              <span className="text-gray-600">{selectedEod.project}</span>
+            </p>
+            <p className="text-lg font-medium text-gray-700">
+              <strong>Name:</strong>{" "}
+              <span className="text-gray-600">
+                {selectedEod?.userName?.fullName}
+              </span>
+            </p>
+          </div>
+          <div>
+            {selectedEod.link && (
+              <>
+                <p className="text-lg font-medium text-gray-700">
+                  <strong>Links:</strong>
+                </p>
+                {selectedEod.link.map((link, i) => (
+                  <a
+                    key={i}
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-blue-600 underline mb-2"
+                  >
+                    {link}
+                  </a>
+                ))}
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="mb-6">
+          <p className="text-lg font-medium text-gray-700 mb-2">
+            <strong>Description:</strong>
+          </p>
+          <p className="text-gray-600 leading-relaxed">
+            {selectedEod.description}
+          </p>
+        </div>
+
+        {/* Uploaded Files */}
+        {selectedEod.uploadFile && selectedEod.uploadFile.length > 0 && (
+          <div>
+            <p className="text-lg font-medium text-gray-700 mb-4">
+              <strong>Uploaded Files:</strong>
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {selectedEod.uploadFile.map((file, index) => (
+                <div key={index} className="relative">
+                  <div className="w-full h-64 border rounded-lg overflow-hidden shadow-md">
+                    <img
+                      src={file}
+                      alt={`Uploaded file ${index + 1}`}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+</Modal>
+
+    </>
   );
 };
 

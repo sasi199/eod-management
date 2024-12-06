@@ -195,7 +195,7 @@ const handleDeleteCancel = () => {
     <div>
      {projectData.length >0 ?(
       <>
-      <div className='h-screen flex flex-col overflow-x-hidden relative'>
+      <div className='h-screen flex flex-col  relative'>
       <div className='group inline-block top-18 right-4 absolute'>
      <button onClick={()=>setIsModalVisible(true)} className='bg-orange-500 rounded-lg px-3 py-2 group-hover:bg-white group-hover:border group-hover:border-orange-500 transition-all transform duration-300 ease-in-out'>
      <span className='text-white font-bold group-hover:text-orange-500 transition-all transform duration-300 ease-in-out'> Create Project</span>
