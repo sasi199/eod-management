@@ -18,8 +18,9 @@ const traineeTaskRouter = require("../routes/traineeTaskRoute");
 const studentAttendanceRouter = require("../routes/studentAttendanceRoute");
 const eodRouter = require("../routes/eodRoute");
 const leaveRouter = require("../routes/leaveRoute");
-
-
+const { requireAll } = require("../utils/requireAll");
+const { path } = require("./roleRoute");
+const AllRoutes = requireAll('./**.{js,ts}')
 
 const Routes = [
   {
@@ -94,12 +95,22 @@ const Routes = [
     path: "/leave",
     route: leaveRouter,
   },
-
-
 ];
 
 Routes.forEach((route) => {
   router.use(route.path, route.route);
 });
+
+for (const routeFileName in AllRoutes) {
+  if(routeFileName !== 'index'){
+    if (Object.prototype.hasOwnProperty.call(AllRoutes, routeFileName)) {
+     const {path,route} = AllRoutes[routeFileName];
+      if(path && route){
+        router.use(path, route)
+        console.log("Route Created for ",path);
+      }
+    }
+  }
+}
 
 module.exports = router;

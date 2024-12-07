@@ -26,7 +26,7 @@ exports.createRole = async(req)=>{
 exports.getAllRoles = async (req)=>{
     const roles = await RoleModel.find();
 
-    if(!roles){
+    if(roles.length<1){
         throw new ApiError(status.NOT_FOUND,'No roles found');
     }
 
