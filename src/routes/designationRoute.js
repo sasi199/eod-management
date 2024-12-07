@@ -15,7 +15,7 @@ designationRouter.get('/get-all', designationController.getAllDesignations);
 
 designationRouter.put('/update/:designation_id', designationController.updateDesignation);
 
-designationRouter.delete('/delete', designationController.deleteDesignation);
+designationRouter.delete('/delete-h', designationController.deleteDesignation);
 
 
 module.exports = {path:'/designation', route:designationRouter}

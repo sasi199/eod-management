@@ -15,6 +15,6 @@ departmentRouter.get('/get-all', departmentController.getAllDepartments);
 
 departmentRouter.put('/update/:department_id', departmentController.updateDepartment);
 
-departmentRouter.delete('/delete', departmentController.deleteDepartment)
+departmentRouter.delete('/delete-h', departmentController.deleteDepartment)
 
 module.exports = {path:'/department', route: departmentRouter};
