@@ -15,7 +15,7 @@ exports.createCompany = async (req) => {
     }
 
     // Check if the companyCode is already used
-    const existingCompany = await CompanyModel.findOne({ companyCode });
+    const existingCompany = await CompanyModel.exists({ companyCode });
     if (existingCompany) {
         throw new ApiError(status.BAD_REQUEST, "Company code already exists");
     }

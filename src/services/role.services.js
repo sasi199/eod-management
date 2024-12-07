@@ -38,7 +38,7 @@ exports.updateRole = async (req)=>{
     const {role_id} = req.params;
 
     if(name){
-       const role = await RoleModel.exist({name});
+       const role = await RoleModel.exists({name});
         if(role){
             throw new ApiError(status.BAD_REQUEST,`Role name ( ${name} ) already exist`);
         }
@@ -55,7 +55,7 @@ exports.updateRole = async (req)=>{
 exports.deleteRole = async (req)=>{
     const {role_id} = req.params;
 
-    const isExist = await RoleModel.exist({_id:role_id});
+    const isExist = await RoleModel.exists({_id:role_id});
 
     if(!isExist){
         throw new ApiError(status.NOT_FOUND,'Role not found');

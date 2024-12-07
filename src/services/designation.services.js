@@ -14,7 +14,7 @@ exports.createDesignation = async (req)=>{
         throw new ApiError(status.BAD_REQUEST,"Please select a department to create a designation");
     }
 
-    const isDepartmentExist = await DepartmentModel.exist({_id:dataToCreate.department_id});
+    const isDepartmentExist = await DepartmentModel.exists({_id:dataToCreate.department_id});
 
     if(!isDepartmentExist){
         throw new ApiError(status.NOT_FOUND,"Please Select a valid department");
