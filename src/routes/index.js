@@ -17,6 +17,7 @@ const chatRouter = require("../routes/chatRoute");
 const traineeTaskRouter = require("../routes/traineeTaskRoute");
 const studentAttendanceRouter = require("../routes/studentAttendanceRoute");
 const eodRouter = require("../routes/eodRoute");
+const leaveRouter = require("../routes/leaveRoute");
 
 
 
@@ -88,6 +89,10 @@ const Routes = [
   {
     path: "/eod",
     route: eodRouter,
+  },
+  {
+    path: "/leave",
+    route: leaveRouter,
   },
 
 
