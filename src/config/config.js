@@ -64,8 +64,8 @@ module.exports = {
           host: envVars.ZEPTO_HOST,
           port: envVars.SMTP_PORT,
           auth: {
-            user: envVars.SMTP_USERNAME,
-            pass: envVars.SMTP_PASSWORD,
+            user: envVars.ZEPTO_USER,
+            pass: envVars.ZEPTO_PASS,
           },
         },
         from: envVars.EMAIL_FROM,
