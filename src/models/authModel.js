@@ -31,18 +31,7 @@ const authSchema = new mongoose.Schema(
       ],
       required: true,
     },
-    // traineeId: {
-    //   type: String,
-    // },
-    // dob: {
-    //   type: String,
-    // },
-    // adminId: {
-    //   type: String,
-    // },
-    // trainerId:{
-    //     type:String
-    // },
+
     archive: {
       type: Boolean,
       default: false,
