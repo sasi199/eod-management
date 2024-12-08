@@ -1,16 +1,17 @@
+const { default: mongoose } = require("mongoose");
 const schemaFields = require("../utils/schemaFieldUtils");
-const { utils } = require("../utils/utils");
-const { createModel } = require("./default.model");
 
-const payRollFields = {
+const payrollFields = {
     _id: schemaFields.idWithV4UUID,
     staff_id: schemaFields.UUIDIdReference('Staff'),
     grossSalary: schemaFields.requiredNumberWithDefault(0),
     isPf: schemaFields.BooleanWithDefaultTrue,
     isEsi: schemaFields.BooleanWithDefaultTrue,
-    isGratuity: schemaFields.BooleanWithDefaultTrue
+    isGratuity: schemaFields.BooleanWithDefault,
 }
 
-const [PayRollSchema, PayRollModel] = createModel("PayRoll", payRollFields);
+const PayrollSchema = mongoose.Schema(payrollFields,{timestamp: true, collection:"Payroll"});
 
-module.exports = { PayRollModel };
+const PayrollModel =  mongoose.model("Payroll", PayrollSchema);
+
+module.exports = { PayrollModel };
