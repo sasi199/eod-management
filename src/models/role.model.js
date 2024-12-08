@@ -5,13 +5,12 @@ const { schema } = require('./authModel');
 
 const RoleSchema = mongoose.Schema({
     _id:schemaFields.idWithV4UUID,
-    roleName: schemaFields.StringAndUnique,
+    name: schemaFields.StringAndUnique,
     permissions: schemaFields.ArrayOfStrings,
     hierarchyLevel: schemaFields.NumberWithDefault(1),
     isArchive: schemaFields.BooleanWithDefault,
     isActive: schemaFields.BooleanWithDefaultTrue
   },{timestamp:true,collection:"Role"});
-
 
   const RoleModel = mongoose.model('Role',RoleSchema);
 
