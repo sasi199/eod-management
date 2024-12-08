@@ -73,8 +73,16 @@ exports.loginByEmailAndLogId = async(req)=>{
 exports.getAttendance = async(req)=>{
   const attendance = await AttendanceModel.find().populate({
     path:'user',
-    select:'fullName profilePic role',
+    select:'fullName profilePic',
+    populate:{
+      path:'role',
+      model:'Role',
+      select:'name'
+    }
   });
+
+  console.log(attendance,"aljalkjljal");
+  
 
   if (!attendance) {
     throw new ApiError(httpStatus.BAD_REQUEST, {message:"Attendance not found password"});

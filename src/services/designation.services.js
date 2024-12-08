@@ -1,7 +1,7 @@
 const { default: status } = require("http-status");
 const ApiError = require("../utils/apiError");
-const {DepartmentModel} = require("../models/department.model");
 const { DesignationModel } = require("../models/designation.model");
+const { DepartmentModel } = require("../models/department.model");
 
 exports.createDesignation = async (req)=>{
     const {...dataToCreate} = req.body;
@@ -15,6 +15,8 @@ exports.createDesignation = async (req)=>{
     }
 
     const isDepartmentExist = await DepartmentModel.exists({_id:dataToCreate.department_id});
+    console.log(isDepartmentExist,"akaklalalal");
+    
 
     if(!isDepartmentExist){
         throw new ApiError(status.NOT_FOUND,"Please Select a valid department");

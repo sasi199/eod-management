@@ -6,39 +6,82 @@ const uploadCloud = require("../utils/uploadCloud");
 const Auth = require("../models/authModel");
 const utils = require("../utils/utils");
 const { log } = require("winston");
+const { DepartmentModel } = require("../models/department.model");
+const { DesignationModel } = require("../models/designation.model");
+const { RoleModel } = require("../models/role.model");
+const { CompanyModel } = require("../models/company.model");
 
 
-const generateStaffLogId = async(role)=>{
-    const rolePrefixMap = {
-        Admin: 'ADM',
-        HR: 'HR',
-        Coordinator: 'CDR',
-        Employee: 'EMP'
-    };
+const generateStaffLogId = async(companyId,departmentId)=>{
+    const company = await CompanyModel.findById(companyId).lean();
+    if (!company || !company.companyCode) {
+        throw new Error('Invalid or missing company details.');
+    }
 
-    const prefix = rolePrefixMap[role]
-    const lastStaffMember = await StaffModel.findOne({role})
-    .sort({createdAt: -1})
-    .select('logId')
-    .lean();
+    const department = await DepartmentModel.findById(departmentId).lean();
+    if (!department || !department.departmentCode) {
+        throw new Error('Invalid or missing department details.');
+    }
+
+    const companyCode = company.companyCode;
+    const departmentCode = department.departmentCode;
+
+    const lastStaffMember = await StaffModel.findOne({ company_id:companyId,department_id:departmentId })
+        .sort({ createdAt: -1 })
+        .select('staffId')
+        .lean();
 
     let newIdNumber = 1;
     if (lastStaffMember && lastStaffMember.logId) {
-        const lastIdNumber = parseInt(lastStaffMember.logId.split('-')[2],10);
-        newIdNumber = lastIdNumber +1
+        const lastIdNumber = parseInt(lastStaffMember.logId.split('-')[2], 10);
+        newIdNumber = lastIdNumber + 1;
     }
 
-    const formattedId = String(newIdNumber).padStart(3,'0')
-    return `${prefix}-ID-${formattedId}`
+    const formattedId = String(newIdNumber).padStart(3, '0');
+    return `${companyCode}-${departmentCode}-${formattedId}`;
 }
 
 
 exports.createStaff = async(req)=>{
-    const {email, fullName , role, password, hybrid, isTrainer} = req.body
+    const staffData = req.body;
 
-    const existingStaff = await StaffModel.findOne({email});
+    if (!validator.isEmail(staffData.profetionalEmail)) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email" });
+    }
+
+    const existingStaff = await StaffModel.findOne({profetionalEmail:staffData.profetionalEmail});
     if (existingStaff) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Staff already exist"});  
+    }
+
+    if (!staffData) {
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "staffData is required" });
+    }
+
+    const company = await CompanyModel.findById({_id:staffData.company_id});
+    console.log("al;lalala",company);
+    
+    if (!company) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"company not found"});  
+    }
+
+    const department = await DepartmentModel.findById({_id:staffData.department_id});
+    console.log("al;lalala",department);
+    
+    if (!department) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"department not found"});  
+    }
+
+    const designation = await DesignationModel.findById({_id:staffData.designation});
+    console.log("lalalala",designation);
+    
+    if (!designation) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"designation not found"});  
+    }
+
+    const role = await RoleModel.findById({_id:staffData.role});
+    if (!role) {
+        throw new ApiError(httpStatus.BAD_REQUEST, {message:"role not found"});  
     }
 
     if (req.user.role !== 'SuperAdmin') {
@@ -46,11 +89,11 @@ exports.createStaff = async(req)=>{
         
     }
 
-    if (!validator.isEmail(email)) {
+    if (!validator.isEmail(staffData.profetionalEmail)) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email"});
       }
 
-      const hashedPassword = await utils.hashPassword(password);
+      const hashedPassword = await utils.hashPassword(staffData.password);
 
     let profilePic;
     if (req.file) {
@@ -59,31 +102,35 @@ exports.createStaff = async(req)=>{
         profilePic = await uploadCloud(`staff-Profile/${fileName}`,req.file)
     }
 
-    const logId = await generateStaffLogId(role);
+    const staffId = await generateStaffLogId(staffData.company_id,staffData.department_id);
 
-    const isTrainerBoolean = role === 'Employee' && isTrainer === 'Yes';
-    if (role === 'Employee' && isTrainer !== 'Yes' && isTrainer !== 'No') {
-        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Invalid value for isTrainer. Use 'Yes' or 'No'." });
+    const isTrainer = staffData.isTrainer;
+    let isTrainerBoolean = false;
+    if (role.name === 'Employee') {
+        if (isTrainer !== 'Yes' && isTrainer !== 'No') {
+            throw new ApiError(httpStatus.BAD_REQUEST, { message: "Invalid value for isTrainer. Use 'Yes' or 'No'." });
+        }
+        isTrainerBoolean = isTrainer === 'Yes';
     }
 
 
     const newStaff = new StaffModel({
         ...req.body,
-        logId,
+        staffId,
         password: hashedPassword,
         profilePic,
-        isTrainer:isTrainerBoolean
+        isTrainer: isTrainerBoolean
     })
 
     const newAuth = new Auth({
         accountId: newStaff._id,
-        email,
-        fullName,
+        email: staffData.profetionalEmail,
+        fullName: staffData.fullName,
         profilePic,
-        logId,
-        hybrid,
-        password:hashedPassword,
-        role
+        logId:staffId,
+        hybrid: staffData.hybrid,
+        password: hashedPassword,
+        role: staffData.role
     })
 
     await newStaff.save();

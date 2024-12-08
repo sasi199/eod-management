@@ -18,20 +18,7 @@ const authSchema = new mongoose.Schema(
       type: String
     },
     hybrid: schemaFields.StringWithEnum(['Online','Offline','WFH']),
-    role: {
-      type: String,
-      enum: [
-        "Trainer",
-        "Trainee",
-        "SuperAdmin",
-        "Admin",
-        "Coordinator",
-        "Employee",
-        "HR",
-      ],
-      required: true,
-    },
-
+    role: schemaFields.requiredAndString,
     archive: {
       type: Boolean,
       default: false,

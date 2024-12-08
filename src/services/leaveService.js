@@ -4,6 +4,7 @@ const LeaveApplyModel = require("../models/leavePermissionModel");
 const ApiError = require("../utils/apiError");
 const httpStatus = require('http-status');
 const utils = require("../utils/utils");
+const schedule = require('node-schedule');
 
 
 exports.applyLeaveRequset = async(req)=>{
@@ -33,15 +34,16 @@ exports.applyLeaveRequset = async(req)=>{
 
     const emailSubject = `Leave Request from ${user.name}`;
     const emailHtml = `
-        <h3>Leave Request</h3>
-        <p><b>User:</b> ${user.fullName} (${user.email})</p>
-        <p><b>Leave Type:</b> ${leaveType}</p>
-        <p><b>Start Date:</b> ${startDate}</p>
-        <p><b>End Date:</b> ${endDate || "N/A"}</p>
-        <p><b>Reason:</b> ${reason || "N/A"}</p>
-        <p><b>Status:</b> Pending</p>
-        <button><b>Approved</b></button>
-    `;
+    <h3>Leave Request</h3>
+    <p><b>User:</b> ${user.fullName} (${user.email})</p>
+    <p><b>Leave Type:</b> ${leaveType}</p>
+    <p><b>Start Date:</b> ${startDate}</p>
+    <p><b>End Date:</b> ${endDate || "N/A"}</p>
+    <p><b>Reason:</b> ${reason || "N/A"}</p>
+    <p><b>Status:</b> Pending</p>
+    <a href="${config.baseUrl}/v1/leave/approveLeave/${leave._id}" style="padding:10px 15px; background-color:green; color:white; text-decoration:none; border-radius:5px;">Approve</a>
+`;
+
 
 
     const emailResponse = await utils.sendEmail(config.email.hrEmail, emailSubject, emailHtml);
@@ -55,62 +57,120 @@ exports.applyLeaveRequset = async(req)=>{
 }
 
 
-exports.approveLeave = async(req)=>{
-    const { isApproved,} =req.body 
-    const {_id} = req.params
+exports.approveLeave = async (req) => {
+    const { _id } = req.params;
     const leave = await LeaveApplyModel.findById(_id);
     if (!leave) {
         throw new Error('Leave request not found');
     }
 
+    const isApproved = true;
     leave.status = isApproved ? 'approved' : 'rejected';
     console.log(`Leave status updated to: ${leave.status}`);
+
     if (isApproved) {
         console.log("Updating hybrid status");
+        // Update hybrid status for the duration of the leave
+        await updateHybridStatus(leave.userId, leave.date, leave.endDate, leave.leaveType);
     }
 
     await leave.save();
-    return leave
-}
+
+    const user = await Auth.findOne({ accountId: leave.userId });
+        if (user) {
+            const emailSubject = `Your Leave Request Approved`;
+            const emailHtml = `
+                <p>Dear ${user.fullName},</p>
+                <p>Your leave request has been approved:</p>
+                <ul>
+                    <li><b>Leave Type:</b> ${leave.leaveType}</li>
+                    <li><b>Start Date:</b> ${leave.date}</li>
+                    <li><b>End Date:</b> ${leave.endDate || 'N/A'}</li>
+                </ul>
+                <p>Enjoy your leave!</p>
+            `;
+            await utils.sendEmail(user.email, emailSubject, emailHtml);
+        }
+        
+    return leave;
+};
 
 
 
 const updateHybridStatus = async (userId, startDate, endDate, leaveType) => {
     const start = new Date(startDate);
-    const end = endDate ? new Date(endDate) : start;
+    const end = endDate ? new Date(endDate) : new Date(startDate); // If no endDate, it's a single-day leave
 
-    // Update Auth model for leave period
-    for (
-        let currentDate = start;
-        currentDate <= end;
-        currentDate.setDate(currentDate.getDate() + 1)
-    ) {
-        const dateStr = currentDate.toISOString().split('T')[0];
+    // Ensure valid date range
+    if (end < start) {
+        console.error("End date cannot be earlier than start date");
+        return;
+    }
+
+    // Valid leave types for hybrid status
+    const validHybridLeaves = ['sick', 'wfh', 'online','casual'];
+    if (!validHybridLeaves.includes(leaveType)) {
+        console.log(`Leave type '${leaveType}' does not require hybrid status update`);
+        return;
+    }
+
+    // Handle single-day leave
+    if (start.toDateString() === end.toDateString()) {
+        console.log(`Single-day leave detected for ${start.toISOString().split('T')[0]}`);
+        
+        // Update hybrid status for the single day
         await Auth.updateOne(
             { accountId: userId },
             { hybrid: leaveType }
         );
 
-        // Schedule reset to "Offline"
-        scheduleResetHybridStatus(userId, currentDate);
+        // Schedule reset to "Offline" for the next day
+        scheduleResetHybridStatus(userId, start);
+        return;
+    }
+
+    // Iterate through the date range for multi-day leave
+    for (
+        let currentDate = new Date(start); // Clone the start date
+        currentDate <= end;
+        currentDate.setDate(currentDate.getDate() + 1)
+    ) {
+        const dateStr = currentDate.toISOString().split('T')[0];
+        console.log(`Updating hybrid status for ${dateStr}`);
+
+        // Update hybrid status in the Auth model for the leave day
+        await Auth.updateOne(
+            { accountId: userId },
+            { hybrid: leaveType }
+        );
+
+        // Schedule reset to "Offline" the next day
+        scheduleResetHybridStatus(userId, new Date(currentDate)); // Clone the date
     }
 };
 
 
+const scheduleResetHybridStatus = (userId, currentDate) => {
+    const resetDate = new Date(currentDate);
+    resetDate.setDate(resetDate.getDate() + 1);
+    resetDate.setHours(0, 0, 0, 0);
 
-// const scheduleResetHybridStatus = (userId, currentDate) => {
-//     const resetDate = new Date(currentDate);
-//     resetDate.setDate(resetDate.getDate() + 1);
-//     resetDate.setHours(0, 0, 0, 0);
+    console.log(`Scheduling hybrid status reset for ${userId} at ${resetDate}`);
 
-//     const delay = resetDate.getTime() - Date.now();
-//     if (delay > 0) {
-//         setTimeout(async () => {
-//             await Auth.updateOne(
-//                 { accountId: userId },
-//                 { hybrid: 'Offline' }
-//             );
-//         }, delay);
-//     }
-// };
+    // Schedule the job
+    schedule.scheduleJob(resetDate, async () => {
+        console.log(`Resetting hybrid status for ${userId} to 'Offline'`);
+        await Auth.updateOne(
+            { accountId: userId },
+            { hybrid: 'Offline' }
+        );
+    });
+};
+
+
+
+
+
+
+
 
