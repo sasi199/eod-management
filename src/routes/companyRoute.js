@@ -1,6 +1,7 @@
 const express = require('express');
 const logger = require('../config/logger');
 const companyController = require('../controller/company.controller');
+const uploads = require('../middlewares/multer');
 
 const companyRouter = express.Router();
 
@@ -11,7 +12,7 @@ companyRouter.use((req, res, next) => {
 });
 
 // Route to create a new company
-companyRouter.post('/create', companyController.createCompany);
+companyRouter.post('/create', uploads.single('companyLogo'),companyController.createCompany);
 
 // Route to get all companies
 companyRouter.get('/get-all', companyController.getAllCompanies);

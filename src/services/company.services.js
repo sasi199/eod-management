@@ -1,6 +1,7 @@
 const { default: status } = require("http-status");
 const ApiError = require("../utils/apiError");
 const { CompanyModel } = require("../models/company.model");
+const uploadCloud = require("../utils/uploadCloud");
 
 exports.createCompany = async (req) => {
     const { companyName, companyCode, address, contactNumber, website } = req.body;
@@ -19,6 +20,13 @@ exports.createCompany = async (req) => {
     if (existingCompany) {
         throw new ApiError(status.BAD_REQUEST, "Company code already exists");
     }
+    
+    let companyLogo;
+    if (req.file) {
+        const fileExtension = req.file.originalname.split('.').pop();
+        const fileName = `${Date.now()}.${fileExtension}`
+        companyLogo = await uploadCloud(`Company/${fileName}`,req.file)
+    }
 
     // Create the company
     const newCompany = await CompanyModel.create({
@@ -27,6 +35,7 @@ exports.createCompany = async (req) => {
         address: address || "Not provided", 
         contactNumber: contactNumber || "Not provided",
         website: website || "http://example.com",
+        companyLogo
     });
 
     if (!newCompany) {
