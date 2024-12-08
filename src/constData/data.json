@@ -15,5 +15,7 @@
   "graceTime": 300,
   "_graceTimeComment": "5min in seconds",
   "workingHours": 270000,
-  "_workingHoursComment" : "7.5 hours in seconds"
+  "_workingHoursComment" : "7.5 hours in seconds",
+  "approvedLate": 3,
+  "startDeductFrom" : 4
 }

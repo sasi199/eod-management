@@ -5,6 +5,7 @@ const schemaFields = require('../utils/schemaFieldUtils');
 const departmentFields = {
     _id: schemaFields.idWithV4UUID,
     name: String,
+    departmentCode: String,
     description: String,
 }
 
