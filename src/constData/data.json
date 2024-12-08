@@ -7,15 +7,15 @@
   "otherAllowance": 0.2,
   "sickLeave": 1,
   "casualLeave": 1,
-  "permission" : 2,
-  "permissionDuration" : 5400,
-  "_permissionDurationComment" : "1.5 hour in seconds",
+  "permission": 2,
+  "permissionDuration": 5400,
+  "_permissionDurationComment": "1.5 hour in seconds",
   "checkInTime": "09:55",
   "checkOutTime": "18:30",
   "graceTime": 300,
   "_graceTimeComment": "5min in seconds",
   "workingHours": 270000,
-  "_workingHoursComment" : "7.5 hours in seconds",
+  "_workingHoursComment": "7.5 hours in seconds",
   "approvedLate": 3,
-  "startDeductFrom" : 4
+  "startDeductFrom": 4
 }
