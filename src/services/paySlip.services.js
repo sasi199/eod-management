@@ -9,29 +9,6 @@ const AttendanceModel = require("../models/attendance");
 const { calculateWorkingDays, calculateSalaryBreakdown } = require("../utils/payRoll");
 const { CompanyModel } = require("../models/company.model");
 
-// const createStaffPaySlip = async (req)=>{
-//     let {month, year, staff_id} = req.body;
-
-//     let currentDate =new Date();
-
-//     if(!month && !year){
-//         month = String(currentDate.getMonth()+1)
-//         year = currentDate.getFullYear()
-//     }
-
-//     const zeroBasedMonth = month-1;
-
-//     const paySlipMonth = `${MONTHS[zeroBasedMonth]} ${year}`
-
-//     const isExist = await PaySlipModel.exists({staff_id,paySlipMonth});
-
-//     if(isExist){
-//         throw new ApiError(status.BAD_REQUEST, "PaySlip Already ")
-//     }
-
-//     const getStaffQuery = StaffModel.findById(staff_id);
-//     const getPayRoll = PayrollModel.findOne({staff_id});
-// }
 
 const getAttendanceDetails = (attendances) => {
   let unapprovedLeavesTaken = 0;
@@ -167,9 +144,9 @@ exports.getStaffPaySlip = async (req) => {
     paidDays: data.totalWorkingDays,
     lopDays: data.totalWorkingDays-data.effectiveWorkingDays,
     balanceLeave: data.carryForwardLeaveBalance,
-    basic: `₹${salaryDetails.basic}`,
+    basic: `₹${salaryDetails.basicSalary}`,
     hra: `₹${salaryDetails.houseRentAllowance}`,
-    conveyance: `₹${conveyance}`,
+    conveyance: `₹${salaryDetails.conveyance}`,
     fixedAllowance: `₹${salaryDetails.otherAllowances}`,
     grossEarnings: `₹${earnedGrossSalary}`,
     epfContribution: `₹${salaryDetails.providentFund}`,

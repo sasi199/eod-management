@@ -9,6 +9,7 @@ const JWT = require("jsonwebtoken");
 const ApiError = require("./apiError");
 const httpStatus = require("http-status");
 const { getData } = require("../config/json.config");
+const { default: puppeteer } = require("puppeteer");
 const secretKey = "weyduejdwewdnweudy";
 
 class Utils {
@@ -382,6 +383,36 @@ numberToWords(num) {
 
   return result.trim() + " Rupees Only";
 }
+
+generatePDF = async(htmlContent) => {
+  const browser = await puppeteer.launch({
+    headless: true, // Ensure Puppeteer runs in headless mode
+    args: ['--no-sandbox', '--disable-setuid-sandbox'], // Safe args for deployment
+  });
+  const page = await browser.newPage();
+
+  // Set HTML content
+  await page.setContent(htmlContent, {
+    waitUntil: 'networkidle0', // Ensure all resources are loaded
+  });
+
+  // Generate PDF with explicit options
+  const pdfBuffer = await page.pdf({
+    format: 'A4', // Standard PDF format
+    printBackground: true, // Include background styles
+    omitBackground:true,
+  //   margin: {
+  //     top: '20px',
+  //     bottom: '20px',
+  //     left: '20px',
+  //     right: '20px',
+  //   },
+  });
+
+  await browser.close();
+  return pdfBuffer;
+}
+
 }
 
 
