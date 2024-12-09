@@ -1,6 +1,6 @@
 const { default: status } = require("http-status");
 const ApiError = require("../utils/apiError");
-const { PayrollModel } = require("../models/payroll.model");
+const { PayrollModel } = require("../models/payRoll.model");
 const StaffModel = require("../models/staffModel");
 
 // Create Payroll

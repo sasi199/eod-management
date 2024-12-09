@@ -10,6 +10,7 @@ const { DepartmentModel } = require("../models/department.model");
 const { DesignationModel } = require("../models/designation.model");
 const { RoleModel } = require("../models/role.model");
 const { CompanyModel } = require("../models/company.model");
+const { PayrollModel } = require("../models/payRoll.model");
 
 
 const generateStaffLogId = async(companyId,departmentId)=>{
@@ -45,11 +46,11 @@ const generateStaffLogId = async(companyId,departmentId)=>{
 exports.createStaff = async(req)=>{
     const staffData = req.body;
 
-    if (!validator.isEmail(staffData.profetionalEmail)) {
+    if (!validator.isEmail(staffData.professionalEmail)) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email" });
     }
 
-    const existingStaff = await StaffModel.findOne({profetionalEmail:staffData.profetionalEmail});
+    const existingStaff = await StaffModel.findOne({professionalEmail:staffData.professionalEmail});
     if (existingStaff) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Staff already exist"});  
     }
@@ -89,7 +90,7 @@ exports.createStaff = async(req)=>{
         
     }
 
-    if (!validator.isEmail(staffData.profetionalEmail)) {
+    if (!validator.isEmail(staffData.professionalEmail)) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email"});
       }
 
@@ -119,12 +120,31 @@ exports.createStaff = async(req)=>{
         staffId,
         password: hashedPassword,
         profilePic,
-        isTrainer: isTrainerBoolean
+        isTrainer: isTrainerBoolean,
+    })
+
+    let {grossSalary,
+        isPf,
+        isEsi,
+        uanNumber,
+        pfNumber,
+        esiNumber,
+        isGratuity} = staffData
+
+    const newPayRoll = new PayrollModel({
+        staff_id: newStaff._id,
+        grossSalary,
+        isPf,
+        isEsi,
+        uanNumber,
+        pfNumber,
+        esiNumber,
+        isGratuity
     })
 
     const newAuth = new Auth({
         accountId: newStaff._id,
-        email: staffData.profetionalEmail,
+        email: staffData.professionalEmail,
         fullName: staffData.fullName,
         profilePic,
         logId:staffId,
