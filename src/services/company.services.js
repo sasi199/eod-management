@@ -4,7 +4,7 @@ const { CompanyModel } = require("../models/company.model");
 const uploadCloud = require("../utils/uploadCloud");
 
 exports.createCompany = async (req) => {
-    const { companyName, companyCode, address, contactNumber, website } = req.body;
+    const { companyName, companyCode, colorCode, address, contactNumber, website } = req.body;
 
     // Validation checks
     if (!companyName) {
@@ -35,7 +35,8 @@ exports.createCompany = async (req) => {
         address: address || "Not provided", 
         contactNumber: contactNumber || "Not provided",
         website: website || "http://example.com",
-        companyLogo
+        companyLogo,
+        colorCode
     });
 
     if (!newCompany) {

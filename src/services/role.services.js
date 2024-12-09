@@ -1,6 +1,7 @@
 const { default: status } = require("http-status");
 const ApiError = require("../utils/apiError");
 const { RoleModel } = require("../models/role.model");
+const { allPermissions } = require("../config/permissions");
 
 exports.createRole = async(req)=>{
     const {name, hierarchyLevel, permissions} = req.body;
@@ -16,6 +17,7 @@ exports.createRole = async(req)=>{
     }
 
     const createdRole = await RoleModel.create({name, hierarchyLevel, permissions});
+    console.log(createdRole,"lalalalallalalala");
 
     if(!createdRole){
         throw new ApiError(status.INTERNAL_SERVER_ERROR,'Failed to create role');
@@ -24,10 +26,15 @@ exports.createRole = async(req)=>{
 }
 
 exports.getAllRoles = async (req)=>{
-    const roles = await RoleModel.find();
+    const {p} = req.query;
+    let roles = await RoleModel.find();
 
     if(roles.length<1){
         throw new ApiError(status.NOT_FOUND,'No roles found');
+    }
+
+    if(p){
+        return {roles,permissions:allPermissions}
     }
 
     return roles;
@@ -43,7 +50,7 @@ exports.updateRole = async (req)=>{
             throw new ApiError(status.BAD_REQUEST,`Role name ( ${name} ) already exist`);
         }
     }
-    const updatedRole = await RoleModel.findByIdAndUpdate(role_id,{...req.body},true);
+    const updatedRole = await RoleModel.findByIdAndUpdate(role_id,req.body,{new:true});
 
     if(!updatedRole){
         throw new ApiError(status.INTERNAL_SERVER_ERROR,'Failed to update role');
