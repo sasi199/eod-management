@@ -20,6 +20,7 @@ const staffSchema = new mongoose.Schema({
     qualification:schemaFields.requiredAndString,
     experience: schemaFields.StringWithEnumAndRequired(['0 to 1 year', '1 to 3 years', '3 to 5 years', '5+']),
     role: schemaFields.UUIDIdReference('Role'),
+    dateOfJoining: schemaFields.requiredAndString,
     department_id: schemaFields.UUIDIdReference('Department'),
     company_id: schemaFields.UUIDIdReference('Company'),
     isTrainer: schemaFields.BooleanWithDefault,
