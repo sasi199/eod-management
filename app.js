@@ -254,7 +254,8 @@ app.get('/payslip/pdf', async (req, res) => {
       const htmlContent = await ejs.renderFile('./src/views/payslip.ejs',paySlipData);
   
       const pdfBuffer = await generatePDF(htmlContent);
-  
+        
+    //   fs.writeFileSync("sample_payslip.pdf",pdfBuffer,)
       // Set headers
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'inline; filename=payslip.pdf');
