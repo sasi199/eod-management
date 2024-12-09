@@ -251,8 +251,8 @@ class Utils {
     const salaryConfig = getData();
     let workingDays = 0; // Counter for working days
     let totalHolidays = 0; // Counter for holidays
-    const startDate = new Date(year, month - 1, 1); // Start of month
-    const endDate = new Date(year, month, 0); // Last day of month
+    const startDate = new Date(year, 5-1, 1); // Start of month
+    const endDate = new Date(year, 5, 0); // Last day of month
     const payDate = new Date(year, month, salaryConfig.payDate??7)
     let saturdayCount = 0; // Track number of Saturdays in the month
 
@@ -309,9 +309,16 @@ class Utils {
   }
 
   formatDate(date, format = 'dd/mm/yyyy') {
+    console.log(date,"date")
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = String(date.getFullYear());
+
+  console.log(format
+    .replace('dd', day)
+    .replace('mm', month)
+    .replace('yyyy', year)
+    .replace('yy', year.toString().slice(2)),"dsds")
 
   return format
     .replace('dd', day)
