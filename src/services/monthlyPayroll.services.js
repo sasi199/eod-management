@@ -1,87 +1,151 @@
 const { default: status } = require("http-status");
 const ApiError = require("../utils/apiError");
 const { MonthlyPayrollModel } = require("../models/monthlyPayroll.model");
-const { getCurrentMonthYear, formatDate, getWorkingDays } = require("../utils/utils");
+const {
+  getCurrentMonthYear,
+  formatDate,
+  getWorkingDays,
+} = require("../utils/utils");
 const { getData } = require("../config/json.config");
 
 exports.createMonthlyPayroll = async (req) => {
-    let {month, year} = req.body;
+  let { month, year } = req.body;
 
-    if(!month || !year){
-        ({ month, year } = getCurrentMonthYear());
-    }
+  let currentDate =new Date();
 
-    const {startDate,endDate} = getWorkingDays(month,year);
-    
-    const isExist = await MonthlyPayrollModel.exists({startDate:formatDate(startDate),endDate:formatDate(endDate)});
+  if (!month || !year) {
+    month = String(currentDate.getMonth()+1)
+    year = currentDate.getFullYear()
+  }
 
-    if(isExist){
-        throw new ApiError(status.BAD_REQUEST, "This months payroll has already been created")
-    }
+  // Adjust month to be zero-based
+  const zeroBasedMonth = month - 1;
 
-    const newPayroll = await MonthlyPayrollModel.create({});
+  currentDate = new Date(year, zeroBasedMonth, 1); // First day of the month
+  const isoString = currentDate.toISOString();
 
-    if (!newPayroll) {
-        throw new ApiError(status.INTERNAL_SERVER_ERROR, "Failed to create monthly payroll");
-    }
+  const formattedDateString = `${month}-${year}`;
 
-    return newPayroll;
+  let { workingDays, holidays, startDate, endDate, payDate } = getWorkingDays(
+    month, // Pass 1-based month
+    year
+  );
+
+  startDate = formatDate(startDate); // Formats correctly
+  endDate = formatDate(endDate);
+  payDate = formatDate(payDate);
+
+  const isExist = await MonthlyPayrollModel.exists({
+    startDate,
+    endDate,
+  });
+
+  if (isExist) {
+    throw new ApiError(
+      status.BAD_REQUEST,
+      "This month's payroll has already been created"
+    );
+  }
+
+  const dataToCreate = {
+    dateString: formattedDateString,
+    date: isoString,
+    noOfWorkingDays: workingDays,
+    numberOfPaidHolydays: holidays,
+    startDate,
+    endDate,
+    payDate,
+  };
+
+  const newPayroll = await MonthlyPayrollModel.create(dataToCreate);
+
+  if (!newPayroll) {
+    throw new ApiError(
+      status.INTERNAL_SERVER_ERROR,
+      "Failed to create monthly payroll"
+    );
+  }
+
+  return newPayroll;
 };
 
+
 exports.getAllMonthlyPayrolls = async () => {
-    const payrolls = await MonthlyPayrollModel.find();
+  const payrolls = await MonthlyPayrollModel.find();
 
-    if (payrolls.length < 1) {
-        throw new ApiError(status.NOT_FOUND, "No monthly payrolls found");
-    }
+  if (payrolls.length < 1) {
+    throw new ApiError(status.NOT_FOUND, "No monthly payrolls found");
+  }
 
-    return payrolls;
+  return payrolls;
 };
 
 exports.getMonthlyPayrollById = async (req) => {
-    const { payrollId } = req.params;
+  const { payrollId } = req.params;
 
-    const payroll = await MonthlyPayrollModel.findById(payrollId);
+  const payroll = await MonthlyPayrollModel.findById(payrollId);
 
-    if (!payroll) {
-        throw new ApiError(status.NOT_FOUND, "Monthly payroll not found");
-    }
+  if (!payroll) {
+    throw new ApiError(status.NOT_FOUND, "Monthly payroll not found");
+  }
 
-    return payroll;
+  return payroll;
 };
 
 exports.updateMonthlyPayroll = async (req) => {
-    const { payrollId } = req.params;
-    const { dateString, date, noOfWorkingDays, numberOfPaidHolydays, startDate, endDate, payDate } = req.body;
+  const { payrollId } = req.params;
+  let {
+    noOfWorkingDays,
+    numberOfPaidHolydays,
+    payDate, // payDate just a date 7
+  } = req.body;
 
-    // Check if payroll exists
-    const existingPayroll = await MonthlyPayrollModel.findById(payrollId);
-    if (!existingPayroll) {
-        throw new ApiError(status.NOT_FOUND, "Monthly payroll not found");
-    }
+  // Check if payroll exists
+  const existingPayroll = await MonthlyPayrollModel.findById(payrollId);
+  if (!existingPayroll) {
+    throw new ApiError(status.NOT_FOUND, "Monthly payroll not found");
+  }
+  const startDateArray = existingPayroll.startDate.split('/')
+  const zeroBasedMonth = parseInt(startDateArray[1])-1
+  const year = parseInt(startDateArray[2])
 
-    // Update the payroll
-    const updatedPayroll = await MonthlyPayrollModel.findByIdAndUpdate(
-        payrollId,
-        { dateString, date, noOfWorkingDays, numberOfPaidHolydays, startDate, endDate, payDate },
-        { new: true }
+  if(payDate){
+    const date = new Date(year, zeroBasedMonth, parseInt(payDate));
+    payDate = formatDate(date)
+  }
+
+  // Update the payroll
+  const updatedPayroll = await MonthlyPayrollModel.findByIdAndUpdate(
+    payrollId,
+    {
+      noOfWorkingDays,
+      numberOfPaidHolydays,
+      payDate,
+    },
+    { new: true }
+  );
+
+  if (!updatedPayroll) {
+    throw new ApiError(
+      status.INTERNAL_SERVER_ERROR,
+      "Failed to update monthly payroll"
     );
+  }
 
-    if (!updatedPayroll) {
-        throw new ApiError(status.INTERNAL_SERVER_ERROR, "Failed to update monthly payroll");
-    }
-
-    return updatedPayroll;
+  return updatedPayroll;
 };
 
 exports.deleteMonthlyPayroll = async (req) => {
-    const { payrollId } = req.params;
+  const { payrollId } = req.params;
 
-    const deletedPayroll = await MonthlyPayrollModel.findByIdAndDelete(payrollId);
+  const deletedPayroll = await MonthlyPayrollModel.findByIdAndDelete(payrollId);
 
-    if (!deletedPayroll) {
-        throw new ApiError(status.NOT_FOUND, "Monthly payroll not found or unable to delete");
-    }
+  if (!deletedPayroll) {
+    throw new ApiError(
+      status.NOT_FOUND,
+      "Monthly payroll not found or unable to delete"
+    );
+  }
 
-    return deletedPayroll;
+  return deletedPayroll;
 };
