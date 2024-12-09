@@ -4,6 +4,7 @@ const schemaFields = require('../utils/schemaFieldUtils');
 const companyFields = {
     _id: schemaFields.idWithV4UUID, 
     companyName: schemaFields.requiredAndString,
+    colorCode: schemaFields.requiredAndString,
     companyLogo: schemaFields.requiredAndString,
     companyCode: schemaFields.requireStringAndUnique,
     address: schemaFields.StringWithDefault('Not provided'),

@@ -17,5 +17,6 @@
   "workingHours": 270000,
   "_workingHoursComment": "7.5 hours in seconds",
   "approvedLate": 3,
-  "startDeductFrom": 4
+  "startDeductFrom": 4,
+  "payDate" : 7
 }

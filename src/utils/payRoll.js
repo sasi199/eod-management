@@ -211,10 +211,10 @@ const calculateWorkingDays = ({
 // Example usage of `calculateWorkingDays`
 const workingDaysData = calculateWorkingDays({
   totalWorkingDays: 30,
-  unapprovedLeavesTaken: 0,
+  unapprovedLeavesTaken: 1,
   approvedLeavesTaken: 1,
   permissionsTaken: 1,
-  lateCount: 7,
+  lateCount: 23,
   leaveBalance: 0,
   compOffDays: 2,
 });

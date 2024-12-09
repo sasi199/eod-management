@@ -139,71 +139,50 @@ app.get('/payslip', (req,res)=>{
     //     netPay: 28700,
     //     basicSalary: 6543,
     // }
-    const data = {
-        // Company Details
-        companyName: "Tech Innovations Ltd.",
-        companyLogo: "https://facesync.app/wp-content/uploads/2024/02/FaceSync-white-background-02-1024x503.png",
-        companyAddress: "123 Innovation Street, Tech City, TX 75001",
-      
-        // Date
-        salaryDate: "2024-12-08", // yyyy-mm-dd format
-      
-        // Personal Details
-        employeeName: "John Doe",
-        relationName: "Jane Doe",
-        relationType: "Spouse",
-        dateOfBirth: "1990-05-15",
-        employeeNumber: "EMP12345",
-        accountNumber: "ACC987654321",
-        department: "Software Development",
-        designation: "Senior Developer",
-        grade: "A",
-        dateOfJoining: "2015-07-20",
-        pfNumber: "PF123456789",
-        esiNumber: "ESI123456",
-      
-        // Attendance Details
-        salaryDays: 30,
-        earnedDays: 30,
-        compensatoryOff: 2,
-        lossOfPayDays: 0,
-        workingDays: 22,
-        paidHolidays: 8,
-      
-        // Leave Details
-        casualLeave: 10,
-        sickLeave: 5,
-        balanceLeave: 0,
-        casualLeaveTaken: 2,
-        sickLeaveTaken: 1,
-        balanceLeaveUsed: 0,
-        lateComings: 1,
-        permissionsTaken: 0,
-      
-        // Salary Components
-        basicSalaryEarned: 50000,
-        basicSalary: 40000,
-        houseRentAllowance: 8000,
-        conveyance: 3000,
-        otherAllowance: 2000,
-        bonus: 5000,
-        gratuity: 2000,
-        grossSalary: 63000,
-      
-        // Deductions
-        pfContribution: 4000,
-        esiContribution: 1200,
-        professionalTax: 150,
-        transportDeduction: 500,
-        otherDeductions: 200,
-        pfEmployerContribution: 4000,
-      
-        // Total Summary
-        totalEarnings: 63000,
-        totalDeductions: 7900,
-        netPay: 55100,
-      }
-    res.status(200).render('payslip',data)
+    const paySlipData = {
+      colorCode: "#531d6b",
+      companyLogo: 'https://facesync.app/wp-content/uploads/2024/02/FaceSync-white-background-02-1024x503.png', // Path to your logo
+      companyName: 'Facesync',
+      companyLocation: 'Chennai, India',
+      paySlipMonth: 'December 2024',
+      employeeName: 'Syed Abuthahir',
+      designation: 'Full Stack Developer',
+      employeeId: '12345',
+      department: 'Web Developer',
+      dateOfJoining: '01/01/2023',
+      payDate: '07/12/2024',
+      pfAccountNumber: 'AA/BBB/1234567/12C/123456',
+      uan: '9876543210',
+      casualLeaveAvailable: 1,
+      casualLeaveUsed: 1,
+      casualLeaveBalance: 0,
+      sickLeaveAvailable: 1,
+      sickLeaveUsed: 0,
+      sickLeaveBalance: 1,
+      balanceLeaveAvailable: 2,
+      balanceLeaveUsed: 0,
+      balanceLeaveBalance: 2,
+      compOffAvailable: 2,
+      compOffUsed: 1,
+      compOffBalance: 1,
+      totalLeaveBalance: 3,
+      netPay: '₹15,000',
+      paidDays: 30,
+      lopDays: 0,
+      balanceLeave: 3,
+      basic: '₹8000',
+      hra: '₹3000',
+      conveyance: '₹2000',
+      fixedAllowance: '₹5000',
+      grossEarnings: '₹18000',
+      epfContribution: '₹1000',
+      professionalTax: '₹200',
+      lopDeduction: '₹0',
+      totalDeductions: '₹1200',
+      totalNetPay: '₹16800',
+      amountInWords: 'Sixteen Thousand Eight Hundred Rupees Only'
+    };
+    res.status(200).render('payslip',paySlipData)
 })
 
 app.get('/payslip/pdf', async (req, res) => {
@@ -213,7 +192,7 @@ app.get('/payslip/pdf', async (req, res) => {
         companyName: 'Facesync',
         companyLocation: 'Chennai, India',
         paySlipMonth: 'December 2024',
-        employeeName: 'Gokul MG',
+        employeeName: 'Syed Abuthahir',
         designation: 'Full Stack Developer',
         employeeId: '12345',
         department: 'Web Developer',
@@ -373,6 +352,7 @@ app.use(errorConverter);
 
 // handle error
 app.use(errorHandler);
+
 
 
 module.exports = server;
