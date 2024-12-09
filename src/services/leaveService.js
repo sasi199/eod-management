@@ -159,6 +159,7 @@ const scheduleResetHybridStatus = (userId, currentDate) => {
 
     // Schedule the job
     schedule.scheduleJob(resetDate, async () => {
+        console.log(`Scheduled job triggered at: ${new Date()}`);
         console.log(`Resetting hybrid status for ${userId} to 'Offline'`);
         await Auth.updateOne(
             { accountId: userId },

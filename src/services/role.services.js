@@ -17,6 +17,7 @@ exports.createRole = async(req)=>{
     }
 
     const createdRole = await RoleModel.create({name, hierarchyLevel, permissions});
+    console.log(createdRole,"lalalalallalalala");
 
     if(!createdRole){
         throw new ApiError(status.INTERNAL_SERVER_ERROR,'Failed to create role');
@@ -49,7 +50,7 @@ exports.updateRole = async (req)=>{
             throw new ApiError(status.BAD_REQUEST,`Role name ( ${name} ) already exist`);
         }
     }
-    const updatedRole = await RoleModel.findByIdAndUpdate(role_id,{...req.body},true);
+    const updatedRole = await RoleModel.findByIdAndUpdate(role_id,req.body,{new:true});
 
     if(!updatedRole){
         throw new ApiError(status.INTERNAL_SERVER_ERROR,'Failed to update role');

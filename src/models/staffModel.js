@@ -27,13 +27,6 @@ const staffSchema = new mongoose.Schema({
     createdBy:schemaFields.UUIDIdReference('superAdmin'),
     isArchive: schemaFields.BooleanWithDefault,
     hybrid: schemaFields.StringWithEnumAndRequired(['Online','Offline','WFH']),
-    permission:{
-        type: String,
-        enum: ["read","write","manage","full-access"],
-        default: ()=>{
-            return this.role === 'superAdmin'?'full-access':'write'
-        }
-    },
 },{timestamps:true, collection: "Staff"});
 
 const StaffModel = mongoose.model('Staff',staffSchema);
