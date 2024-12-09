@@ -1,5 +1,5 @@
 const { default: status } = require("http-status");
-const { PayrollModel } = require("../models/payroll.model");
+const { PayrollModel } = require("../models/payRoll.model");
 const { PaySlipModel } = require("../models/paySlip.model");
 const StaffModel = require("../models/staffModel");
 const ApiError = require("../utils/apiError");
