@@ -12,6 +12,12 @@ const { getData } = require("../config/json.config");
 const secretKey = "weyduejdwewdnweudy";
 
 class Utils {
+
+  MONTHS = [
+    "january", "february", "march", "april", "may", "june", 
+    "july", "august", "september", "october", "november", "december"
+  ];
+
   /**
    * Creates a string with proper conjunction (e.g., "A, B, and C").
    * @param {string[]} wordsArray - An array of words or phrases.
@@ -331,6 +337,50 @@ class Utils {
     .replace('mm', month)
     .replace('yyyy', year)
     .replace('yy', year.toString().slice(2));
+}
+
+numberToWords(num) {
+  const ones = [
+      "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", 
+      "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", 
+      "Seventeen", "Eighteen", "Nineteen"
+  ];
+  const tens = [
+      "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
+  ];
+  const scales = ["", "Thousand", "Lakh", "Crore"];
+
+  if (num === 0) return "Zero Rupees Only";
+
+  let result = "";
+
+  const getBelowThousand = (n) => {
+      let str = "";
+      if (n > 99) {
+          str += ones[Math.floor(n / 100)] + " Hundred ";
+          n %= 100;
+      }
+      if (n > 19) {
+          str += tens[Math.floor(n / 10)] + " ";
+          n %= 10;
+      }
+      if (n > 0) {
+          str += ones[n] + " ";
+      }
+      return str.trim();
+  };
+
+  let scaleIndex = 0;
+  while (num > 0) {
+      const chunk = num % 1000;
+      if (chunk > 0) {
+          result = getBelowThousand(chunk) + (scales[scaleIndex] ? " " + scales[scaleIndex] + " " : "") + result;
+      }
+      num = Math.floor(num / 1000);
+      scaleIndex++;
+  }
+
+  return result.trim() + " Rupees Only";
 }
 }
 
