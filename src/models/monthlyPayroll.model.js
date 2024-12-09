@@ -13,13 +13,13 @@ const {workingDays,holidays, startDate, endDate, payDate} = getWorkingDays(month
 
 const monthlyPayrollConfigFields = {
     _id: schemaFields.idWithV4UUID,
-    dateString: schemaFields.StringWithDefault(formattedDateString),
-    date: schemaFields.StringWithDefault(isoString),
+    dateString: schemaFields.StringWithDefault("formattedDateString"),
+    date: schemaFields.StringWithDefault("isoString"),
     noOfWorkingDays: schemaFields.NumberWithDefault(workingDays),
     numberOfPaidHolydays: schemaFields.NumberWithDefault(holidays),
-    startDate: schemaFields.StringWithDefault(formatDate(startDate)),
-    endDate: schemaFields.StringWithDefault(formatDate(endDate)),
-    payDate: schemaFields.StringWithDefault(formatDate(payDate))
+    startDate: schemaFields.StringWithDefault(""),
+    endDate: schemaFields.StringWithDefault("formatDate(endDate)"),
+    payDate: schemaFields.StringWithDefault("formatDate(payDate)")
 }
 
 const MonthlyPayrollSchema = mongoose.Schema(monthlyPayrollConfigFields,{timestamps:true,collection:"MonthlyPayRoll"})

@@ -251,28 +251,32 @@ class Utils {
     const salaryConfig = getData();
     let workingDays = 0; // Counter for working days
     let totalHolidays = 0; // Counter for holidays
-    const startDate = new Date(year, 5-1, 1); // Start of month
-    const endDate = new Date(year, 5, 0); // Last day of month
-    const payDate = new Date(year, month, salaryConfig.payDate??7)
+  
+    const zeroBasedMonth = month - 1;
+  
+    const startDate = new Date(year, zeroBasedMonth, 1); // First day of the month
+    const endDate = new Date(year, month, 0); // Last day of the current month
+    const payDate = new Date(year, zeroBasedMonth, salaryConfig.payDate ?? 7);
+  
     let saturdayCount = 0; // Track number of Saturdays in the month
-
+  
     for (
-      let date = startDate;
+      let date = new Date(startDate);
       date <= endDate;
       date.setDate(date.getDate() + 1)
     ) {
       const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
-
+  
       if (dayOfWeek === 0) {
         // Sundays are always holidays
         totalHolidays++;
         continue;
       }
-
+  
       if (dayOfWeek === 6) {
         // Saturday logic
         saturdayCount++; // Increment Saturday count
-
+  
         if (isAlternateSaturday) {
           // Only count 1st, 3rd, and 5th Saturdays as working days
           if (saturdayCount % 2 !== 0) {
@@ -289,7 +293,7 @@ class Utils {
         workingDays++;
       }
     }
-
+  
     return {
       workingDays,
       holidays: totalHolidays,
@@ -298,11 +302,13 @@ class Utils {
       payDate,
     };
   }
+  
 
   getCurrentMonthYear() {
     const currentDate = new Date();
 
-    const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Month is 0-based
+    const month = String(currentDate.getMonth() ).padStart(2, "0"); // Month is 0-based
+    console.log(month,"month")
     const year = currentDate.getFullYear();
 
     return { month, year };
