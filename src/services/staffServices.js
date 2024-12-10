@@ -80,15 +80,12 @@ exports.createStaff = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"designation not found"});  
     }
 
-    const role = await RoleModel.findById({_id:staffData.role});
+    const role = await RoleModel.findById(staffData.role);
     if (!role) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"role not found"});  
     }
 
-    if (req.user.role !== 'SuperAdmin') {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message: "Only super admin can create staff"});
-        
-    }
+    
 
     if (!validator.isEmail(staffData.professionalEmail)) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email"});

@@ -23,8 +23,8 @@ exports.loginByEmailAndLogId = async(req)=>{
 
     
       const now = new Date();
-      const startOfDay = new Date(now.setHours(0, 0, 0, 0));
-      const endOfDay = new Date(now.setHours(23, 59, 59, 999));
+      const startOfDay = utils.Currentdate();
+      // const endOfDay = new Date(now.setHours(23, 59, 59, 999));
       const workStart = new Date();
       workStart.setHours(10, 0, 0);
       const workEnd = new Date();
@@ -49,12 +49,12 @@ exports.loginByEmailAndLogId = async(req)=>{
       }   
 
       console.log("stata",startOfDay);
-      console.log("stata",endOfDay);
+      // console.log("stata",endOfDay);
       
 
       let attendance = await AttendanceModel.findOne({
         user: user._id, 
-        date: {$gte: startOfDay, $lte: endOfDay}
+        dateString: startOfDay
       });
       console.log("aaaaaaaa",attendance);
       
@@ -98,7 +98,7 @@ exports.createAttendance = async(req)=>{
 
 
     const attendanceData = employeesWithoutAttendance.map(employee => ({
-      date: todayDate,
+      dateString: todayDate,
       checkIn: null,
       checkOut: null,
       user: employee._id,

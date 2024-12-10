@@ -35,7 +35,7 @@ exports.createCompany = async (req) => {
         address: address || "Not provided", 
         contactNumber: contactNumber || "Not provided",
         website: website || "http://example.com",
-        companyLogo,
+        companyLogo: companyLogo,
         colorCode
     });
 

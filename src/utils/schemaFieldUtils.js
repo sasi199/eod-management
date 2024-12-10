@@ -115,7 +115,7 @@ const requiredAndDate = {
 // Date field with a default value of the current date
 const DateWithDefault = {
     type: Date,
-    default: Date.now
+    default: () => new Date().toISOString()
 };
 
 // ObjectId field referencing another model

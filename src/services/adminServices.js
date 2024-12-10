@@ -7,12 +7,13 @@ const Auth = require("../models/authModel");
 const config = require("../config/config");
 const uploadCloud = require("../utils/uploadCloud");
 const { Amplify } = require("aws-sdk");
+const { RoleModel } = require("../models/role.model");
 
 
 const generateAdminLogId = async () => {
    // Find the last created admin based on the logId in descending order
-   const lastAdmin = await AdminModel.findOne().sort({ logId: -1 });
-   const lostLogIdNumber = lastAdmin ? parseInt(lastAdmin.logId.split('-')[2],10) : 0;
+   const lastAdmin = await AdminModel.findOne().sort({ adminId: -1 });
+   const lostLogIdNumber = lastAdmin ? parseInt(lastAdmin.adminId.split('-')[2],10) : 0;
    const newLogIdNumber = (lostLogIdNumber + 1).toString().padStart(3, '0');
 
    return `ADM-ID-${newLogIdNumber}`
@@ -42,20 +43,21 @@ const generateAdminLogId = async () => {
 
 
 exports.createAdmin = async(req)=>{
-   const { email,fullName, role} = req.body;
+   const adminData = req.body;
    console.log(req.body);
    
 
-   const existingAdmin = await AdminModel.findOne({email})
+   const existingAdmin = await AdminModel.findOne({email: adminData.email})
    if (existingAdmin) {
       throw new ApiError(httpStatus.BAD_REQUEST, {message:"Admin already exist"});
    }
 
-   if (req.user.role !== 'superAdmin') {
-      throw new ApiError(httpStatus.FORBIDDEN, { message: "Only super admins can create an admin" });
-    }    
+   const existingrole = await RoleModel.findById({_id:adminData.role});
+   if (!existingrole) {
+       throw new ApiError(httpStatus.BAD_REQUEST, {message:"role not found"});  
+   }   
 
-    if (!validator.isEmail(email)) {
+    if (!validator.isEmail(adminData.email)) {
       throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email"});
     }
 
@@ -63,26 +65,30 @@ exports.createAdmin = async(req)=>{
 //    req.body.imageFile = uploadCloud('adminProfile',req.file)
 //   }
 
-  let profilePic;
-   if (req.file) {
-      profilePic = await uploadCloud('adminProfile', req.file);
+//   let profilePic;
+//    if (req.file) {
+//       profilePic = await uploadCloud('adminProfile', req.file);
       
-   }
+//    }
 
-
-  const logId = await generateAdminLogId();
+const hashedPassword = await utils.hashPassword(adminData.password)
+  const adminId = await generateAdminLogId();
 
   const newAdmin = new AdminModel({
    ...req.body,
-   logId,
-   profilePic
+   adminId,
+   password: hashedPassword
   })
 
   const newAuth = new Auth({
-   adminId:newAdmin._id,
-   email,
-   logId,
-   role
+   accountId: newAdmin._id,
+        email:adminData.email,
+        fullName: adminData.fullName,
+        profilePic: adminData.profilePic,
+        logId: adminId,
+        hybrid:adminData.hybrid,
+        password: hashedPassword,
+        role: adminData.role
   })
 
   await newAdmin.save();

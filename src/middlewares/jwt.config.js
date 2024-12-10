@@ -46,10 +46,13 @@ const verifyToken = async (token, model) => {
     const payload = JWT.verify(token, secretKey);
     console.log(payload,"payload");
     
-    const user = await model.findById(payload.id);
+    const user = await model.findById(payload.id).populate({
+      path: "role", // Ensure this matches your schema setup
+      select: "name permissions",
+    });
     console.log(user,"userid");
     
-    if (user && user.role === payload.role) {
+    if (user && user.role._id === payload.role._id) {
       return { userId: payload.id, user };
     }
     return null;
