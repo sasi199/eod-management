@@ -77,7 +77,6 @@ exports.loginByEmailAndLogId = async(req)=>{
       return {token,role:user.role};
 }
 
-
 exports.createAttendance = async(req)=>{
   const todayDate = utils.Currentdate();
 
@@ -102,7 +101,7 @@ exports.createAttendance = async(req)=>{
       checkIn: null,
       checkOut: null,
       user: employee._id,
-      location: { latitude: 0, longitude: 0 }, // Default location, adjust if necessary
+      location: { latitude: 0, longitude: 0 },
       status: 'Absent',
       islate: false,
       isApprovedLeave: false,

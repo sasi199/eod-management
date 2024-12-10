@@ -8,6 +8,7 @@ const TraineeDetailsModel = require("../models/traineeDetails");
 const utils = require("../utils/utils");
 const {AssignedBatchModel} = require("../models/assignedBatchesModel");
 const BatchModel = require("../models/batchModel");
+const { PayrollModel } = require("../models/payRoll.model");
 
 
 
@@ -89,6 +90,17 @@ await newAssignBatch.save();
     password: hashedPassword
    })
 
+
+   const newPayRoll = new PayrollModel({
+    user_id: newTrainee._id,
+    grossSalary,
+    isPf,
+    isEsi,
+    uanNumber,
+    pfNumber,
+    esiNumber,
+    isGratuity
+   })
    
    await newTrainee.save();
    await newAuth.save();
