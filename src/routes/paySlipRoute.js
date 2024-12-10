@@ -14,9 +14,14 @@ PaySlipRouter.use((req, res, next) => {
 // PaySlipRouter.post('/create', PayslipController.createMonthlyPayroll);
 
 // Route to get all monthly payrolls
-PaySlipRouter.get('/get-all', PayslipController.getPaySlip);
+PaySlipRouter.get('/get-all', PayslipController.getAllPaySlip);
 
-PaySlipRouter.get('/download', PayslipController.downloadPaySlip);
+PaySlipRouter.get('/generate-t', PayslipController.generateTraineePaySlip);
+PaySlipRouter.get('/generate-s', PayslipController.generateStaffPaySlip);
+
+PaySlipRouter.get('/get-by-id', PayslipController.getPaySlipById);
+
+
 
 // Route to get a monthly payroll by ID
 // PaySlipRouter.get('/:payrollId', PayslipController.getMonthlyPayrollById);
