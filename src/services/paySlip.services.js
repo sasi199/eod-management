@@ -3,12 +3,20 @@ const { PayrollModel } = require("../models/payRoll.model");
 const { PaySlipModel } = require("../models/paySlip.model");
 const StaffModel = require("../models/staffModel");
 const ApiError = require("../utils/apiError");
-const { MONTHS, formatDate, getWorkingDays, numberToWords } = require("../utils/utils");
+const {
+  MONTHS,
+  formatDate,
+  getWorkingDays,
+  numberToWords,
+} = require("../utils/utils");
 const { MonthlyPayrollModel } = require("../models/monthlyPayroll.model");
 const AttendanceModel = require("../models/attendance");
-const { calculateWorkingDays, calculateSalaryBreakdown } = require("../utils/payRoll");
+const {
+  calculateWorkingDays,
+  calculateSalaryBreakdown,
+} = require("../utils/payRoll");
 const { CompanyModel } = require("../models/company.model");
-
+const TraineeModel = require("../models/traineeModel");
 
 const getAttendanceDetails = (attendances) => {
   let unapprovedLeavesTaken = 0;
@@ -35,9 +43,18 @@ const getAttendanceDetails = (attendances) => {
   };
 };
 
-exports.getStaffPaySlip = async (req) => {
-  const { sid, m, y } = req.query;
+const getPaySlipData = async (query) => {
+  const { sid, tid, m, y } = query; // sid - staff_id, tid - trainee_id, m - month (1,2,...12), y - year (2023,2024)
+    console.log(query,"sd")
+  if ((!sid && !tid) || !m || !y) {
+    console.log("no proper data")
+    return null;
+  }
 
+  let isTrainee = false;
+  if (!sid && tid) {
+    isTrainee = true;
+  }
   console.log(sid, "sid");
   const { workingDays, holidays, startDate, endDate, payDate } = getWorkingDays(
     parseInt(m),
@@ -53,50 +70,85 @@ exports.getStaffPaySlip = async (req) => {
 
   const paySlipMonth = `${MONTHS[m - 1]} ${y}`;
 
-  const getStaffQuery = StaffModel.findById(sid).populate({
-    path: 'designation',
-    select: 'title'
-  }).populate({
-    path: 'department_id',
-    select: 'name'
-  });
-  const getPayRollQuery = PayrollModel.findOne({ staff_id: sid });
-  const getMonthlyPayrollQuery = MonthlyPayrollModel.findOne({
-    startDate: formattedStartDate,
-    endDate: formattedEndDate,
-  });
-  const getAttendanceQuery = AttendanceModel.find({
-    user: sid,
-    date: {
-      $gte: startIsoString,
-      $lte: endIsoString,
-    },
-  });
+  let getUserQuery = null;
+  let getPayRollQuery = null;
+  let getMonthlyPayrollQuery = null;
+  let getAttendanceQuery = null;
 
-  console.log(formattedStartDate, formattedEndDate, "sdsdsd");
-  const [staffDetails, payrollDetails, monthlyPayroll, staffAttendance] =
+  if (!isTrainee) {
+    getUserQuery = StaffModel.findById(sid)
+      .populate({
+        path: "designation",
+        select: "title",
+      })
+      .populate({
+        path: "department_id",
+        select: "name",
+      });
+    getPayRollQuery = PayrollModel.findOne({ user_id: sid });
+    getMonthlyPayrollQuery = MonthlyPayrollModel.findOne({
+      startDate: formattedStartDate,
+      endDate: formattedEndDate,
+    });
+    getAttendanceQuery = AttendanceModel.find({
+      user: sid,
+      date: {
+        $gte: startIsoString,
+        $lte: endIsoString,
+      },
+    });
+  }
+  if (isTrainee) {
+    getUserQuery = TraineeModel.findById(tid);
+    getPayRollQuery = PayrollModel.findOne({ user_id: tid });
+    getMonthlyPayrollQuery = MonthlyPayrollModel.findOne({
+      startDate: formattedStartDate,
+      endDate: formattedEndDate,
+    });
+    getAttendanceQuery = AttendanceModel.find({
+      user: tid,
+      date: {
+        $gte: startIsoString,
+        $lte: endIsoString,
+      },
+    });
+  }
+
+
+  const [userDetails, payrollDetails, monthlyPayroll, staffAttendance] =
     await Promise.all([
-      getStaffQuery,
+      getUserQuery,
       getPayRollQuery,
       getMonthlyPayrollQuery,
       getAttendanceQuery,
     ]);
 
-    const companyData = await CompanyModel.findById(staffDetails.company_id);
+  if (!userDetails || !payrollDetails || !monthlyPayroll || !staffAttendance) {
+    console.log({userDetails, payrollDetails, monthlyPayroll, staffAttendance})
+    console.log("error in getting data")
+    return null;
+  }
+
+  const companyData = await CompanyModel.findById(userDetails.company_id);
+
+  if (!companyData) {
+    console.log("no company data")
+    return null;
+  }
 
   let {
     unapprovedLeavesTaken,
     approvedLeavesTaken,
     permissionsTaken,
     lateCount,
-    compOffDays
+    compOffDays,
   } = getAttendanceDetails(staffAttendance);
 
   let totalWorkingDays = monthlyPayroll.noOfWorkingDays;
 
   let leaveBalance = 0;
 
-  data = calculateWorkingDays({
+  leaveDetail = calculateWorkingDays({
     totalWorkingDays,
     unapprovedLeavesTaken,
     approvedLeavesTaken,
@@ -106,56 +158,188 @@ exports.getStaffPaySlip = async (req) => {
     compOffDays,
   });
 
+  const { grossSalary } = payrollDetails;
 
-  const {grossSalary} = payrollDetails;
+  const { effectiveWorkingDays, lopDays } = leaveDetail;
 
-  const earnedGrossSalary = data.effectiveWorkingDays * (grossSalary/data.totalWorkingDays);
+  const { salaryDetails } = calculateSalaryBreakdown(
+    grossSalary,
+    effectiveWorkingDays,
+    lopDays
+  );
 
-  const {salaryDetails} = calculateSalaryBreakdown(earnedGrossSalary);
+  let department = null;
+  let designation = null;
+
+  if (isTrainee) {
+    department = userDetails.department;
+    designation = useDetails.designation ?? "Trainee";
+  } else {
+    department = userDetails.department_id.name;
+    designation = userDetails.designation.title;
+  }
 
   const paySlipData = {
-    colorCode: companyData.colorCode ?? "#531d6b",
-    companyLogo: companyData.companyLogo ?? 'https://facesync.app/wp-content/uploads/2024/02/FaceSync-white-background-02-1024x503.png', // Path to your logo
-    companyName: companyData.companyName??'Facesync',
-    companyLocation: companyData.address??'Chennai, India',
+    colorCode: companyData.colorCode,
+    companyLogo: companyData.companyLogo,
+    companyName: companyData.companyName,
+    companyLocation: companyData.address,
     paySlipMonth,
-    employeeName: staffDetails.fullName ?? 'Syed Abuthahir',
-    designation: staffDetails.designation.title,
-    employeeId: staffDetails.staffId,
-    department: staffDetails.department_id.name,
-    dateOfJoining: staffDetails.doj,
+    employeeName: userDetails.fullName,
+    designation,
+    employeeId: userDetails.staffId,
+    department,
+    dateOfJoining: userDetails.doj,
     payDate: monthlyPayroll.payDate,
     pfAccountNumber: payrollDetails.pfNumber,
     uan: payrollDetails.uanNumber,
-    casualLeaveAvailable: 1,
-    casualLeaveUsed: 1-data.casualLeaveBalance,
-    casualLeaveBalance: data.casualLeaveBalance,
-    sickLeaveAvailable: 1,
-    sickLeaveUsed: 1-data.sickLeaveBalance,
-    sickLeaveBalance: data.sickLeaveBalance,
-    balanceLeaveAvailable: leaveBalance,
-    balanceLeaveUsed: leaveBalance-data.balanceLeaveAvailable,
-    balanceLeaveBalance: data.balanceLeaveAvailable,
-    compOffAvailable: compOffDays,
-    compOffUsed: compOffDays-data.compOffBalance,
-    compOffBalance: data.compOffBalance,
-    totalLeaveBalance: data.carryForwardLeaveBalance,
-    netPay: `₹${payrollDetails.grossSalary}`,
-    paidDays: data.totalWorkingDays,
-    lopDays: data.totalWorkingDays-data.effectiveWorkingDays,
-    balanceLeave: data.carryForwardLeaveBalance,
-    basic: `₹${salaryDetails.basicSalary}`,
-    hra: `₹${salaryDetails.houseRentAllowance}`,
-    conveyance: `₹${salaryDetails.conveyance}`,
-    fixedAllowance: `₹${salaryDetails.otherAllowances}`,
-    grossEarnings: `₹${earnedGrossSalary}`,
-    epfContribution: `₹${salaryDetails.providentFund}`,
-    professionalTax: '₹0',
-    lopDeduction: `₹${(data.totalWorkingDays-data.effectiveWorkingDays)*(grossSalary/data.totalWorkingDays)}`,
-    totalDeductions: `₹${grossSalary-earnedGrossSalary}`,
-    totalNetPay: `₹${earnedGrossSalary}`,
-    amountInWords: numberToWords(earnedGrossSalary),
+    netPay: grossSalary,
+    ...salaryDetails,
+    ...leaveDetail,
+    amountInWords: numberToWords(salaryDetails.grossEarned),
   };
 
+  return {paySlipData,user_id:userDetails._id};
+};
+
+const managePaySlip = async (data) => {
+  const { paySlipData, user_id } = data;
+
+  if (!paySlipData) {
+    throw new Error(status.BAD_REQUEST, "Pay slip data is required");
+  }
+  if (!user_id) {
+    throw new Error(status.BAD_REQUEST, "User id is required");
+  }
+  const { paySlipMonth, employeeId } = paySlipData;
+  const existingPaySlipData = await PaySlipModel.findOne({
+    paySlipMonth,
+    employeeId,
+  });
+
+  let finalData = null;
+
+  if (existingPaySlipData) {
+    existingPaySlipData = { existingPaySlipData, ...paySlipData };
+    const isUpdated = await existingPaySlipData.save();
+    if (!isUpdated) {
+      return null;
+    }
+    finalData = isUpdated;
+  } else {
+    const createdPaySlip = await PaySlipModel.create(paySlipData);
+    if (!createdPaySlip) {
+      return null;
+    }
+    finalData = createdPaySlip;
+  }
+  return finalData ?? "Something went wrong";
+};
+
+exports.generatePaySlip = async (req, isForTrainee = false) => {
+  const { uid, m, y } = req.query;
+
+  if (!m || !y) {
+    throw new ApiError(status.BAD_REQUEST, "Provide a proper query");
+  }
+
+  let isForOne = false;
+
+  if (uid) {
+    isForOne = true;
+  }
+
+  let paySlipData = null;
+
+  if (isForOne) {
+    if (isForTrainee) {
+      paySlipData = await getPaySlipData({ tid: uid, m, y });
+    } else {
+      paySlipData = await getPaySlipData({ sid: uid, m, y });
+    }
+    if(!paySlipData){
+        throw new ApiError(status.INTERNAL_SERVER_ERROR,"paysilp data in null")
+    }
+  try {
+    const isPaySlipManaged = await managePaySlip({...paySlipData});
+    return isPaySlipManaged;
+  } catch (error) {
+    console.log("Unable to manage the pay slip", error);
+    throw new ApiError(
+      status.INTERNAL_SERVER_ERROR,
+      "Something went wrong please try again"
+    );
+  }}else{
+    let generatePaySlipQuery = null;
+    if (isForTrainee) {
+        const traineeData = await TraineeModel.find(); // need changes gokul
+
+        if(!traineeData){
+            throw new ApiError(status.BAD_REQUEST,"No trainees available")
+        }
+        generatePaySlipQuery = traineeData.map(trainee=>getPaySlipData({tid:trainee._id,}));
+
+      } else {
+        const staffData = await StaffModel.find(); // need changes gokul
+
+        if(!staffData){
+            throw new ApiError(status.BAD_REQUEST,"No Staffs are available")
+        }
+        generatePaySlipQuery = staffData.map(staff=>getPaySlipData({sid:staff._id,}));
+      }
+
+      if(!generatePaySlipQuery){
+        throw new ApiError(status.INTERNAL_SERVER_ERROR,"Something went wrong please try again");
+      }
+
+      const [...managePaySlipData] = await Promise.all(generatePaySlipQuery);
+      console.log(managePaySlipData,"managedPaySlipData")
+      const managePaySlipQuery = managePaySlipData.map(payslipData=>managePaySlip(payslipData));
+      try {
+        const [...managedPaySlipData] = await Promise.all(managePaySlipQuery);
+        console.log(managedPaySlipData,"managedPaySlipData");
+        return managedPaySlipData;
+      } catch (error) {
+        console.log(error);
+      }
+  }
+};
+
+exports.getPaySlip = async (req) => {
+  const { uid, m, y } = req.query;
+
+  if (!uid || !m || !y) {
+    throw new ApiError(status.BAD_REQUEST, "Provide a proper query");
+  }
+
+  const paySlipMonth = `${MONTHS[m - 1]} ${y}`;
+
+  const paySlipData = await PaySlipModel.findOne({
+    paySlipMonth,
+    user_id: uid,
+  });
+
+  if (!paySlipData) {
+    throw new ApiError(
+      status.NOT_FOUND,
+      `Pay slip is not generated for this month yet`
+    );
+  }
+  return paySlipData;
+};
+
+exports.getAllPaySlip = async (req) => {
+  const { m, y } = req.query;
+
+  if (!m || !y) {
+    throw new ApiError(status.BAD_REQUEST, "Provide a valid query");
+  }
+
+  const paySlipMonth = `${MONTHS[m - 1]} ${y}`;
+
+  const paySlipData = await PaySlipModel.find({ paySlipMonth });
+  if (!paySlipData) {
+    throw new ApiError(status.BAD_REQUEST, `Pay slip is `);
+  }
   return paySlipData;
 };

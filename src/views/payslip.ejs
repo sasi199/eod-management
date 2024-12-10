@@ -11,7 +11,7 @@
   <div class="bg-white rounded-lg p-8 m-0 relative z-1">
 
     <!-- Logo -->
-    <img src="<%= companyLogo %>" alt="Logo" class="w-48 object-fit max-w-xs absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-0 opacity-40" />
+    <img src="<%= companyLogo %>" alt="Logo" class="w-48 object-fit max-w-xs absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-0 opacity-20" />
 
     <!-- Header -->
     <div class="flex justify-between items-center border-b pb-4">
@@ -91,7 +91,7 @@
     <!-- Net Pay Summary -->
     <div class="bg-green-50 mt-6 rounded-lg p-4 flex justify-between items-center">
       <div>
-        <h3 class="text-xl font-bold text-green-700"><%= netPay %></h3>
+        <h3 class="text-xl font-bold text-green-700">₹<%= netPay %></h3>
         <p class="text-sm text-gray-700">Employee Net Pay</p>
       </div>
       <div class="text-sm text-gray-600">
@@ -110,23 +110,23 @@
           <div class="text-sm text-gray-700 space-y-2">
             <div class="flex justify-between">
               <span>Basic</span>
-              <span><%= basic %></span>
+              <span>₹<%= basic %></span>
             </div>
             <div class="flex justify-between">
               <span>House Rent Allowance</span>
-              <span><%= hra %></span>
+              <span>₹<%= hra %></span>
             </div>
             <div class="flex justify-between">
               <span>Conveyance Allowance</span>
-              <span><%= conveyance %></span>
+              <span>₹<%= conveyance %></span>
             </div>
             <div class="flex justify-between">
-              <span>Fixed Allowance</span>
-              <span><%= fixedAllowance %></span>
+              <span>Other Allowance</span>
+              <span>₹<%= otherAllowance %></span>
             </div>
             <div class="flex justify-between font-semibold border-t pt-2">
               <span>Gross Earnings</span>
-              <span><%= grossEarnings %></span>
+              <span>₹<%= grossEarnings %></span>
             </div>
           </div>
         </div>
@@ -137,19 +137,23 @@
           <div class="text-sm text-gray-700 space-y-2">
             <div class="flex justify-between">
               <span>EPF Contribution</span>
-              <span><%= epfContribution %></span>
+              <span>₹<%= epfContribution %></span>
+            </div>
+            <div class="flex justify-between">
+              <span>ESI Contribution</span>
+              <span>₹<%= esiContribution %></span>
             </div>
             <div class="flex justify-between">
               <span>Professional Tax</span>
-              <span><%= professionalTax %></span>
+              <span>₹<%= professionalTax %></span>
             </div>
             <div class="flex justify-between">
               <span>LOP</span>
-              <span><%= lopDeduction %></span>
+              <span>₹<%= lopDeduction %></span>
             </div>
             <div class="flex justify-between font-semibold border-t pt-2">
               <span>Total Deductions</span>
-              <span><%= totalDeductions %></span>
+              <span>₹<%= totalDeductions %></span>
             </div>
           </div>
         </div>
@@ -159,7 +163,7 @@
     <!-- Total Net Pay -->
     <div class="bg-gray-50 mt-6 rounded-lg p-4 flex justify-between items-center">
       <h3 class="text-lg font-bold text-gray-800">TOTAL NET PAYABLE</h3>
-      <h3 class="text-xl font-bold text-green-700"><%= totalNetPay %></h3>
+      <h3 class="text-xl font-bold text-green-700">₹<%= totalNetPay %></h3>
     </div>
 
     <!-- Footer -->

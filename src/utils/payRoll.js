@@ -25,26 +25,33 @@ const standardSalaryConfig = {
 /**
  * Calculates the salary breakdown from the gross salary.
  * @param {number} grossSalary - Total gross salary.
+ * @param {number} totalWorkingDays - Total working days.
+ * @param {number} lopDays - Total loss of pay.
  * @param {boolean} includePF - Flag to include Provident Fund (default: true).
  * @param {boolean} includeESI - Flag to include Employee State Insurance (default: true).
- * @param {object} config - Optional custom salary configuration (default: standardSalaryConfig).
  * @returns {object} An object containing success status and salary breakdown.
  */
 const calculateSalaryBreakdown = (
   grossSalary,
+  totalWorkingDays,
+  lopDays = 0,
   includePF = true,
-  includeESI = true,
+  includeESI = true
 ) => {
+
+  let success = true;
+
   if (typeof grossSalary !== "number" || grossSalary <= 0) {
     throw new Error("Invalid gross salary. It must be a positive number.");
   }
 
-  // Use configuration or fallback to standardSalaryConfig
-  let salaryConfig = getData();
+  if (typeof lopDays !== "number" || lopDays < 0) {
+    throw new Error("Invalid LOP days. It must be a non-negative number.");
+  }
 
-  let basicSalary = grossSalary * standardSalaryConfig.basic
-   // Ensure all required keys exist in configuration
-   const requiredKeys = [
+  // Load salary configuration or use defaults
+  let salaryConfig = getData();
+  const requiredKeys = [
     "basic",
     "pf",
     "esi",
@@ -52,34 +59,61 @@ const calculateSalaryBreakdown = (
     "otherAllowance",
     "conveyance",
   ];
-  for (const key of requiredKeys) {
-    if (salaryConfig[key] === undefined) {
-      // If keys are missing, return a default breakdown with partial calculation
-      const salaryDetails = {
-        basicSalary: basicSalary,
-        providentFund: includePF ? basicSalary * standardSalaryConfig.pf : 0,
-        esi: includeESI ? basicSalary * standardSalaryConfig.esi : 0,
-        houseRentAllowance: grossSalary * standardSalaryConfig.hra,
-        otherAllowances:  grossSalary - ((grossSalary * salaryConfig.hra) - basicSalary - (grossSalary * salaryConfig.conveyance)),
-        conveyance: grossSalary * standardSalaryConfig.conveyance,
-      };
-      return { success: false, salaryDetails };
-    }
-  }
-  // Default basic salary as 40% of gross salary
-    basicSalary = grossSalary * salaryConfig.basic;
 
-  // Calculate salary components using the configuration
+  // Validate required keys, fallback to standardSalaryConfig if incomplete
+  const hasAllKeys = requiredKeys.every(
+    (key) => salaryConfig[key] !== undefined
+  );
+  if (!hasAllKeys) {
+    salaryConfig = standardSalaryConfig; // Fallback to defaults
+    success = false;
+  }
+
+  // Calculate LOP deduction based on gross salary
+  const lopDeduction = (grossSalary / totalWorkingDays) * lopDays;
+
+  
+  // Adjust gross salary after LOP deduction
+  const adjustedGrossSalary = grossSalary - lopDeduction;
+  
+  // Basic salary calculation
+  let basicSalary = adjustedGrossSalary * salaryConfig.basic;
+
+  // Calculate Provident Fund and ESI on adjusted gross salary
+  let providentFund = includePF ? basicSalary * salaryConfig.pf : 0;
+  let esi = includeESI ? basicSalary * salaryConfig.esi : 0;
+
+  // Other salary components
+  let houseRentAllowance = adjustedGrossSalary * salaryConfig.hra;
+  let conveyance = adjustedGrossSalary * salaryConfig.conveyance;
+
+  // Calculate other allowances to ensure total matches adjusted gross salary
+  let otherAllowances =
+    adjustedGrossSalary - (basicSalary + houseRentAllowance + conveyance);
+
+  // Total deductions (PF + ESI)
+  const pfAndEsiDeduction = providentFund + esi;
+
+  // Gross earned after LOP and deductions
+  const grossEarned = adjustedGrossSalary - pfAndEsiDeduction;
+
+  // Round all values to 1 decimal place
   const salaryDetails = {
-    basicSalary: basicSalary,
-    providentFund: includePF ? basicSalary * salaryConfig.pf : 0,
-    esi: includeESI ? basicSalary * salaryConfig.esi : 0,
-    houseRentAllowance: grossSalary * salaryConfig.hra,
-    conveyance: grossSalary * salaryConfig.conveyance,
-    otherAllowances: grossSalary - ((grossSalary * salaryConfig.hra )- basicSalary - (grossSalary * salaryConfig.conveyance))
+    basic: Math.round(basicSalary * 10) / 10,
+    epfContribution: Math.round(providentFund * 10) / 10,
+    esiContribution: Math.round(esi * 10) / 10,
+    hra: Math.round(houseRentAllowance * 10) / 10,
+    conveyance: Math.round(conveyance * 10) / 10,
+    otherAllowance: Math.round(otherAllowances * 10) / 10,
+    lopDeduction: Math.round(lopDeduction * 10) / 10,
+    pfAndEsiDeduction: Math.round(pfAndEsiDeduction * 10) / 10,
+    grossEarnings: Math.round(grossEarned * 10) / 10,
+    totalDeductions: Math.round(pfAndEsiDeduction * 10) / 10 + + Math.round(lopDeduction * 10) / 10,
+    professionalTax: 0,
+    totalNetPay:  Math.round(grossEarned * 10) / 10,
   };
 
-  return { success: true, salaryDetails };
+  return { success, salaryDetails };
 };
 
 /**
@@ -108,7 +142,11 @@ const calculateLateBalance = (lateCount, deductionLimit) => {
  * @param {number} carryForwardLeaves - The number of carry forward leave days.
  * @returns {Array} An array with the number of leaves taken and updated balances.
  */
-const calculateLeaveBalance = (leavesTaken, leaveBalance, carryForwardLeaves = null) => {
+const calculateLeaveBalance = (
+  leavesTaken,
+  leaveBalance,
+  carryForwardLeaves = null
+) => {
   let remainingLeaveBalance = leaveBalance;
   let carryForwardLeaveBalance = carryForwardLeaves;
 
@@ -168,23 +206,45 @@ const calculateWorkingDays = ({
   let compOffBalance = compOffDays;
   let carryForwardLeaveBalance = leaveBalance;
   let approvedLeavesUsed = approvedLeavesTaken;
-  let permissionBalance = Math.max(0, salaryConfig.permission - permissionsTaken);
+  let permissionBalance = Math.max(
+    0,
+    salaryConfig.permission - permissionsTaken
+  );
   let lateBalance = Math.max(0, lateCount - salaryConfig.approvedLate);
 
   // Calculate balances for late, casual, sick leaves, and permissions
-  [lateBalance, permissionBalance] = calculateLateBalance(lateBalance, permissionBalance);
-  [lateBalance, casualLeaveBalance] = calculateLateBalance(lateBalance, casualLeaveBalance);
-  [lateBalance, sickLeaveBalance] = calculateLateBalance(lateBalance, sickLeaveBalance);
+  [lateBalance, permissionBalance] = calculateLateBalance(
+    lateBalance,
+    permissionBalance
+  );
+  [lateBalance, casualLeaveBalance] = calculateLateBalance(
+    lateBalance,
+    casualLeaveBalance
+  );
+  [lateBalance, sickLeaveBalance] = calculateLateBalance(
+    lateBalance,
+    sickLeaveBalance
+  );
 
   // Calculate balances for approved leaves and carry forward leaves
-  [approvedLeavesUsed, casualLeaveBalance] = calculateLeaveBalance(approvedLeavesUsed, casualLeaveBalance);
-  [approvedLeavesUsed, sickLeaveBalance, carryForwardLeaveBalance] = calculateLeaveBalance(
+  [approvedLeavesUsed, casualLeaveBalance] = calculateLeaveBalance(
     approvedLeavesUsed,
-    sickLeaveBalance,
+    casualLeaveBalance
+  );
+  [approvedLeavesUsed, sickLeaveBalance, carryForwardLeaveBalance] =
+    calculateLeaveBalance(
+      approvedLeavesUsed,
+      sickLeaveBalance,
+      carryForwardLeaveBalance
+    );
+  [approvedLeavesUsed, compOffBalance] = calculateLeaveBalance(
+    approvedLeavesUsed,
+    compOffBalance
+  );
+  [approvedLeavesUsed, carryForwardLeaveBalance] = calculateLeaveBalance(
+    approvedLeavesUsed,
     carryForwardLeaveBalance
   );
-  [approvedLeavesUsed, compOffBalance] = calculateLeaveBalance(approvedLeavesUsed, compOffBalance);
-  [approvedLeavesUsed, carryForwardLeaveBalance] = calculateLeaveBalance(approvedLeavesUsed, carryForwardLeaveBalance);
 
   if (lateBalance > 0) {
     const deductionDays = lateBalance * 0.5;
@@ -192,33 +252,40 @@ const calculateWorkingDays = ({
     lateBalance = 0;
   }
 
+  let lopDays = totalWorkingDays - effectiveWorkingDays;
+
   return {
-    totalWorkingDays,
-    effectiveWorkingDays,
-    sickLeaveBalance,
+    casualLeaveAvailable: salaryConfig.casualLeave,
+    casualLeaveUsed: salaryConfig.casualLeave - casualLeaveBalance,
     casualLeaveBalance,
-    compOffBalance,
-    lateBalance,
-    permissionBalance,
-    carryForwardLeaveBalance,
-    lateArrivals: lateCount,
-    unapprovedLeavesTaken,
-    approvedLeavesTaken,
-    permissionsTaken,
+    sickLeaveAvailable: salaryConfig.sickLeave,
+    sickLeaveUsed: salaryConfig.sickLeave - sickLeaveBalance,
+    sickLeaveBalance,
+    balanceLeaveAvailable: leaveBalance,
+    balanceLeaveUsed: leaveBalance - carryForwardLeaveBalance,
+    balanceLeaveBalance: carryForwardLeaveBalance,
+    balanceLeave:carryForwardLeaveBalance,
+    compOffAvailable: compOffDays,
+    compOffUsed: compOffDays - compOffBalance,
+    compOffBalance: compOffBalance,
+    totalLeaveBalance: carryForwardLeaveBalance,
+    paidDays: totalWorkingDays,
+    lopDays,
+    effectiveWorkingDays,
   };
 };
 
 // Example usage of `calculateWorkingDays`
-const workingDaysData = calculateWorkingDays({
-  totalWorkingDays: 30,
-  unapprovedLeavesTaken: 1,
-  approvedLeavesTaken: 1,
-  permissionsTaken: 1,
-  lateCount: 23,
-  leaveBalance: 0,
-  compOffDays: 2,
-});
+// const workingDaysData = calculateWorkingDays({
+//   totalWorkingDays: 30,
+//   unapprovedLeavesTaken: 1,
+//   approvedLeavesTaken: 1,
+//   permissionsTaken: 1,
+//   lateCount: 23,
+//   leaveBalance: 0,
+//   compOffDays: 2,
+// });
 
-console.log(workingDaysData, "leave data");
+// console.log(workingDaysData, "leave data");
 
 module.exports = { calculateSalaryBreakdown, calculateWorkingDays };
