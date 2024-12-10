@@ -21,7 +21,7 @@ companyRouter.get('/get-all', companyController.getAllCompanies);
 companyRouter.get('/:companyId', companyController.getCompanyById);
 
 // Route to update a company
-companyRouter.put('/update/:companyId', companyController.updateCompany);
+companyRouter.put('/update/:companyId', uploads.single('companyLogo'), companyController.updateCompany);
 
 // Route to delete a company
 companyRouter.delete('/delete-h/:companyId', companyController.deleteCompany);

@@ -31,7 +31,7 @@ exports.getAllPaySlip = catchAsync(async (req, res) => {
 });
 
 exports.downloadPaySlip = catchAsync(async (req, res) => {
-    const response = await PaySlipServices.getStaffPaySlip(req);
+    const response = await PaySlipServices.getPaySlip(req);
 
     const htmlContent = await ejs.renderFile('./src/views/payslip.ejs',response);
 

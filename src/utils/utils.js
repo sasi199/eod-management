@@ -342,8 +342,8 @@ class Utils {
 
 numberToWords(num) {
   const ones = [
-      "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", 
-      "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", 
+      "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+      "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
       "Seventeen", "Eighteen", "Nineteen"
   ];
   const tens = [
@@ -355,6 +355,7 @@ numberToWords(num) {
 
   let result = "";
 
+  // Function to convert numbers below 1000 into words
   const getBelowThousand = (n) => {
       let str = "";
       if (n > 99) {
@@ -371,17 +372,35 @@ numberToWords(num) {
       return str.trim();
   };
 
+  let integerPart = Math.floor(num);
+  let fractionalPart = Math.round((num - integerPart) * 100); // Two decimal places (paise)
+  let parts = [];
   let scaleIndex = 0;
-  while (num > 0) {
-      const chunk = num % 1000;
-      if (chunk > 0) {
-          result = getBelowThousand(chunk) + (scales[scaleIndex] ? " " + scales[scaleIndex] + " " : "") + result;
+
+  // Process the number for Indian numbering system
+  while (integerPart > 0) {
+      let chunk;
+      if (scaleIndex === 0) {
+          chunk = integerPart % 1000; // First group: 3 digits (thousands)
+          integerPart = Math.floor(integerPart / 1000);
+      } else {
+          chunk = integerPart % 100; // Subsequent groups: 2 digits (lakhs, crores)
+          integerPart = Math.floor(integerPart / 100);
       }
-      num = Math.floor(num / 1000);
+      if (chunk > 0) {
+          parts.unshift(getBelowThousand(chunk) + (scales[scaleIndex] ? " " + scales[scaleIndex] : ""));
+      }
       scaleIndex++;
   }
 
-  return result.trim() + " Rupees Only";
+  result = parts.join(" ").trim() + " Rupees";
+
+  // Add fractional part (paise) if any
+  if (fractionalPart > 0) {
+      result += " and " + getBelowThousand(fractionalPart) + " Paise";
+  }
+
+  return result + " Only";
 }
 
 generatePDF = async(htmlContent) => {

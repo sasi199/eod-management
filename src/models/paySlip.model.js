@@ -10,17 +10,20 @@ const paySlipFields = {
   companyName: schemaFields.requiredAndString,
   companyLogo: schemaFields.requiredAndString,
   companyLocation: schemaFields.requiredAndString, // Added location
+  colorCode:String,
   // Date
   paySlipMonth: schemaFields.requiredAndString, // Added paySlipMonth
   salaryDate: schemaFields.requiredAndString, // Added salaryDate
+  payDate: String,
   // Personal Details
   employeeName: schemaFields.requiredAndString,
   employeeId: schemaFields.requiredAndString, // Changed from employeeNumber
   designation: schemaFields.requiredAndString,
   department: schemaFields.requiredAndString,
   dateOfJoining: schemaFields.requiredAndString,
-  pfAccountNumber: schemaFields.StringWithDefault("Not provided"), // Changed pfNumber to pfAccountNumber
-  uan: schemaFields.StringWithDefault("Not provided"), // Added UAN (Universal Account Number)
+  pfAccountNumber: schemaFields.StringWithDefault("Not provided"),
+  esiAccountNumber: schemaFields.StringWithDefault("Not provided"),
+  uan: schemaFields.StringWithDefault("Not provided"),
   
   // Leave Details
   casualLeaveAvailable: schemaFields.requiredNumberWithDefault(0),
@@ -41,11 +44,18 @@ const paySlipFields = {
   basic: schemaFields.requiredNumberWithDefault(0),
   hra: schemaFields.requiredNumberWithDefault(0),
   conveyance: schemaFields.requiredNumberWithDefault(0),
-  fixedAllowance: schemaFields.requiredNumberWithDefault(0),
+  otherAllowance: schemaFields.requiredNumberWithDefault(0),
   grossEarnings: schemaFields.requiredNumberWithDefault(0),
 
   // Deductions
+  isPf: Boolean,
+  isEsi:Boolean,
+  isEmployerPf:Boolean,
+  isEmployerEsi:Boolean,
+  employerPF: schemaFields.requiredNumberWithDefault(0),
   epfContribution: schemaFields.requiredNumberWithDefault(0),
+  employerEsi: schemaFields.requiredNumberWithDefault(0),
+  esiContribution: schemaFields.requiredNumberWithDefault(0),
   professionalTax: schemaFields.requiredNumberWithDefault(0),
   lopDeduction: schemaFields.requiredNumberWithDefault(0),
   totalDeductions: schemaFields.requiredNumberWithDefault(0),

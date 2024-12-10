@@ -174,13 +174,14 @@ const getPaySlipData = async (query) => {
 
   if (isTrainee) {
     department = userDetails.department;
-    designation = useDetails.designation ?? "Trainee";
+    designation = userDetails.designation ?? "Trainee";
   } else {
     department = userDetails.department_id.name;
     designation = userDetails.designation.title;
   }
 
   const paySlipData = {
+    user_id: isTrainee?tid:sid,
     colorCode: companyData.colorCode,
     companyLogo: companyData.companyLogo,
     companyName: companyData.companyName,
@@ -195,10 +196,12 @@ const getPaySlipData = async (query) => {
     pfAccountNumber: payrollDetails.pfNumber,
     uan: payrollDetails.uanNumber,
     salaryDate:payDate,
-    netPay: grossSalary,
+    netPay: salaryDetails.grossEarnings,
+    isPf:payrollDetails.isPf,
+    isEsi:payrollDetails.isEsi,
     ...salaryDetails,
     ...leaveDetail,
-    amountInWords: numberToWords(salaryDetails.grossEarned),
+    amountInWords: numberToWords(salaryDetails.grossEarnings),
   };
 
   return {paySlipData,user_id:userDetails._id};
@@ -214,7 +217,7 @@ const managePaySlip = async (data) => {
     throw new Error(status.BAD_REQUEST, "User id is required");
   }
   const { paySlipMonth, employeeId } = paySlipData;
-  const existingPaySlipData = await PaySlipModel.findOne({
+  let existingPaySlipData = await PaySlipModel.findOne({
     paySlipMonth,
     employeeId,
   });
@@ -222,7 +225,7 @@ const managePaySlip = async (data) => {
   let finalData = null;
 
   if (existingPaySlipData) {
-    existingPaySlipData = { existingPaySlipData, ...paySlipData };
+    existingPaySlipData.set(paySlipData);
     const isUpdated = await existingPaySlipData.save();
     if (!isUpdated) {
       return null;

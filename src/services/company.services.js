@@ -86,10 +86,18 @@ exports.updateCompany = async (req) => {
         }
     }
 
+    let companyLogo;
+    if (req.file) {
+        const fileExtension = req.file.originalname.split('.').pop();
+        const fileName = `${Date.now()}.${fileExtension}`
+        companyLogo = await uploadCloud(`Company/${fileName}`,req.file)
+        req.body.companyLogo = companyLogo;
+    }
+
     // Update the company
     const updatedCompany = await CompanyModel.findByIdAndUpdate(
         companyId,
-        { companyName, companyCode, address, contactNumber, website },
+        req.body,
         { new: true }
     );
 

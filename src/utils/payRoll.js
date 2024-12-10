@@ -1,8 +1,12 @@
 const { getData } = require("../config/json.config");
 
 const standardSalaryConfig = {
+  isEmployerEsi:true,
+  isEmployerPf:true,
   pf: 0.12,
+  employerPF: 0.12,
   esi: 0.0075,
+  employerEsi: 0.0325,
   basic: 0.4,
   hra: 0.3,
   conveyance: 0.1,
@@ -80,8 +84,10 @@ const calculateSalaryBreakdown = (
   let basicSalary = adjustedGrossSalary * salaryConfig.basic;
 
   // Calculate Provident Fund and ESI on adjusted gross salary
+  let employerPF = includePF ? basicSalary * salaryConfig.employerPF : 0
   let providentFund = includePF ? basicSalary * salaryConfig.pf : 0;
-  let esi = includeESI ? basicSalary * salaryConfig.esi : 0;
+  let esi = includeESI ? grossSalary * salaryConfig.esi : 0;
+  let employerEsi = includeESI ? grossSalary * salaryConfig.employerEsi : 0;
 
   // Other salary components
   let houseRentAllowance = adjustedGrossSalary * salaryConfig.hra;
@@ -100,7 +106,9 @@ const calculateSalaryBreakdown = (
   // Round all values to 1 decimal place
   const salaryDetails = {
     basic: Math.round(basicSalary * 10) / 10,
+    employerPF: Math.round(employerPF * 10) / 10,
     epfContribution: Math.round(providentFund * 10) / 10,
+    employerEsi: Math.round(employerEsi * 10) / 10,
     esiContribution: Math.round(esi * 10) / 10,
     hra: Math.round(houseRentAllowance * 10) / 10,
     conveyance: Math.round(conveyance * 10) / 10,
@@ -111,6 +119,8 @@ const calculateSalaryBreakdown = (
     totalDeductions: Math.round(pfAndEsiDeduction * 10) / 10 + + Math.round(lopDeduction * 10) / 10,
     professionalTax: 0,
     totalNetPay:  Math.round(grossEarned * 10) / 10,
+    isEmployerEsi:salaryConfig.isEmployerEsi,
+    isEmployerPf:salaryConfig.isEmployerPf,
   };
 
   return { success, salaryDetails };
@@ -262,7 +272,7 @@ const calculateWorkingDays = ({
     sickLeaveUsed: salaryConfig.sickLeave - sickLeaveBalance,
     sickLeaveBalance,
     balanceLeaveAvailable: leaveBalance,
-    balanceLeaveUsed: leaveBalance - carryForwardLeaveBalance,
+    balanceLeaveUsed: Math.max(leaveBalance - carryForwardLeaveBalance, 0),
     balanceLeaveBalance: carryForwardLeaveBalance,
     balanceLeave:carryForwardLeaveBalance,
     compOffAvailable: compOffDays,

@@ -21,6 +21,8 @@ PaySlipRouter.get('/generate-s', PayslipController.generateStaffPaySlip);
 
 PaySlipRouter.get('/get-by-id', PayslipController.getPaySlipById);
 
+PaySlipRouter.get('/download',PayslipController.downloadPaySlip)
+
 
 
 // Route to get a monthly payroll by ID
