@@ -73,6 +73,7 @@ exports.approveLeave = async (req) => {
         // Update hybrid status for the duration of the leave
         await updateHybridStatus(leave.userId, leave.date, leave.endDate, leave.leaveType);
     }
+    
 
     await leave.save();
 
