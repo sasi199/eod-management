@@ -96,14 +96,14 @@ exports.createStaff = async(req)=>{
 
       const hashedPassword = await utils.hashPassword(staffData.password);
 
-    let profilePic;
+      const staffId = await generateStaffLogId(staffData.company_id,staffData.department_id);
+      let profilePic;
+
     if (req.file) {
         const fileExtension = req.file.originalname.split('.').pop();
-        const fileName = `${Date.now()}.${fileExtension}`
-        profilePic = await uploadCloud(`staff-Profile/${fileName}`,req.file)
+        const fileName = `${'profilePic'}.${fileExtension}`
+        profilePic = await uploadCloud(`staff/${staffId}/${fileName}`,req.file)
     }
-
-    const staffId = await generateStaffLogId(staffData.company_id,staffData.department_id);
 
     const isTrainer = staffData.isTrainer;
     let isTrainerBoolean = false;
@@ -155,7 +155,7 @@ exports.createStaff = async(req)=>{
 
     await newStaff.save();
     await newAuth.save();
-
+    await newPayRoll.save();
     return newStaff;
 }
 

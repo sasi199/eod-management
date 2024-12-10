@@ -1,11 +1,14 @@
 const mongoose = require('mongoose');
 const schemaFields = require('../utils/schemaFieldUtils');
+const { required } = require('joi');
 
 
 const attendanceSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
     date: schemaFields.requiredAndDate,
-    checkIn: schemaFields.requiredAndDate,
+    checkIn:{
+        type: Date,
+    },
     user: {
         type: String,
         ref: 'Auth',
@@ -14,7 +17,6 @@ const attendanceSchema = new mongoose.Schema({
     
     checkOut:{
         type: Date,
-        required: false,
     },
     location:{
         type: {
@@ -25,22 +27,27 @@ const attendanceSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Present', 'Absent', 'WFH', 'Off-Day','1 hour','Online','Late'],
+        enum: ['Present', 'Absent', 'WFH', 'Half-Day','Online','Late'],
         required: true,
         default: 'Present'
     },
     islate: schemaFields.BooleanWithDefault,
-    modifiedBy:{
+    isApprovedLeave: schemaFields.BooleanWithDefault,
+    isApprovedPermission: schemaFields.BooleanWithDefault,
+    isApprovedCompoff: schemaFields.BooleanWithDefault,
+    isApprovedWFH: schemaFields.BooleanWithDefault,
+    isApprovedOnline: schemaFields.BooleanWithDefault,
+    modifiedBy:[{
         type: String,
         ref: 'Auth',
-    },
-    permission:{
-        type: String,
-        enum: ["write"],
-        default: ()=>{
-            return this.role === 'superAdmin'?'full-access':'write'
-        }
-    },
+    }],
+    // permission:{
+    //     type: String,
+    //     enum: ["write"],
+    //     default: ()=>{
+    //         return this.role === 'superAdmin'?'full-access':'write'
+    //     }
+    // },
 },{timestamps:true, collection: "Attendance"});
 
 // attendanceSchema.pre('save', function (next) {

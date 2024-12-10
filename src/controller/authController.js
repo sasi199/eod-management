@@ -16,6 +16,11 @@ exports.authLogin = catchAsync (async(req,res)=>{
 })
 
 
+exports.createAttendance = catchAsync(async(req,res)=>{
+    const response = await authService.createAttendance(req)
+    res.status(200).json({status:true, message: "Attendance craete successfully",data:response})
+})
+
 exports.getAttendance = catchAsync(async(req,res)=>{
     const response = await authService.getAttendance(req)
     res.status(200).json({status:true, message: "Attendance get successfully",data:response})
