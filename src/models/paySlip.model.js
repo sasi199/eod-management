@@ -2,6 +2,7 @@ const { default: mongoose } = require("mongoose");
 const schemaFields = require("../utils/schemaFieldUtils");
 
 const paySlipFields = {
+  _id: schemaFields.idWithV4UUID,
   //user details
   user_id: String,
 

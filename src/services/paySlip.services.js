@@ -55,6 +55,8 @@ const getPaySlipData = async (query) => {
   if (!sid && tid) {
     isTrainee = true;
   }
+
+  console.log(isTrainee,"isTrainee")
   console.log(sid, "sid");
   const { workingDays, holidays, startDate, endDate, payDate } = getWorkingDays(
     parseInt(m),
@@ -97,8 +99,7 @@ const getPaySlipData = async (query) => {
         $lte: endIsoString,
       },
     });
-  }
-  if (isTrainee) {
+  }else{
     getUserQuery = TraineeModel.findById(tid);
     getPayRollQuery = PayrollModel.findOne({ user_id: tid });
     getMonthlyPayrollQuery = MonthlyPayrollModel.findOne({
@@ -193,6 +194,7 @@ const getPaySlipData = async (query) => {
     payDate: monthlyPayroll.payDate,
     pfAccountNumber: payrollDetails.pfNumber,
     uan: payrollDetails.uanNumber,
+    salaryDate:payDate,
     netPay: grossSalary,
     ...salaryDetails,
     ...leaveDetail,
