@@ -80,15 +80,12 @@ exports.createStaff = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"designation not found"});  
     }
 
-    const role = await RoleModel.findById({_id:staffData.role});
+    const role = await RoleModel.findById(staffData.role);
     if (!role) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"role not found"});  
     }
 
-    if (req.user.role !== 'SuperAdmin') {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message: "Only super admin can create staff"});
-        
-    }
+    
 
     if (!validator.isEmail(staffData.professionalEmail)) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email"});
@@ -96,14 +93,14 @@ exports.createStaff = async(req)=>{
 
       const hashedPassword = await utils.hashPassword(staffData.password);
 
-    let profilePic;
+      const staffId = await generateStaffLogId(staffData.company_id,staffData.department_id);
+      let profilePic;
+
     if (req.file) {
         const fileExtension = req.file.originalname.split('.').pop();
-        const fileName = `${Date.now()}.${fileExtension}`
-        profilePic = await uploadCloud(`staff-Profile/${fileName}`,req.file)
+        const fileName = `${'profilePic'}.${fileExtension}`
+        profilePic = await uploadCloud(`staff/${staffId}/${fileName}`,req.file)
     }
-
-    const staffId = await generateStaffLogId(staffData.company_id,staffData.department_id);
 
     const isTrainer = staffData.isTrainer;
     let isTrainerBoolean = false;
@@ -155,7 +152,7 @@ exports.createStaff = async(req)=>{
 
     await newStaff.save();
     await newAuth.save();
-
+    await newPayRoll.save();
     return newStaff;
 }
 

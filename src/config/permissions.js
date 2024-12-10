@@ -20,6 +20,28 @@ const permissionGroups = {
         'empViewOwn',
       ]
     },
+
+    adminManagement: {
+      create: [
+        'adminCreate',            // Create new employee
+      ],
+      manage: [
+        'adminManage',            // Manage employee details
+        'adminManageOwn',         // Manage own employee details
+        'adminManageOther',       // Manage other employees' details
+      ],
+      manageOwn:[
+        'adminManageOwn',
+      ],
+      view: [
+        'adminView',              // View employee details
+        'adminViewOwn',           // View own employee details
+        'adminViewOther',         // View other employees' details
+      ],
+      viewOwn: [
+        'adminViewOwn',
+      ]
+    },
   
     leaveManagement: {
       request: [
@@ -79,6 +101,12 @@ const permissionGroups = {
     },
   
     roleManagement: {
+      create:[
+        'roleCreate'
+      ],
+      manage:[
+        'roleManage'
+      ],
       assign: [
         'roleAssign',           // Assign roles to users
       ],
@@ -98,6 +126,15 @@ const permissionGroups = {
     'empView',
     'empViewOwn',
     'empViewOther',
+
+    // Employee Management
+    'adminCreate',
+    'adminManage',
+    'adminManageOwn',
+    'adminManageOther',
+    'adminView',
+    'adminViewOwn',
+    'adminViewOther',
   
     // Leave Management
     'leaveRequest',

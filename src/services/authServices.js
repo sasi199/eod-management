@@ -13,18 +13,22 @@ const jwt = require('jsonwebtoken');
 
 exports.loginByEmailAndLogId = async(req)=>{
     const { email, password, latitude,longitude,} = req.body
-    const user = await Auth.findOne({email});
+    const user = await Auth.findOne({email}).populate({
+      path:'role',
+      select:'name'
+    });
     if (!user) {
         throw new ApiError(httpStatus.UNAUTHORIZED, {message:"Invalid credantials",status:false,});
       }
 
-      const today = new Date().toISOString().slice(0.10);
+    
       const now = new Date();
-
+      const startOfDay = utils.Currentdate();
+      // const endOfDay = new Date(now.setHours(23, 59, 59, 999));
       const workStart = new Date();
-      workStart.setHours(10,0,0)
+      workStart.setHours(10, 0, 0);
       const workEnd = new Date();
-      workEnd.setHours(18,30,0)
+      workEnd.setHours(18, 30, 0);
 
 
 
@@ -44,21 +48,25 @@ exports.loginByEmailAndLogId = async(req)=>{
         
       }   
 
-        const newAttendance = new AttendanceModel({
-          user: user._id,
-          date: today,
-          checkIn: now,
-          status: workStart > now ? "Late" : "Present",
-          islate: now > workStart,
-          location:{
-            latitude: latitude,
-            longitude: longitude,
-          },
-        })
-
-      await newAttendance.save();
-
+      console.log("stata",startOfDay);
+      // console.log("stata",endOfDay);
       
+
+      let attendance = await AttendanceModel.findOne({
+        user: user._id, 
+        dateString: startOfDay
+      });
+      console.log("aaaaaaaa",attendance);
+      
+
+      if (attendance) {
+        // Update existing attendance record
+        attendance.checkIn = now;
+        attendance.status = workStart > now ? "Late" : "Present";
+        attendance.islate = now > workStart;
+        attendance.location = { latitude, longitude };
+        await attendance.save();
+      } 
 
       const token = jwt.sign(
         {id:user._id, role:user.role},
@@ -69,6 +77,46 @@ exports.loginByEmailAndLogId = async(req)=>{
       return {token,role:user.role};
 }
 
+
+exports.createAttendance = async(req)=>{
+  const todayDate = utils.Currentdate();
+
+
+  const allEmployees = await Auth.find({ active: true, archive: false });
+  if (!allEmployees || allEmployees.length === 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, "No active employees found");
+  }
+
+
+  const existingAttendance = await AttendanceModel.find({date:todayDate});
+  const existingUserIds = existingAttendance.map(att => att.user);
+
+    // Step 3: Filter employees who don't have attendance recorded yet
+    const employeesWithoutAttendance = allEmployees.filter(
+      employee => !existingUserIds.includes(employee._id)
+    );
+
+
+    const attendanceData = employeesWithoutAttendance.map(employee => ({
+      dateString: todayDate,
+      checkIn: null,
+      checkOut: null,
+      user: employee._id,
+      location: { latitude: 0, longitude: 0 }, // Default location, adjust if necessary
+      status: 'Absent',
+      islate: false,
+      isApprovedLeave: false,
+      isApprovedPermission: false,
+      isApprovedCompoff: false,
+      modifiedBy: null
+    }));
+
+    if (attendanceData.length > 0) {
+      await AttendanceModel.insertMany(attendanceData);
+      return { message: "Default attendance created for employees", count: attendanceData.length };
+    }
+
+}
 
 exports.getAttendance = async(req)=>{
   const attendance = await AttendanceModel.find().populate({
