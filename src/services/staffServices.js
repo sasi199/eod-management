@@ -45,8 +45,6 @@ const generateStaffLogId = async(companyId,departmentId)=>{
 
 exports.createStaff = async(req)=>{
     const staffData = req.body;
-    console.log("satggg",req.body);
-    
 
     if (!validator.isEmail(staffData.professionalEmail)) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email" });
@@ -67,13 +65,13 @@ exports.createStaff = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"company not found"});  
     }
 
-    const department = await DepartmentModel.findById({_id:staffData.department_id});
+    const department = await DepartmentModel.findById(staffData.department_id);
     
     if (!department) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"department not found"});  
     }
 
-    const designation = await DesignationModel.findById({_id:staffData.designation});
+    const designation = await DesignationModel.findById(staffData.designation);
     
     if (!designation) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"designation not found"});  
@@ -83,9 +81,6 @@ exports.createStaff = async(req)=>{
     if (!role) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"role not found"});  
     }
-
-    
-
     if (!validator.isEmail(staffData.professionalEmail)) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email"});
       }
@@ -133,7 +128,7 @@ exports.createStaff = async(req)=>{
         isGratuity} = staffData
 
     const newPayRoll = new PayrollModel({
-        staff_id: newStaff._id,
+        user_id: newStaff._id,
         grossSalary,
         isPf,
         isEsi,
@@ -147,6 +142,7 @@ exports.createStaff = async(req)=>{
         accountId: newStaff._id,
         email: staffData.professionalEmail,
         fullName: staffData.fullName,
+        department: staffData.department_id,
         profilePic,
         logId:staffId,
         hybrid: staffData.hybrid,

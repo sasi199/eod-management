@@ -4,6 +4,7 @@ const uploads = require("../middlewares/multer");
 const httpStatus = require('http-status');
 const { verifyAuthToken } = require('../middlewares/jwt.config');
 const { checkPermission } = require('../middlewares/permission');
+const { permissionGroups } = require('../config/permissions');
 
 const Router = express.Router();
 
@@ -11,7 +12,7 @@ const Router = express.Router();
 
 // Router.use(verifyAuthToken);
 
-Router.route('/createStaff').post(verifyAuthToken,checkPermission,uploads.single('profilePic'),staffController.createStaff);
+Router.route('/createStaff').post(verifyAuthToken,checkPermission(permissionGroups.adminManagement.create),uploads.single('profilePic'),staffController.createStaff);
 Router.route('/getStaffAll').get(staffController.getStaffAll);
 Router.route('/getFilterStaff').get(staffController.getFilterStaff);
 Router.route('/getStaffId/:_id').get(staffController.getStaffId);
