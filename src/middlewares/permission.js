@@ -8,7 +8,7 @@ const checkPermission = (permission) => {
     try {
 
       // Check if user has the required permission
-      if (role.permissions && role.permissions.includes(permission)) {
+      if (permission.every((value) => role.includes(value))) {
         req.role = role
         return next();
       }
