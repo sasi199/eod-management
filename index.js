@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const server = require("./app");
 const config = require("./src/config/config");
 const logger = require("./src/config/logger");
+require('./src/utils/devLogger');
 
 const jsonConfig = require('./src/config/json.config')
 
