@@ -1,0 +1,140 @@
+/* General Container */
+.container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+  }
+  
+  /* Main Content */
+  .main-content {
+    width: 70%;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    margin-bottom: 20px;
+  }
+  
+  .config-details {
+    margin-bottom: 20px;
+  }
+  
+  .config-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  button.edit-btn {
+    padding: 10px 20px;
+    background-color: #3f51b5;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button.edit-btn:hover {
+    background-color: #303f9f;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 25%;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .history-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .history-item {
+    background-color: #fafafa;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal {
+    background-color: #fff;
+    padding: 20px;
+    width: 60%;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    font-size: 16px;
+    font-weight: bold;
+    display: block;
+  }
+  
+  .text-input,
+  .checkbox-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  button.cancel-btn,
+  button.save-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button.cancel-btn {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  button.save-btn {
+    background-color: #3f51b5;
+    color: white;
+  }
+  
+  button.cancel-btn:hover {
+    background-color: #d32f2f;
+  }
+  
+  button.save-btn:hover {
+    background-color: #303f9f;
+  }
+  
