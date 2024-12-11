@@ -50,6 +50,53 @@ import Profile from "../Panel/Trainer/Pages/Profile/Profile";
 import Eod from "../Panel/Trainer/Pages/EOD/Eod";
 import TrainerEod from "../Panel/Trainer/Pages/EOD/Eod";
 import SuperEod from "../Panel/SuperAdmin/Pages/EOD/SuperEod";
+import SalaryConfig from "../Panel/SuperAdmin/Pages/SalaryConfig/SalaryConfig";
+
+
+
+const initialSalaryConfig = {
+  _id: "someUUID",
+  isEmployerEsi: true,
+  isEmployerPf: true,
+  pf: 0.12,
+  employerPF: 0.12,
+  esi: 0.0075,
+  employerEsi: 0.0325,
+  basic: 0.4,
+  hra: 0.3,
+  conveyance: 0.1,
+  otherAllowance: 0.2,
+  sickLeave: 1,
+  casualLeave: 1,
+  permission: 2,
+  permissionDuration: 5400,
+  checkInTime: "09:55",
+  checkOutTime: "18:30",
+  graceTime: 300,
+  workingHours: 270000,
+  approvedLate: 3,
+  startDeductFrom: 4,
+  lastModified: [],
+};
+
+const history = [
+  {
+    _id: "uuid1",
+    date: "10/12/2024",
+    modifiedFields: ["pf", "esi"]
+  },
+  {
+    _id: "uuid2",
+    date: "11/12/2024",
+    modifiedFields: ["basic", "hra"]
+  },
+];
+
+const handleSave = (updatedConfig, historyEntry) => {
+  console.log('Updated Config:', updatedConfig);
+  console.log('History Entry:', historyEntry);
+};
+
 
 // export default pages;
 
@@ -127,6 +174,14 @@ export const pages = [
       {
         path: "report",
         element: <SuperReports />,
+      },
+      {
+        path: "salary-config",
+        element: <SalaryConfig
+        salaryConfig={initialSalaryConfig}
+        history={history}
+        onSave={handleSave}
+      />,
       },
     ],
   },

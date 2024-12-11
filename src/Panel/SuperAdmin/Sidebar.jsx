@@ -19,6 +19,7 @@ import { MdAssignment } from "react-icons/md";
 import { GiNotebook } from "react-icons/gi";
 import logo from "../../assets/Login/NavbarLogo.png";
 import { GetProjects, logout } from "../../services";
+import { GrConfigure } from "react-icons/gr";
 
 const Navbar = () => {
   const location = useLocation();
@@ -38,6 +39,7 @@ const Navbar = () => {
     "/sidebar/chat": "Chat",
     "/sidebar/schedule": "Schedule",
     "/sidebar/notifications": "Notifications",
+    "/sidebar/salary-config": "Salary Config"
   };
 
   // const currentPageName = pageNames[location.pathname] || "Page";
@@ -342,6 +344,15 @@ const Sidebar = () => {
             >
               <FaFileAlt size={24}/>
               Reports
+            </Link>
+            <Link
+              to="/sidebar/salary-config"
+              className={`${
+                isActive("/sidebar/salary-config") ? "text-orange-600 bg-white" : ""
+              } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
+            >
+              <GrConfigure size={24} />
+              Salary Config
             </Link>
           </div>
         ) : (

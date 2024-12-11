@@ -34,7 +34,7 @@ const Login = () => {
 
             if (response.data.status === true) {
               localStorage.setItem("authToken", response.data.data.token);
-              const role = response.data.data.role
+              const role = response.data.data.role.name
               setEmail("");
               setPassword("");
               setRole(role);
@@ -58,7 +58,7 @@ const Login = () => {
           })
           .catch((error) => {
             console.error("Login failed:", error);
-            alert("Login failed. Please try again.");
+            alert(error.response.message);
           });
       },
 
