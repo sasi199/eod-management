@@ -47,11 +47,7 @@ const generateBatchName = async() =>{
 
 exports.createBatch = async(req)=>{
     const { authId } = req
-    
     const { courseName, courseDuration, batchTimings, trainer,} = req.body
-    console.log(req.body,"eeeeeeeeee");
-    
-
     const batchId = await generateBatchId(courseName);
     
     if (!batchId) {
@@ -69,12 +65,7 @@ exports.createBatch = async(req)=>{
     if (existingBatch) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Batch already exist'}); 
     }
-
-    if (req.user.role !== 'SuperAdmin') {
-        throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Only super admin can create staff'});
-    }
-
-    
+        
     const batchName = await generateBatchName();
 
     const newBatch = new BatchModel({

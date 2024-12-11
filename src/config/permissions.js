@@ -42,6 +42,121 @@ const permissionGroups = {
         'adminViewOwn',
       ]
     },
+
+
+    batchManagement: {
+      create: [
+        'batchCreate',            // Create new employee
+      ],
+      manage: [
+        'batchManage',            // Manage employee details
+        'batchManageOwn',         // Manage own employee details
+        'batchManageOther',       // Manage other employees' details
+      ],
+      manageOwn:[
+        'batchManageOwn',
+      ],
+      view: [
+        'batchView',              // View employee details
+        'batchViewOwn',           // View own employee details
+        'batchViewOther',         // View other employees' details
+      ],
+      viewOwn: [
+        'batchViewOwn',
+      ]
+    },
+
+
+    TaskManagement: {
+      create: [
+        'taskCreate',            // Create new employee
+      ],
+      manage: [
+        'taskManage',            // Manage employee details
+        'taskManageOwn',         // Manage own employee details
+        'taskManageOther',       // Manage other employees' details
+      ],
+      manageOwn:[
+        'taskManageOwn',
+      ],
+      view: [
+        'taskView',              // View employee details
+        'taskViewOwn',           // View own employee details
+        'taskViewOther',         // View other employees' details
+      ],
+      viewOwn: [
+        'taskViewOwn',
+      ]
+    },
+
+
+    traineeManagement: {
+      create: [
+        'traineeCreate',            // Create new employee
+      ],
+      manage: [
+        'traineeManage',            // Manage employee details
+        'traineeManageOwn',         // Manage own employee details
+        'traineeManageOther',       // Manage other employees' details
+      ],
+      manageOwn:[
+        'traineeManageOwn',
+      ],
+      view: [
+        'traineeView',              // View employee details
+        'traineeViewOwn',           // View own employee details
+        'traineeViewOther',         // View other employees' details
+      ],
+      viewOwn: [
+        'traineeViewOwn',
+      ]
+    },
+
+    scheduleManagement: {
+      create: [
+        'scheduleCreate',            // Create new employee
+      ],
+      manage: [
+        'scheduleManage',            // Manage employee details
+        'scheduleManageOwn',         // Manage own employee details
+        'scheduleManageOther',       // Manage other employees' details
+      ],
+      manageOwn:[
+        'scheduleManageOwn',
+      ],
+      view: [
+        'scheduleView',              // View employee details
+        'scheduleViewOwn',           // View own employee details
+        'scheduleViewOther',         // View other employees' details
+      ],
+      viewOwn: [
+        'scheduleViewOwn',
+      ]
+    },
+
+
+    syllabusManagement: {
+      create: [
+        'syllabusCreate',            // Create new employee
+      ],
+      manage: [
+        'syllabusManage',            // Manage employee details
+        'syllabusManageOwn',         // Manage own employee details
+        'syllabusManageOther',       // Manage other employees' details
+      ],
+      manageOwn:[
+        'syllabusManageOwn',
+      ],
+      view: [
+        'syllabusView',              // View employee details
+        'syllabusViewOwn',           // View own employee details
+        'syllabusViewOther',         // View other employees' details
+      ],
+      viewOwn: [
+        'syllabusViewOwn',
+      ]
+    },
+    
   
     leaveManagement: {
       request: [

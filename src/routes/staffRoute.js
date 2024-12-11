@@ -11,7 +11,7 @@ const Router = express.Router();
 
 // Router.use(verifyAuthToken);
 
-Router.route('/createStaff').post(verifyAuthToken,checkPermission('empCreate'),uploads.single('profilePic'),staffController.createStaff);
+Router.route('/createStaff').post(verifyAuthToken,checkPermission,uploads.single('profilePic'),staffController.createStaff);
 Router.route('/getStaffAll').get(staffController.getStaffAll);
 Router.route('/getFilterStaff').get(staffController.getFilterStaff);
 Router.route('/getStaffId/:_id').get(staffController.getStaffId);

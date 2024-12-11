@@ -14,8 +14,8 @@ const { PayrollModel } = require("../models/payRoll.model");
 
 const generateTraineeLogId = async () => {
     // Find the last created admin based on the logId in descending order
-    const lastTrainee = await TraineeModel.findOne().sort({ logId: -1 });
-    const lostLogIdNumber = lastTrainee ? parseInt(lastTrainee.logId.split('-')[2],10) : 0;
+    const lastTrainee = await TraineeModel.findOne().sort({ traineeId: -1 });
+    const lostLogIdNumber = lastTrainee ? parseInt(lastTrainee.traineeId.split('-')[2],10) : 0;
     const newLogIdNumber = (lostLogIdNumber + 1).toString().padStart(3, '0');
  
     return `TRE-ID-${newLogIdNumber}`
@@ -24,49 +24,40 @@ const generateTraineeLogId = async () => {
 
 exports.createTrainee = async(req)=>{
     const {auth} = req;
-    const { email, fullName, password,role,hybrid,batch} = req.body
-    console.log(req.body);
+    const traineeData = req.body
 
-    const existingTrainee = await TraineeModel.findOne({email})
+    const existingTrainee = await TraineeModel.findOne({email:traineeData.email})
     if (existingTrainee) {
         throw new ApiError(httpStatus.BAD_REQUEST,{message: 'Trainee already exist'});   
     }
-    
-    if (req.user.role !== 'SuperAdmin') {
-        throw new ApiError(httpStatus.FORBIDDEN, {message: 'Only super admin can create trainee'}); 
-    }
 
-    if (!validator.isEmail(email)) {
+    if (!validator.isEmail(traineeData.email)) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email"});
     }
+    const traineeId = await generateTraineeLogId();
 
     let profilePic;
     if (req.file) {
         const fileExtension = req.file.originalname.split('.').pop();
-        const fileName = `${Date.now()}.${fileExtension}`
-        profilePic = await uploadCloud(`trainee-Profile/${fileName}`,req.file)
+        const fileName = `${'profilePic'}.${fileExtension}`
+        profilePic = await uploadCloud(`trainee-Profile/${traineeId}/${fileName}`,req.file)
     }
-//    if (req.files['resumeUpload']) {
-//       resumeUpload = await uploadCloud('resume-file', req.files['resumeUpload'][0])      
-//    }
 
-
-   const existingBatch  = await BatchModel.findOne({_id:batch})
+   const existingBatch  = await BatchModel.findById(traineeData.batch)
    console.log(existingBatch,"bigils");
    
    if (!existingBatch) {
     throw new ApiError(httpStatus.BAD_REQUEST, { message: "Batch does not exist" });
    } 
 
-   const logId = await generateTraineeLogId();
 
-   const hashedPassword = await utils.hashPassword(password)
+   const hashedPassword = await utils.hashPassword(traineeData.password)
 
    const newTrainee = new TraineeModel({
     ...req.body,
-    logId,
+    traineeId,
     profilePic,
-    batch,
+    batch: existingBatch._id,
     password: hashedPassword
    })
 
@@ -79,17 +70,24 @@ await newAssignBatch.save();
    
    const newAuth = new Auth({
     accountId: newTrainee._id,
-    email,
+    email: traineeData.email,
     profilePic,
-    fullName,
-    department,
-    logId,
-    role,
-    batch,
-    hybrid,
+    fullName: traineeData.fullName,
+    department: traineeData.department,
+    logId: traineeId,
+    role: traineeData.role,
+    batch: traineeData.batch,
+    hybrid: traineeData.hybrid,
     password: hashedPassword
    })
 
+   let {grossSalary,
+    isPf,
+    isEsi,
+    uanNumber,
+    pfNumber,
+    esiNumber,
+    isGratuity} = traineeData
 
    const newPayRoll = new PayrollModel({
     user_id: newTrainee._id,
@@ -102,10 +100,9 @@ await newAssignBatch.save();
     isGratuity
    })
    
+   await newPayRoll.save();
    await newTrainee.save();
    await newAuth.save();
-//    await assignedBatch.save();
-
    return newTrainee;
     
 }

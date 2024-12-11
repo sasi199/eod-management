@@ -3,7 +3,7 @@ const schemaFields = require("../utils/schemaFieldUtils");
 
 const payrollFields = {
     _id: schemaFields.idWithV4UUID,
-    user_id: schemaFields.UUIDIdReference('Staff'),
+    user_id: schemaFields.requiredAndString,
     grossSalary: schemaFields.requiredNumberWithDefault(0),
     uanNumber: schemaFields.StringWithDefault('NA'),
     pfNumber: schemaFields.StringWithDefault('NA'),

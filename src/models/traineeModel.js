@@ -4,7 +4,7 @@ const schemaFields = require('../utils/schemaFieldUtils');
 
 const traineeSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
-    logId: schemaFields.requiredAndString,
+    traineeId: schemaFields.requiredAndString,
     batch:{
         type: String,
         ref:"Batch",
@@ -19,19 +19,23 @@ const traineeSchema = new mongoose.Schema({
     gender: schemaFields.requiredAndString,
     permanentAddress: schemaFields.requiredAndString,
     currentAddress: schemaFields.requiredAndString,
-    // resumeUpload: schemaFields.requiredAndString,
-    isActive: schemaFields.BooleanWithDefault,
+    grossSalary: schemaFields.requiredAndString,
+    uanNumber: String,
+    pfNumber: String,
+    esiNumber: String,
     hybrid: schemaFields.StringWithEnumAndRequired(['Online','Offline','WFH']),
-    // designation:schemaFields.requiredAndString,
     department: schemaFields.StringWithEnumAndRequired([
         'FSD-Trainee',
         'DM-Trainee',
     ]),
     qualification:schemaFields.requiredAndString,
-    experience: schemaFields.StringWithEnumAndRequired(['0 to 1', '1 to 3', '3 to 5', '5+']),
+    experience: schemaFields.StringWithEnumAndRequired(['0 to 1 year', '1 to 3 year', '3 to 5', '5+']),
     role: schemaFields.StringWithEnumAndRequired(["Admin","SuperAdmin","Trainer","Trainee"]),
+    isActive: schemaFields.BooleanWithDefault,
     createdBy:schemaFields.UUIDIdReference('superAdmin'),
     isArchive: schemaFields.BooleanWithDefault,
+    // resumeUpload: schemaFields.requiredAndString,
+    // designation:schemaFields.requiredAndString,
     permission:{
         type: String,
         enum: ["read","write"],

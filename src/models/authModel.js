@@ -11,6 +11,7 @@ const authSchema = new mongoose.Schema(
     logId: schemaFields.requiredAndString,
     password: schemaFields.requiredAndString,
     profilePic: schemaFields.requiredAndString,
+    department: schemaFields.requiredAndString,
     accountId:{
       type: String
     },

@@ -45,6 +45,8 @@ const generateStaffLogId = async(companyId,departmentId)=>{
 
 exports.createStaff = async(req)=>{
     const staffData = req.body;
+    console.log("satggg",req.body);
+    
 
     if (!validator.isEmail(staffData.professionalEmail)) {
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "Provide a valid email" });
@@ -59,22 +61,19 @@ exports.createStaff = async(req)=>{
         throw new ApiError(httpStatus.BAD_REQUEST, { message: "staffData is required" });
     }
 
-    const company = await CompanyModel.findById({_id:staffData.company_id});
-    console.log("al;lalala",company);
+    const company = await CompanyModel.findById(staffData.company_id);
     
     if (!company) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"company not found"});  
     }
 
     const department = await DepartmentModel.findById({_id:staffData.department_id});
-    console.log("al;lalala",department);
     
     if (!department) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"department not found"});  
     }
 
     const designation = await DesignationModel.findById({_id:staffData.designation});
-    console.log("lalalala",designation);
     
     if (!designation) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"designation not found"});  
@@ -94,12 +93,17 @@ exports.createStaff = async(req)=>{
       const hashedPassword = await utils.hashPassword(staffData.password);
 
       const staffId = await generateStaffLogId(staffData.company_id,staffData.department_id);
-      let profilePic;
-
-    if (req.file) {
+      let profilePic = null;
+      console.log("req.file", req.file)
+    if (req.file) {        
         const fileExtension = req.file.originalname.split('.').pop();
         const fileName = `${'profilePic'}.${fileExtension}`
         profilePic = await uploadCloud(`staff/${staffId}/${fileName}`,req.file)
+    }
+
+    if (!req.file) {
+        console.log("No file uploaded");
+        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Profile picture is required" });
     }
 
     const isTrainer = staffData.isTrainer;
