@@ -50,6 +50,8 @@ import Profile from "../Panel/Trainer/Pages/Profile/Profile";
 import Eod from "../Panel/Trainer/Pages/EOD/Eod";
 import TrainerEod from "../Panel/Trainer/Pages/EOD/Eod";
 import SuperEod from "../Panel/SuperAdmin/Pages/EOD/SuperEod";
+import AddRole from "../Panel/SuperAdmin/Pages/BasicDetails/AddRole";
+import AddCompany from "../Panel/SuperAdmin/Pages/BasicDetails/AddCompany";
 import SalaryConfig from "../Panel/SuperAdmin/Pages/SalaryConfig/SalaryConfig";
 
 
@@ -131,6 +133,14 @@ export const pages = [
         path: "staffs",
         element: <Staffs />,
       },
+{
+  path:"basicdetails/addRole",
+  element:<AddRole/>
+},
+{
+  path:"basicdetails/addCompany",
+  element:<AddCompany/>
+},
 
       {
         path: "trainer",
