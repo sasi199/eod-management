@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import { BiDetail } from "react-icons/bi";
+
 import {
   FaTachometerAlt,
   FaClipboardList,
   FaBook,
-  FaUserShield,
-  FaChalkboardTeacher,
+ 
   FaUserGraduate,
   FaUsers,
-  FaChevronDown,
+
   FaBell,
   FaComment,
   FaCalendarAlt,
   FaFileAlt,
+  FaChevronCircleDown,
 } from "react-icons/fa";
 import { SlCalender } from "react-icons/sl";
 import { MdAssignment } from "react-icons/md";
@@ -39,6 +41,8 @@ const Navbar = () => {
     "/sidebar/schedule": "Schedule",
     "/sidebar/notifications": "Notifications",
   };
+
+  
 
   // const currentPageName = pageNames[location.pathname] || "Page";
 
@@ -121,6 +125,11 @@ const Sidebar = () => {
 
   const [projectData, setProjectData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isBasicDetailsDropdownOpen, setIsBasicDetailsDropdownOpen] = useState(false);
+
+  const toggleBasicDetailsDropdown = () => {
+    setIsBasicDetailsDropdownOpen(!isBasicDetailsDropdownOpen);
+  };
 
   const locate = useLocation();
   const isActive = (path) => location.pathname === path;
@@ -215,6 +224,46 @@ const Sidebar = () => {
               Batches
             </Link>
 
+            <div>
+            <button
+              onClick={toggleBasicDetailsDropdown}
+              className={`flex items-center justify-between w-full px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 ${
+                isActive("/sidebar/basicDetail") ? "text-orange-600 bg-white" : ""
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <BiDetail size={24} />
+                Basic Details
+              </div>
+              <FaChevronCircleDown
+                className={`transform transition-transform ${
+                  isBasicDetailsDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            {isBasicDetailsDropdownOpen && (
+              <div className="ml-8 mt-2 space-y-2">
+                <Link
+                  to="/sidebar/basicdetails/addRole"
+                  className="block text-lg text-white hover:bg-white hover:text-orange-600 px-4 py-2 rounded-md transition-all duration-200"
+                >
+                  Add Role
+                </Link>
+                <Link
+                  to="/sidebar/basicdetails/addCompany"
+                  className="block text-lg text-white hover:bg-white hover:text-orange-600 px-4 py-2 rounded-md transition-all duration-200"
+                >
+                  Add Company
+                </Link>
+                <Link
+                  to="/sidebar/add-designation"
+                  className="block text-lg text-white hover:bg-white hover:text-orange-600 px-4 py-2 rounded-md transition-all duration-200"
+                >
+                  Add Designation
+                </Link>
+              </div>
+            )}
+          </div>
             <Link
               to="/sidebar/courses"
               className={`${

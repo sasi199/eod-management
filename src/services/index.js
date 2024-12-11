@@ -333,3 +333,34 @@ export const EditEodById = async(data,eodId) => {
   return res;
 }
 
+
+//role
+ export const CreateRole =async (data)=>{
+  const res= await interceptors.post('/role/create',data);
+  return res;
+ }
+
+ export const GetRole = async ()=>{
+  const res = await interceptors.get('/role/get-all')
+return res;
+ }
+ export const UpdateRole = async (data, id)=>{
+  const res = await interceptors.put(`/role/update/${id}`,data)
+return res;
+ }
+ export const DeleteRole = async ( id)=>{
+  const res = await interceptors.delete(`/role/delete-h/${id}`)
+return res;
+ }
+
+ //company
+
+ export const CreateCompany =async (data)=>{
+  const res= await interceptors.post('/company/create',data);
+  return res;
+ }
+
+ export const GetCompany =async ()=>{
+  const res= await interceptors.get('/company/get-all');
+  return res;
+ }
