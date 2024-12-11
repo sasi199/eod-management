@@ -347,11 +347,10 @@ app.use('/v1/auth',authLimiter);
 app.use((req, res, next) => {
     next(new ApiError(status.NOT_FOUND, "Not found"));
   });
+  // handle error
+  app.use(errorConverter);
+  app.use(errorHandler);
 
-app.use(errorConverter);
-
-// handle error
-app.use(errorHandler);
 
 
 
