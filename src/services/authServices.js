@@ -1,3 +1,4 @@
+const { default: status } = require("http-status");
 const config = require("../config/config");
 const { AssignedBatchModel } = require("../models/assignedBatchesModel");
 const AttendanceModel = require("../models/attendance");
@@ -6,7 +7,6 @@ const StaffModel = require("../models/staffModel");
 const TraineeModel = require("../models/traineeModel");
 const ApiError = require("../utils/apiError");
 const utils = require("../utils/utils");
-const httpStatus = require('http-status');
 const jwt = require('jsonwebtoken');
 
 
@@ -18,7 +18,7 @@ exports.loginByEmailAndLogId = async(req)=>{
       select:'name'
     });
     if (!user) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, {message:"Invalid credantials",status:false,});
+        throw new ApiError(status.UNAUTHORIZED, {message:"Invalid credantials",status:false,});
       }
 
     
@@ -34,7 +34,7 @@ exports.loginByEmailAndLogId = async(req)=>{
 
       const isPasswordCorrect = await utils.comparePassword(password, user.password);
       if (!isPasswordCorrect) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Invalid password"});
+        throw new ApiError(status.BAD_REQUEST, {message:"Invalid password"});
       }
 
       const allowedDistance = 0.5;
@@ -44,7 +44,7 @@ exports.loginByEmailAndLogId = async(req)=>{
       })
 
       if (!isWithinRange && user.hybrid !== "WFH" && user.hybrid !== "Online") {
-        throw new ApiError(httpStatus.BAD_REQUEST,"Login denied. You are not within the allowed location range.");
+        throw new ApiError(status.BAD_REQUEST,"Login denied. You are not within the allowed location range.");
         
       }   
 
@@ -83,7 +83,7 @@ exports.createAttendance = async(req)=>{
 
   const allEmployees = await Auth.find({ active: true, archive: false });
   if (!allEmployees || allEmployees.length === 0) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No active employees found");
+    throw new ApiError(status.NOT_FOUND, "No active employees found");
   }
 
 
@@ -132,7 +132,7 @@ exports.getAttendance = async(req)=>{
   
 
   if (!attendance) {
-    throw new ApiError(httpStatus.BAD_REQUEST, {message:"Attendance not found password"});
+    throw new ApiError(status.BAD_REQUEST, {message:"Attendance not found password"});
   }
 
   return attendance;
@@ -143,7 +143,7 @@ exports.getTraineeAttendance = async(req)=>{
 
   const assignedBatches = await AssignedBatchModel.find({ trainer: accountId }).select('batchId');
     if (!assignedBatches || assignedBatches.length === 0) {
-        throw new ApiError(httpStatus.NOT_FOUND, { message: "No batches assigned to this trainer" });
+        throw new ApiError(status.NOT_FOUND, { message: "No batches assigned to this trainer" });
     }
 
     console.log(assignedBatches,"aaaaaaaaaa");
@@ -152,7 +152,7 @@ exports.getTraineeAttendance = async(req)=>{
 
     const trainees = await TraineeModel.find({batch:{$in:batchIds}}).select('_id');
     if (!trainees || trainees.length === 0) {
-      throw new ApiError(httpStatus.BAD_REQUEST, {message:"Trainee not found"});
+      throw new ApiError(status.BAD_REQUEST, {message:"Trainee not found"});
     }
     console.log(trainees,"ddddddddd");
     
@@ -175,7 +175,7 @@ exports.getTraineeAttendance = async(req)=>{
   
 
   if (!traineeAttendance || traineeAttendance.length === 0) {
-    throw new ApiError(httpStatus.BAD_REQUEST, {message:"No attendance records found for these trainees"});
+    throw new ApiError(status.BAD_REQUEST, {message:"No attendance records found for these trainees"});
   }
 
   return traineeAttendance;
@@ -189,12 +189,12 @@ exports.editTraineeAttendance = async(req)=>{
 
   const trainer = await StaffModel.findOne({ _id: accountId, isTrainer:true});
     if (!trainer) {
-        throw new ApiError(httpStatus.FORBIDDEN, { message: "Only trainers can modify attendance" });
+        throw new ApiError(status.FORBIDDEN, { message: "Only trainers can modify attendance" });
     }
 
     const attendance = await AttendanceModel.findById({ _id:_id, date });
     if (!attendance) {
-        throw new ApiError(httpStatus.NOT_FOUND, { message: "Attendance record not found for the given trainee and date" });
+        throw new ApiError(status.NOT_FOUND, { message: "Attendance record not found for the given trainee and date" });
     }
 
     if (status) attendance.status = status;
@@ -226,11 +226,11 @@ exports.logoutUser = async (req) => {
   
 
   if (!attendance) {
-    throw new ApiError(httpStatus.BAD_REQUEST, {message:"No attendance record found for today."});
+    throw new ApiError(status.BAD_REQUEST, {message:"No attendance record found for today."});
   }
 
   if (attendance.checkOut) {
-    throw new ApiError(httpStatus.BAD_REQUEST, {message:"User has already logged out."});
+    throw new ApiError(status.BAD_REQUEST, {message:"User has already logged out."});
   }
 
   attendance.checkOut = now;
@@ -244,17 +244,17 @@ exports.authCreation = async(req)=>{
     const { email,logId,password,role,profilePic} = req.body
     let auth = await Auth.findOne({email});
     if (auth) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message:"User already exist",status:false,field:"email"});
+        throw new ApiError(status.BAD_REQUEST, {message:"User already exist",status:false,field:"email"});
     }
 
     
   // if (!userRole.includes(role)) {
-  //   throw new ApiError(httpStatus.BAD_REQUEST, "Invalid user role");
+  //   throw new ApiError(status.BAD_REQUEST, "Invalid user role");
   // }
 
   const validRoles = ["SuperAdmin","Admin","Trainer","Trainee"];
   if (!validRoles.includes(role)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid user role");
+    throw new ApiError(status.BAD_REQUEST, "Invalid user role");
   }
 
   const hashedPassword = await utils.hashPassword(password)
@@ -278,7 +278,7 @@ exports.authUpdate = async(req) =>{
     const user = await Auth.findById(id);
     
     if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, { message: "User not found", status: false });
+    throw new ApiError(status.NOT_FOUND, { message: "User not found", status: false });
   }
     
 

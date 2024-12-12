@@ -16,6 +16,8 @@ salaryConfigRouter.post('/create', salaryConfigController.createSalaryConfig);
 // Route to get all salary configs
 salaryConfigRouter.get('/get-all', salaryConfigController.getAllSalaryConfigs);
 
+salaryConfigRouter.get('/', salaryConfigController.getSalaryConfigs)
+
 // Route to get a salary config by ID
 salaryConfigRouter.get('/:configId', salaryConfigController.getSalaryConfigById);
 

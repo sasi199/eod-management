@@ -15,6 +15,13 @@ exports.getAllSalaryConfigs = catchAsync(async (req, res) => {
     res.status(200).json({ success: true, message: "Salary configs fetched successfully", data: response });
 });
 
+// Get salary configs
+exports.getSalaryConfigs = catchAsync(async (req, res) => {
+    const response = await SalaryConfigService.getAllSalaryConfigs();
+
+    res.status(200).json({ success: true, message: "Salary config fetched successfully", data: response[0] });
+});
+
 // Get a salary config by ID
 exports.getSalaryConfigById = catchAsync(async (req, res) => {
     const response = await SalaryConfigService.getSalaryConfigById(req);

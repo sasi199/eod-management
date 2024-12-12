@@ -3,9 +3,9 @@ const ApiError = require("../utils/apiError");
 const { SalaryConfigModel } = require("../models/salaryConfig.model");
 
 // Helper function to format the modification history entry
-const getModifiedHistoryEntry = (modifiedFields) => {
+const getModifiedHistoryEntry = (_id,modifiedFields) => {
     const date = new Date().toLocaleDateString('en-GB'); // dd/mm/yyyy format
-    return { _id: new Date().toISOString(), date, modifiedFields };
+    return { _id, date, modifiedFields };
 };
 
 exports.createSalaryConfig = async (req) => {
@@ -90,7 +90,7 @@ exports.updateSalaryConfig = async (req) => {
     if (existingSalaryConfig.startDeductFrom !== startDeductFrom) modifiedFields.push('startDeductFrom');
 
     // Append the modification history with the modified fields
-    const newHistoryEntry = getModifiedHistoryEntry(modifiedFields);
+    const newHistoryEntry = getModifiedHistoryEntry("dummy_id",modifiedFields);
     
     // Update the salary config
     const updatedSalaryConfig = await SalaryConfigModel.findByIdAndUpdate(
