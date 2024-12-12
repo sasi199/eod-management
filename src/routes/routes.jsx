@@ -53,6 +53,7 @@ import SuperEod from "../Panel/SuperAdmin/Pages/EOD/SuperEod";
 import AddRole from "../Panel/SuperAdmin/Pages/BasicDetails/AddRole";
 import AddCompany from "../Panel/SuperAdmin/Pages/BasicDetails/AddCompany";
 import SalaryConfig from "../Panel/SuperAdmin/Pages/SalaryConfig/SalaryConfig";
+import Payroll from "../Panel/SuperAdmin/Pages/Payroll/Payroll";
 
 
 // export default pages;
@@ -143,6 +144,10 @@ export const pages = [
       {
         path: "config",
         element: <SalaryConfig/>,
+      },
+      {
+        path: "payroll",
+        element: <Payroll/>,
       },
     ],
   },

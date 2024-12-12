@@ -403,6 +403,15 @@ const Sidebar = () => {
               <GrConfigure size={24} />
               Config
             </Link>
+            <Link
+              to="/sidebar/payroll"
+              className={`${
+                isActive("/sidebar/payroll") ? "text-orange-600 bg-white" : ""
+              } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
+            >
+              <GrConfigure size={24} />
+              Payroll
+            </Link>
           </div>
         ) : (
           <div className="space-y-4 ">

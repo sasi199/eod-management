@@ -378,3 +378,20 @@ return res;
   const res = await interceptors.put(`/salary-config/update/${id}`,data);
   return res
  }
+
+ // Payroll
+
+ export const GetInitialPayrollData = async (m,y,sm,sy,em,ey) => {
+  const res = await interceptors.get(`/payslip?m=${m}&y=${y}&sm=${sm}&sy=${sy}&em=${em}&ey=${ey}`);
+  return res;
+ }
+
+ export const GetLeaveDetails = async (sm,sy,em,ey) => {
+  const res = await interceptors.get(`/payslip?sm=${sm}&sy=${sy}&em=${em}&ey=${ey}`);
+  return res;
+ }
+
+ export const GetPaySlipDetails = async (m,y) => {
+  const res = await interceptors.get(`/payslip?m=${m}&y=${y}`);
+  return res;
+ }
