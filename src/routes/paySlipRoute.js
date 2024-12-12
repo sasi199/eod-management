@@ -20,8 +20,11 @@ PaySlipRouter.get('/generate-t', PayslipController.generateTraineePaySlip);
 PaySlipRouter.get('/generate-s', PayslipController.generateStaffPaySlip);
 
 PaySlipRouter.get('/get-by-id', PayslipController.getPaySlipById);
+PaySlipRouter.get('/', PayslipController.getPaySlipDetails);
 
-PaySlipRouter.get('/download',PayslipController.downloadPaySlip)
+PaySlipRouter.get('/download',PayslipController.downloadPaySlip);
+
+
 
 
 

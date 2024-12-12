@@ -1,7 +1,7 @@
 const { default: status } = require("http-status");
 const ApiError = require("../utils/apiError");
 const { RoleModel } = require("../models/role.model");
-const { allPermissions } = require("../config/permissions");
+const { allPermissions, permissionGroups } = require("../config/permissions");
 
 exports.createRole = async(req)=>{
     const {name, hierarchyLevel, permissions} = req.body;
@@ -34,7 +34,7 @@ exports.getAllRoles = async (req)=>{
     }
 
     if(p){
-        return {roles,permissions:allPermissions}
+        return {roles,permissions:allPermissions, permissionGroups}
     }
 
     return roles;

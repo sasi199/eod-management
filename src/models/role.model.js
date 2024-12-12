@@ -8,8 +8,9 @@ const RoleSchema = mongoose.Schema({
     name: schemaFields.StringAndUnique,
     permissions: schemaFields.ArrayOfStrings,
     hierarchyLevel: schemaFields.NumberWithDefault(1),
+    allowedRoutes: schemaFields.ArrayOfStrings,
     isArchive: schemaFields.BooleanWithDefault,
-    isActive: schemaFields.BooleanWithDefaultTrue
+    isActive: schemaFields.BooleanWithDefaultTrue,
   },{timestamp:true,collection:"Role"});
 
   const RoleModel = mongoose.model('Role',RoleSchema);

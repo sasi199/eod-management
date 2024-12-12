@@ -30,6 +30,11 @@ exports.getAllPaySlip = catchAsync(async (req, res) => {
     res.status(200).json({ success: true, message: "PaySlip records fetched successfully", data: response });
 });
 
+exports.getPaySlipDetails = catchAsync(async (req, res) => {
+    const response = await PaySlipServices.getPaySlipDetails(req);
+    res.status(200).json({ success: true, message: "PaySlip details fetched successfully", data: response });
+});
+
 exports.downloadPaySlip = catchAsync(async (req, res) => {
     const response = await PaySlipServices.getPaySlip(req);
 
