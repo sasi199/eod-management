@@ -58,7 +58,7 @@ const Login = () => {
           })
           .catch((error) => {
             console.error("Login failed:", error);
-            alert(error.response.message);
+            alert(error.response.data.message);
           });
       },
 

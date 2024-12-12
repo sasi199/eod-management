@@ -41,7 +41,7 @@ const Navbar = () => {
     "/sidebar/chat": "Chat",
     "/sidebar/schedule": "Schedule",
     "/sidebar/notifications": "Notifications",
-    "/sidebar/salary-config": "Salary Config"
+    "/sidebar/config": "Config"
   };
 
   
@@ -395,13 +395,13 @@ const Sidebar = () => {
               Reports
             </Link>
             <Link
-              to="/sidebar/salary-config"
+              to="/sidebar/config"
               className={`${
-                isActive("/sidebar/salary-config") ? "text-orange-600 bg-white" : ""
+                isActive("/sidebar/config") ? "text-orange-600 bg-white" : ""
               } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
             >
               <GrConfigure size={24} />
-              Salary Config
+              Config
             </Link>
           </div>
         ) : (

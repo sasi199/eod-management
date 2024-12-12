@@ -364,3 +364,17 @@ return res;
   const res= await interceptors.get('/company/get-all');
   return res;
  }
+
+
+
+ // Config
+
+ export const GetConfig = async ()=>{
+  const res = await interceptors.get('/salary-config');
+  return res;
+ }
+
+ export const UpdateConfig = async (id,data)=>{
+  const res = await interceptors.put(`/salary-config/update/${id}`,data);
+  return res
+ }
