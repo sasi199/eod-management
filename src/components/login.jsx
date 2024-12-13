@@ -34,14 +34,14 @@ const Login = () => {
 
             if (response.data.status === true) {
               localStorage.setItem("authToken", response.data.data.token);
-              const role = response.data.data.role.name
+              const role = response.data.data.role.roleName
               setEmail("");
               setPassword("");
-              setRole(role);
-
+              setRole(role);  
+console.log(response, "goip");
               console.log("User Role:", role);
 
-              if (role === "SuperAdmin") {
+              if (role === "superAdmin") {
                 navigate("/sidebar/dashboard");
               } else if (role === "Admin") {
                 navigate("/admin");
