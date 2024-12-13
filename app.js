@@ -256,7 +256,7 @@ app.use('/v1/auth',authLimiter);
 app.use((req, res, next) => {
     next(new ApiError(status.NOT_FOUND, "Not found"));
   });
-
+  require("aws-sdk/lib/maintenance_mode_message").suppress = true;
   // handle error
   app.use(errorConverter);
   app.use(errorHandler);
