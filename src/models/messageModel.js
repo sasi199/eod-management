@@ -74,6 +74,9 @@ const messageSchema = new mongoose.Schema({
       addMessage: {
         type: String,
       },
+      createdBy: {
+        type: String
+      },
 },{ timestamps: true, collection: 'Message' })
 
 

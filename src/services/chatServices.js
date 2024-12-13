@@ -92,7 +92,7 @@ const getMembers = async (req) => {
     });
 
 
-    if (val.length === 0) throw new ApiError(httpStatus.NOT_FOUND, "Data Not Found.");
+    if (val.length === 0) throw new ApiError(httpStatus.status.NOT_FOUND, "Data Not Found.");
     return { val, data };
 };
 
@@ -142,7 +142,7 @@ const createChats = async (req) => {
             ],
             messageTime: dateFormat,
             lastMessageUserId: user._id,
-            lastMessage: `Hello from ${user.userName}`,
+            lastMessage: `Hello from ${user.fullName}`,
             count: participants.map((participant) => ({
                 userId: participant._id,
                 count: 1,
@@ -159,7 +159,7 @@ const createChats = async (req) => {
 
         let messageData = {
             messageTime: dateFormat,
-            message: `Chat initiated by ${user.userName}`,
+            message: `Chat initiated by ${user.fullName}`,
             messageType: "initial",
             senderId: user.adminId,
             receiverId: receiverIds,
@@ -205,7 +205,7 @@ const createChats = async (req) => {
         createdBy: user._id,
         messageTime: dateFormat,
         lastMessageUserId: user._id,
-        lastMessage: `Created by ${user.userName}`,
+        lastMessage: `Created by ${user.fullName}`,
         count: participants.map((participant) => ({
             userId: participant._id,
             count: 1,
@@ -213,7 +213,7 @@ const createChats = async (req) => {
         admins: [
             {
                 _id: user._id,
-                userName: user.userName,
+                userName: user.fullName,
             },
         ],
         participants,
@@ -226,7 +226,7 @@ const createChats = async (req) => {
 
     let messageData = {
         messageTime: dateFormat,
-        message: `${user.userName} created group "${req.body.chatName}"`,
+        message: `${user.fullName} created group "${req.body.chatName}"`,
         messageType: "initial",
         senderId: user.adminId,
         receiverId: receiverIds,
@@ -260,9 +260,43 @@ const createChats = async (req) => {
     return createChat;
 };
 
+const getMessaages = async (req) => {
+    const { roomId } = req.query;
+    const user = req.user;
+  
+    if (!roomId || !user || !user._id) {
+      throw new ApiError(httpStatus.status.BAD_REQUEST, "Invalid Request Parameters");
+    }
 
+      const updateGroupCountPromise = ChatModel.updateOne(
+        { roomId },
+        {
+          $set: {
+            "count.$[elem].count": 0,
+          },
+        },
+        {
+          arrayFilters: [{ "elem.userId": user._id }],
+        }
+      );
+  
+      const findMessagesPromise = MessageModel.aggregate([{ $match: { roomId } }]);  
+      const [updateResult, findMessages] = await Promise.all([
+        updateGroupCountPromise,
+        findMessagesPromise,
+      ]);
+  
+      if (!findMessages || findMessages.length === 0) {
+        throw new ApiError(httpStatus.status.BAD_REQUEST, "No Messages Found");
+      }
+  
+      return findMessages;
+   
+  };
+  
 
 module.exports = {
     getMembers,
-    createChats
+    createChats,
+    getMessaages
 };
