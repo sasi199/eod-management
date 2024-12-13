@@ -48,7 +48,7 @@ const verifyToken = async (token, model) => {
     
     const user = await model.findById(payload.id).populate({
       path: "role", // Ensure this matches your schema setup
-      select: "name permissions",
+      select: "name permissions hierarchyLevel",
     });
     console.log(user,"userid");
     

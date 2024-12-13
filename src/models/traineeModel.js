@@ -24,25 +24,15 @@ const traineeSchema = new mongoose.Schema({
     pfNumber: String,
     esiNumber: String,
     hybrid: schemaFields.StringWithEnumAndRequired(['Online','Offline','WFH']),
-    department: schemaFields.StringWithEnumAndRequired([
-        'FSD-Trainee',
-        'DM-Trainee',
-    ]),
+    department: schemaFields.UUIDIdReference("Department"),
     qualification:schemaFields.requiredAndString,
     experience: schemaFields.StringWithEnumAndRequired(['0 to 1 year', '1 to 3 year', '3 to 5', '5+']),
-    role: schemaFields.StringWithEnumAndRequired(["Admin","SuperAdmin","Trainer","Trainee"]),
+    role: schemaFields.UUIDIdReference('Role'),
     isActive: schemaFields.BooleanWithDefault,
-    createdBy:schemaFields.UUIDIdReference('superAdmin'),
+    createdBy:schemaFields.UUIDIdReference('Staff'),
     isArchive: schemaFields.BooleanWithDefault,
     // resumeUpload: schemaFields.requiredAndString,
     // designation:schemaFields.requiredAndString,
-    permission:{
-        type: String,
-        enum: ["read","write"],
-        default: ()=>{
-            return this.role === 'superAdmin'?'full-access':'write';
-        }
-    },
 },{timestamps:true, collection: "Trainee"});
 
 const TraineeModel = mongoose.model('Trainee',traineeSchema);

@@ -12,3 +12,8 @@ exports.approveLeave = catchAsync(async(req,res)=>{
     const response = await leaveService.approveLeave(req);
     res.status(200).json({status:true, message:'Leave approved successfully',data:response,})
 });
+
+exports.getAllLeaves = catchAsync(async(req,res)=>{
+    const response = await leaveService.getAllLeaves(req);
+    res.status(200).json({status:true, message:'Leave fetched successfully',data:response,})
+});

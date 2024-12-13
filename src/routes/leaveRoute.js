@@ -7,5 +7,6 @@ const Router = express.Router();
 
 Router.route('/applyLeave').post(verifyAuthToken,leaveController.applyLeaveRequset);
 Router.route('/approveLeave/:_id').put(leaveController.approveLeave);
+Router.get('/get-all',verifyAuthToken, leaveController.getAllLeaves);
 
 module.exports = Router;

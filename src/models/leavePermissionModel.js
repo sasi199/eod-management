@@ -9,13 +9,13 @@ const leaveSchema = new mongoose.Schema({
         ref: 'Auth',
         required: true
     },
-    date: schemaFields.requiredAndString,
-    endDate: {
-        type: String
-    },
+    startDateString: String, // dd/mm/yyyy
+    endDateString: String,
+    startDate: Date,
+    endDate: Date,
     leaveType: {
         type: String,
-        enum: ['sick', 'casual', 'annual','permission','wfh','online'],
+        enum: ['sick', 'casual', 'annual','permission','wfh','online', 'compOff'],
         required: true
     },
     status: {
