@@ -148,6 +148,14 @@ const Payroll = () => {
     isUpdated: false,
   };
 
+  const errorLeaveDetails = {
+    availableLeave: "NA",
+    leavesTaken: "NA",
+    lates: "NA",
+    permissionsTaken: "NA",
+    isUpdated: true,
+  };
+
   const initialBasicDetails = {
     grossSalary: 0,
     basic: 0,
@@ -172,6 +180,7 @@ const Payroll = () => {
   };
 
   const [dateObj, setDateObj] = useState(initialDateObj);
+  const [dateObjBackUp, setDateObjBackup] = useState(initialDateObj);
 
   const [leaveDetails, setLeaveDetails] = useState(initialLeaveDetails);
 
@@ -276,10 +285,11 @@ const Payroll = () => {
     try {
     const { startMonth, startYear, endMonth, endYear, } = dateObj;
     const response = await GetLeaveDetails(startMonth,startYear,endMonth,endYear);
-    setLeaveDetails((prev) => ({ ...prev, ...response.data.data, isUpdated: true }));
+    setLeaveDetails((prev) => ({ ...prev, ...response.data.data.leaveDetail, isUpdated: true }));
     } catch (error) {
         console.log(error,"error leave details");
         alert(error.response.data.message);
+        setLeaveDetails(prev=>({...prev,...errorLeaveDetails}))
     } finally {
         setLeaveDetails(prev=>({...prev,isUpdated:true}));
     }
@@ -290,10 +300,13 @@ const Payroll = () => {
     try {
     const { startMonth, startYear, endMonth, endYear, } = dateObj;
     const response = await GetPaySlipDetails(startMonth,startYear,endMonth,endYear);
-    setPaySlipDetails((prev) => ({ ...prev, ...response.data.data, isUpdated: true }));
+    setPaySlipDetails((prev) => ({ ...prev, ...response.data.data.paySlipDetails, isUpdated: true }));
+    setDateObjBackup(prev=>({...prev,startMonth, startYear, endMonth, endYear}))
     } catch (error) {
         console.log(error,"error PaySlip details");
         alert(error.response.data.message);
+        const {month,year,...otherData} = dateObjBackUp;
+        setDateObj(prev=>({...prev,...otherData}))
     } finally {
         setPaySlipDetails(prev=>({...prev,isUpdated:true}));
     }
