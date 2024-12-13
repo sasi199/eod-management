@@ -122,7 +122,7 @@ const getMembers = async (req) => {
             messageTime: "",
             participants: [],
             roomId: "",
-        };
+        }
     });
     
 
