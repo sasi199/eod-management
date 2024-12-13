@@ -382,16 +382,16 @@ return res;
  // Payroll
 
  export const GetInitialPayrollData = async (m,y,sm,sy,em,ey) => {
-  const res = await interceptors.get(`/payslip?m=${m}&y=${y}&sm=${sm}&sy=${sy}&em=${em}&ey=${ey}`);
+  const res = await interceptors.get(`/pay-slip?m=${m}&y=${y}&sm=${sm}&sy=${sy}&em=${em}&ey=${ey}&bd=${true}`);
   return res;
  }
 
  export const GetLeaveDetails = async (sm,sy,em,ey) => {
-  const res = await interceptors.get(`/payslip?sm=${sm}&sy=${sy}&em=${em}&ey=${ey}`);
+  const res = await interceptors.get(`/pay-slip?sm=${sm}&sy=${sy}&em=${em}&ey=${ey}`);
   return res;
  }
 
  export const GetPaySlipDetails = async (m,y) => {
-  const res = await interceptors.get(`/payslip?m=${m}&y=${y}`);
+  const res = await interceptors.get(`/pay-slip?m=${m}&y=${y}`);
   return res;
  }
