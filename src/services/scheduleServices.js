@@ -64,7 +64,31 @@ exports.createSchedule = async (req) => {
 
 
 exports.getScheduleAll = async(req)=>{
-    const schedule = await ScheduleModel.find({})
+    const schedule = await ScheduleModel.aggregate([
+        {
+            $lookup:{
+                from: "TimeTable",
+                localField: "_id",
+                foreignField: "scheduleId",
+                as: "details",
+            },
+        },
+            {
+                
+                $project: {
+                    _id: 1,
+                    batch: 1,
+                    date: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    "details.trainer": 1,
+                    "details.startTime": 1,
+                    "details.endTime": 1,
+                    "details.subject": 1,
+                    "details.status": 1,
+                },
+        }
+    ])
     if (!schedule) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message: "Schedule not found"});
     }
