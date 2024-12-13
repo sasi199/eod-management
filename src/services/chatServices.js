@@ -1,161 +1,268 @@
 const ChatModel = require("../models/chatModel");
 const MessageModel = require("../models/messageModel");
+const AuthModel = require("../models/authModel");
 const ApiError = require("../utils/apiError");
 const httpStatus = require('http-status');
-const uploadCloud = require("../utils/uploadCloud");
+const generateFolderId = require("../utils/generateId");
+const moment = require("moment");
 
 
-exports.createChat = async(req)=>{
-    const { authId } = req
-    const { _id } = req.params;
+const getMembers = async (req) => {
+    const user = req.user;
+    let userId = user._id
+    let project = {
+        _id: 1,
+        chatName: 1,
+        type: 1,
+        profile: 1,
+        lastMessage: 1,
+        lastMessageUserId: 1,
+        roomId: 1,
+        count: 1,
+        messageTime: 1,
+        participants: 1
+    };
+    const [val, getChat] = await Promise.all([
+        AuthModel.aggregate([
+            {
+                $match: {
+                    archive: false,
+                    active: true
+                }
+            },
+            {
+                $lookup: {
+                    from: "Role",
+                    localField: "role",
+                    foreignField: "_id",
+                    as: "roleDetails"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$roleDetails",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: "Department",
+                    localField: "department",
+                    foreignField: "_id",
+                    as: "departmentDetails"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$departmentDetails",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    email: 1,
+                    userName: "$fullName",
+                    profile: "$profilePic",
+                    department: "$departmentDetails.name",
+                    role: "$roleDetails.name"
+                }
+            }
+        ]),
+        ChatModel.find({ "participants._id": user._id }, project)
+    ]);
 
-    if (!_id) {
-        throw new ApiError(httpStatus.BAD_REQUEST, {message:"Recevier id required"});
-    }
+    const data = getChat.map(chat => {
+        const userChatName = chat.chatName.find(cn => cn.userId === userId)?.name || "";
+        const userProfile = chat.profile.find(p => p.userId === userId)?.profile || "";
+        const userCount = chat.count.find(c => c.userId === userId)?.count || 0;
 
-    let chat = await ChatModel.findOne({
-        isGroupChat: false,
-        users: { $all: [authId, _id] },
-    }).populate("users", "-password");
-
-    
-    if (chat) {
-        return chat;
-    }
-
-    chat = new ChatModel({
-        chatName: 'Private Chat',
-        isGroupChat: false,
-        users: [authId, _id],
+        return {
+            _id: chat._id,
+            chatName: userChatName,
+            type: chat.type,
+            profile: userProfile,
+            lastMessage: chat.lastMessage,
+            lastMessageUserId: chat.lastMessageUserId,
+            count: userCount,
+            messageTime: chat.messageTime,
+            participants: chat.participants,
+            roomId: chat.roomId,
+        };
     });
 
-    await chat.save();
-    return chat;
-}
 
-
-exports.sendMessage = async(req)=>{
-    const { authId } =req;
-    const { _id } = req.params;
-    const { text } = req.body;
-    
-    if (!_id) {
-        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Chat ID is required" });
-    }
-
-    if (!text && !req.files) {
-        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Message content cannot be empty" });
-    }
-
-    
-    const chat = await ChatModel.findById(_id);
-    if (!chat) {
-        throw new ApiError(httpStatus.NOT_FOUND, { message: "Chat not found" });
-    }
-
-
-    let imageUrl = null;
-    let videoUrl = null;
-
-    if (req.files) {
-        if (req.files.imageUrl && req.files.imageUrl[0]) {
-            const fileExtension = req.files.imageUrl[0].originalname.split('.').pop();
-            const fileName = `image/${Date.now()}.${fileExtension}`;
-            imageUrl = await uploadCloud(fileName, req.files.imageUrl[0]);
-        }
-
-        if (req.files.videoUrl && req.files.videoUrl[0]) {
-            const fileExtension = req.files.videoUrl[0].originalname.split('.').pop();
-            const fileName = `video/${Date.now()}.${fileExtension}`;
-            videoUrl = await uploadCloud(fileName, req.files.videoUrl[0]);
-        }
-    }
-
-
-    const newMessage = new MessageModel({
-        sender: authId,
-        chat: _id,
-        text: text || null,
-        imageUrl: imageUrl || null,
-        videoUrl: videoUrl || null,
-    });
-
-    
-    const savedMessage = await newMessage.save();
-
-    
-    chat.latestMessage = savedMessage._id;
-    await chat.save();
-
-    
-    const populatedMessage = await MessageModel.findById(savedMessage._id).populate('sender','-password').exec();
-
-    return populatedMessage;
-}
-
-
-
-exports.editMessage = async (req) => {
-    const { authId } = req;
-    const { _id } = req.params;
-    const { text } = req.body;
-
-    if (!_id) {
-        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Message ID is required" });
-    }
-
-    if (!text) {
-        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Text content is required for editing the message." });
-    }
-
-    
-    const message = await MessageModel.findById(_id);
-    if (!message) {
-        throw new ApiError(httpStatus.NOT_FOUND, { message: "Message not found" });
-    }
-
-    if (message.sender !== authId) {
-        throw new ApiError(httpStatus.FORBIDDEN, { message: "You are not authorized to edit this message." });
-    }
-
-    
-    if (req.files || req.file) {
-        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Editing image or video is not allowed." });
-    }
-
-    
-    const updatedMessage = await MessageModel.findByIdAndUpdate(
-        _id,
-        { $set: { text, updatedAt: new Date() } },
-        { new: true }
-    );
-
-    return updatedMessage;
+    if (val.length === 0) throw new ApiError(httpStatus.NOT_FOUND, "Data Not Found.");
+    return { val, data };
 };
 
 
-exports.deleteMessage = async (req) => {
-    const { authId } = req;
-    const { _id } = req.params;
 
-    
-    if (!_id) {
-        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Message ID is required" });
+const createChats = async (req) => {
+    let user = req.user;
+    let { type, participants } = req.body;
+    let dateFormat = moment(Date.now()).format("hh:mm A");
+    participants.push({
+        _id: user._id,
+        userName: user.fullName,
+        profile: user.profilePic || "",
+        email: user.email,
+        role: user.role,
+        department: user.department
+    });
+
+    let folderId = generateFolderId(user.fullName);
+
+    let chatData;
+
+    if (type === "individual") {
+        const [participant1, participant2] = participants;
+
+        const existingChat = await ChatModel.findOne({
+            type: "individual",
+            "participants._id": { $all: [participant1._id, participant2._id] },
+        });
+
+        if (existingChat) {
+            return { message: "Chat already exists", chat: existingChat };
+        }
+
+        chatData = {
+            ...req.body,
+            folderId,
+            createdBy: user._id,
+            participants,
+            chatName: [
+                { userId: participant1._id, name: participant2.userName },
+                { userId: participant2._id, name: participant1.userName },
+            ],
+            profile: [
+                { userId: participant1._id, profile: participant2.profile || "" },
+                { userId: participant2._id, profile: participant1.profile || "" },
+            ],
+            messageTime: dateFormat,
+            lastMessageUserId: user._id,
+            lastMessage: `Hello from ${user.userName}`,
+            count: participants.map((participant) => ({
+                userId: participant._id,
+                count: 1,
+            })),
+        };
+
+        const createChat = await ChatModel.create(chatData);
+
+        const receiverIds = participants
+            .filter(
+                (participant) => participant._id.toString() !== user._id.toString(),
+            )
+            .map((participant) => participant._id);
+
+        let messageData = {
+            messageTime: dateFormat,
+            message: `Chat initiated by ${user.userName}`,
+            messageType: "initial",
+            senderId: user.adminId,
+            receiverId: receiverIds,
+            chat_id: createChat._id,
+            roomId: createChat.roomId,
+            profile: user.profile,
+            groupType: "individual",
+            createdBy: user._id,
+        };
+
+        await MessageModel.create(messageData);
+
+        let projectData = {
+            ...createChat._doc,
+            count: 1,
+            admin: false,
+            usersCount: createChat.count,
+            chatName: createChat.chatName.find(
+                (chat) => chat.userId.toString() !== user._id.toString(),
+            )?.name,
+            profile: createChat.profile.find(
+                (prof) => prof.userId.toString() !== user._id.toString(),
+            )?.profile,
+        };
+
+        let {
+            archive,
+            active,
+            instituteId,
+            createdAt,
+            updatedAt,
+            __v,
+            ...filteredProjectData
+        } = projectData;
+        //   sendNewChatToMicroservice(filteredProjectData);
+
+        return createChat;
     }
 
-    
-    const message = await MessageModel.findById(_id);
-    if (!message) {
-        throw new ApiError(httpStatus.NOT_FOUND, { message: "Message not found" });
-    }
+    chatData = {
+        ...req.body,
+        folderId,
+        createdBy: user._id,
+        messageTime: dateFormat,
+        lastMessageUserId: user._id,
+        lastMessage: `Created by ${user.userName}`,
+        count: participants.map((participant) => ({
+            userId: participant._id,
+            count: 1,
+        })),
+        admins: [
+            {
+                _id: user._id,
+                userName: user.userName,
+            },
+        ],
+        participants,
+    };
 
-    
-    if (message.sender !== authId) {
-        throw new ApiError(httpStatus.FORBIDDEN, { message: "You are not authorized to delete this message." });
-    }
+    const createChat = await ChatModel.create(chatData);
+    const receiverIds = participants
+        .filter((participant) => participant._id.toString() !== user._id.toString())
+        .map((participant) => participant._id);
 
-    await MessageModel.findByIdAndDelete(_id);
+    let messageData = {
+        messageTime: dateFormat,
+        message: `${user.userName} created group "${req.body.chatName}"`,
+        messageType: "initial",
+        senderId: user.adminId,
+        receiverId: receiverIds,
+        chat_id: createChat._id,
+        roomId: createChat.roomId,
+        groupType: "group",
+        createdBy: user._id,
+    };
 
-    return { message: "Message deleted successfully" };
+    await MessageModel.create(messageData);
+
+    let projectData = {
+        ...createChat._doc,
+        count: 1,
+        admin: false,
+        usersCount: createChat.count,
+        chatName: createChat.chatName[0],
+        profile: createChat.profile.length > 0 ? createChat.profile[0] : "",
+    };
+
+    let {
+        archive,
+        active,
+        instituteId,
+        createdAt,
+        updatedAt,
+        __v,
+        ...filteredProjectData
+    } = projectData;
+    // sendNewChatToMicroservice(filteredProjectData);
+    return createChat;
 };
 
+
+
+module.exports = {
+    getMembers,
+    createChats
+};

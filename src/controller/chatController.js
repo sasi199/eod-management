@@ -1,24 +1,19 @@
-const chatServices = require("../services/chatServices");
 const catchAsync = require("../utils/catchAsync");
+const chatService = require("../services/chatServices");
+
+const getMembers = catchAsync(async (req, res) => {
+  const data = await chatService.getMembers(req);
+  res.status(200).send(data);
+});
+
+const createChats = catchAsync(async (req, res) => {
+  const data = await chatService.createChats(req);
+  res.status(200).send(data);
+});
 
 
 
-exports.createChat = catchAsync(async(req,res)=>{
-    const response = await chatServices.createChat(req)
-    res.status(200).json({status:true, message:'chat created succesfully',data:response,})
-})
-
-exports.sendMessage = catchAsync(async(req,res)=>{
-    const response = await chatServices.sendMessage(req)
-    res.status(200).json({status:true, message:'Message send succesfully',data:response,})
-})
-
-exports.editMessage = catchAsync(async(req,res)=>{
-    const response = await chatServices.editMessage(req)
-    res.status(200).json({status:true, message:'Message edit succesfully',data:response,})
-})
-
-exports.deleteMessage = catchAsync(async(req,res)=>{
-    const response = await chatServices.deleteMessage(req)
-    res.status(200).json({status:true, message:'Message delete succesfully',data:response,})
-})
+module.exports = {
+  getMembers,
+  createChats,
+};

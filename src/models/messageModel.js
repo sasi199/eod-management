@@ -1,35 +1,82 @@
 const mongoose = require('mongoose');
-const schemaFields = require("../utils/schemaFieldUtils");
+const { v4 } = require("uuid");
 
 const messageSchema = new mongoose.Schema({
-    _id: schemaFields.idWithV4UUID,
-    sender:{
+    _id: {
         type: String,
-        ref: 'Auth'
-    },
-    receiver:{
+        default: v4,
+      },
+      senderId: {
         type: String,
-        ref: 'Auth'
-    },
-    chat:{
+      },
+      receiverId: {
+        type: Array,
+        default: [],
+      },
+      chat_id: {
         type: String,
-        ref: 'Chat'
-    },
-    text: schemaFields.requiredAndString,
-    imageUrl: {
+      },
+      time: {
         type: String,
-        default: null,
-    },
-    videoUrl: {
+      },
+      message: {
         type: String,
-        default: null,
-    },
-    seen: {
-        type: Boolean,
-        default: false,
-    },
-},{timestamps:true,collection:'Message'});
+      },
+      captionMessage: {
+        type: String
+      },
+      roomId: {
+        type: String,
+      },
+      tag: {
+        type: String,
+      },
+      date: {
+        type: String,
+      },
+      messageType: {
+        type: String,
+      },
+      messageTime: {
+        type: String,
+      },
+      reaction: {
+        type: String,
+      },
+      senderName: {
+        type: String,
+      },
+      profile: {
+        type: String,
+      },
+      messageStatus: {
+        type: Array,
+        default: [],
+      },
+      fileName: {
+        type: String,
+      },
+      fileType: {
+        type: String,
+      },
+      fileFormat: {
+        type: String,
+      },
+      groupType: {
+        type: String,
+      },
+      fileSize: {
+        type: String,
+      },
+      mimeType: {
+        type: String,
+      },
+      addMessage: {
+        type: String,
+      },
+},{ timestamps: true, collection: 'Message' })
 
-const MessageModel = mongoose.model('Message',messageSchema);
+
+const MessageModel = mongoose.model('Message', messageSchema);
 
 module.exports = MessageModel;
