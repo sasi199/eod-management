@@ -11,9 +11,13 @@ const createChats = catchAsync(async (req, res) => {
   res.status(200).send(data);
 });
 
-
+const getMessaages = catchAsync(async (req, res) => {
+    const data = await chatService.getMessaages(req);
+    res.status(200).send(data);
+  });
 
 module.exports = {
   getMembers,
   createChats,
+  getMessaages
 };

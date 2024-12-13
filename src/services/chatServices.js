@@ -92,7 +92,7 @@ const getMembers = async (req) => {
     });
 
 
-    if (val.length === 0) throw new ApiError(httpStatus.NOT_FOUND, "Data Not Found.");
+    if (val.length === 0) throw new ApiError(httpStatus.status.NOT_FOUND, "Data Not Found.");
     return { val, data };
 };
 
@@ -260,9 +260,43 @@ const createChats = async (req) => {
     return createChat;
 };
 
+const getMessaages = async (req) => {
+    const { roomId } = req.query;
+    const user = req.user;
+  
+    if (!roomId || !user || !user._id) {
+      throw new ApiError(httpStatus.status.BAD_REQUEST, "Invalid Request Parameters");
+    }
 
+      const updateGroupCountPromise = ChatModel.updateOne(
+        { roomId },
+        {
+          $set: {
+            "count.$[elem].count": 0,
+          },
+        },
+        {
+          arrayFilters: [{ "elem.userId": user._id }],
+        }
+      );
+  
+      const findMessagesPromise = MessageModel.aggregate([{ $match: { roomId } }]);  
+      const [updateResult, findMessages] = await Promise.all([
+        updateGroupCountPromise,
+        findMessagesPromise,
+      ]);
+  
+      if (!findMessages || findMessages.length === 0) {
+        throw new ApiError(httpStatus.status.BAD_REQUEST, "No Messages Found");
+      }
+  
+      return findMessages;
+   
+  };
+  
 
 module.exports = {
     getMembers,
-    createChats
+    createChats,
+    getMessaages
 };
