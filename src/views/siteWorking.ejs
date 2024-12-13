@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= siteName %> - Site Working</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f7fafc;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      text-align: center;
+      background-color: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #2D3748;
+      margin-bottom: 20px;
+    }
+
+    .message {
+      font-size: 1.25rem;
+      color: #4A5568;
+      margin-bottom: 30px;
+    }
+
+    .button {
+      display: inline-block;
+      background-color: #ED8936; /* Tailwind Orange-500 */
+      color: white;
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .button:hover {
+      background-color: #DD6B20; /* Slightly darker shade of orange */
+    }
+
+    footer {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #A0AEC0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1><%= siteName %> is Working!</h1>
+    <% if (message) { %>
+      <p class="message"><%= message %></p>
+    <% } else { %>
+      <p class="message">Everything is working as expected.</p>
+    <% } %>
+
+    <% if (siteLink) { %>
+      <a href="<%= siteLink %>" class="button">Go to Site</a>
+    <% } %>
+
+    <footer>
+      <p>Made with ❤️ by <%= siteName %> Team</p>
+    </footer>
+  </div>
+
+</body>
+</html>

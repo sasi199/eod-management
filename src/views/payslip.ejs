@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pay Slip</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="">
+
+  <div class="bg-white rounded-lg p-8 m-0 relative z-1">
+
+    <!-- Logo -->
+    <img src="<%= companyLogo %>" alt="Logo" class="w-48 object-fit max-w-xs absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-0 opacity-20" />
+
+    <!-- Header -->
+    <div class="flex justify-between items-center border-b pb-4">
+      <div>
+        <h1 class="text-2xl font-bold" style="color: <%= colorCode %>;"><%= companyName %></h1>
+        <p class="text-sm text-gray-600"><%= companyLocation %></p>
+      </div>
+      <div class="text-right">
+        <p class="text-gray-600">Payslip For the Month</p>
+        <h2 class="text-xl font-semibold"><%= paySlipMonth %></h2>
+      </div>
+    </div>
+
+    <!-- Employee Summary -->
+    <div class="mt-4">
+      <h3 class="text-lg font-semibold border-b pb-2">Employee Summary</h3>
+      <div class="grid grid-cols-3 gap-4 mt-2 text-sm text-gray-700">
+        <p><strong>Employee Name:</strong> <%= employeeName %></p>
+        <p><strong>Employee ID:</strong> <%= employeeId %></p>
+        <p><strong>Date of Joining:</strong> <%= dateOfJoining %></p>
+        <p><strong>Department:</strong> <%= department %></p>
+        <p><strong>Designation:</strong> <%= designation %></p>
+        <p><strong>Pay Date:</strong> <%= payDate %></p>
+        <% if (isEmployerPf) { %>
+        <p><strong>PF A/C Number:</strong> <%= pfAccountNumber %></p>
+        <% } %>
+        <% if (isEmployerEsi) { %>
+        <p><strong>ESI A/C Number:</strong> <%= esiAccountNumber %></p>
+        <% } %>
+        <% if (isEmployerPf) { %>
+        <p><strong>UAN:</strong> <%= uan %></p>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Leave Details -->
+    <div class="mt-6">
+      <h3 class="text-lg font-semibold border-b pb-2">Leave Details</h3>
+      <div class="flex flex-col space-y-3 mt-4 text-sm text-gray-700">
+        <!-- Casual Leave -->
+        <div class="flex justify-between">
+          <span>Casual Leave (CL):</span>
+          <div class="flex space-x-2">
+            <span>Available: <%= casualLeaveAvailable %></span>
+            <span>Used: <%= casualLeaveUsed %></span>
+            <span class="font-semibold">Balance: <%= casualLeaveBalance %></span>
+          </div>
+        </div>
+        <!-- Sick Leave -->
+        <div class="flex justify-between">
+          <span>Sick Leave (SL):</span>
+          <div class="flex space-x-2">
+            <span>Available: <%= sickLeaveAvailable %></span>
+            <span>Used: <%= sickLeaveUsed %></span>
+            <span class="font-semibold">Balance: <%= sickLeaveBalance %></span>
+          </div>
+        </div>
+        <!-- Bereavement Leave -->
+        <div class="flex justify-between">
+          <span>Balance Leave (BL):</span>
+          <div class="flex space-x-2">
+            <span>Available: <%= balanceLeaveAvailable %></span>
+            <span>Used: <%= balanceLeaveUsed %></span>
+            <span class="font-semibold">Balance: <%= balanceLeaveBalance %></span>
+          </div>
+        </div>
+        <!-- CompOff -->
+        <div class="flex justify-between">
+          <span>Compensatory Off (CompOff):</span>
+          <div class="flex space-x-2">
+            <span>Available: <%= compOffAvailable %></span>
+            <span>Used: <%= compOffUsed %></span>
+            <span class="font-semibold">Balance: <%= compOffBalance %></span>
+          </div>
+        </div>
+        <!-- Total Leave -->
+        <div class="flex justify-between border-t pt-2 font-bold">
+          <span>Total Leave Balance (SL + BL):</span>
+          <span class=""> <%= totalLeaveBalance %> </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Net Pay Summary -->
+    <div class="bg-green-50 mt-6 rounded-lg p-4 flex justify-between items-center">
+      <div>
+        <h3 class="text-xl font-bold text-green-700">₹<%= netPay %></h3>
+        <p class="text-sm text-gray-700">Employee Net Pay</p>
+      </div>
+      <div class="text-sm text-gray-600">
+        <p><strong>Paid Days:</strong> <%= paidDays %></p>
+        <p><strong>LOP Days:</strong> <%= lopDays %></p>
+        <p><strong>Balance Leave:</strong> <%= totalLeaveBalance %></p>
+      </div>
+    </div>
+
+    <!-- Earnings and Deductions -->
+    <div class="mt-6">
+      <div class="grid grid-cols-2 gap-6">
+        <!-- Earnings Table -->
+        <div>
+          <h3 class="text-lg font-semibold border-b pb-2">Earnings</h3>
+          <div class="text-sm text-gray-700 space-y-2">
+            <div class="flex justify-between">
+              <span>Basic</span>
+              <span>₹<%= basic %></span>
+            </div>
+            <div class="flex justify-between">
+              <span>House Rent Allowance</span>
+              <span>₹<%= hra %></span>
+            </div>
+            <div class="flex justify-between">
+              <span>Conveyance Allowance</span>
+              <span>₹<%= conveyance %></span>
+            </div>
+            <div class="flex justify-between">
+              <span>Other Allowance</span>
+              <span>₹<%= otherAllowance %></span>
+            </div>
+            <div class="flex justify-between font-semibold border-t pt-2">
+              <span>Gross Earnings</span>
+              <span>₹<%= grossEarnings %></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deductions Table -->
+        <div>
+          <h3 class="text-lg font-semibold border-b pb-2">Deductions</h3>
+          <div class="text-sm text-gray-700 space-y-2">
+            <div class="flex justify-between">
+              <span>EPF Contribution</span>
+              <span>₹<%= epfContribution %></span>
+            </div>
+            <div class="flex justify-between">
+              <span>ESI Contribution</span>
+              <span>₹<%= esiContribution %></span>
+            </div>
+            <div class="flex justify-between">
+              <span>Professional Tax</span>
+              <span>₹<%= professionalTax %></span>
+            </div>
+            <div class="flex justify-between">
+              <span>LOP</span>
+              <span>₹<%= lopDeduction %></span>
+            </div>
+            <div class="flex justify-between font-semibold border-t pt-2">
+              <span>Total Deductions</span>
+              <span>₹<%= totalDeductions %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Employer PF and ESI (Conditional) -->
+    <% if (isEmployerPf || isEmployerEsi) { %>
+      <div class="mt-6">
+        <h3 class="text-lg font-semibold border-b pb-2">Employer Contributions</h3>
+        <div class="text-sm text-gray-700 space-y-2">
+          <% if (isEmployerPf) { %>
+            <div class="flex justify-between">
+            <span>Employer EPF Contribution</span>
+            <span>₹<%= employerPF %></span>
+          </div><% } %>
+          <% if (isEmployerEsi) { %>
+          <div class="flex justify-between">
+            <span>Employer ESI Contribution</span>
+            <span>₹<%= employerEsi %></span>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- Total Net Pay -->
+    <div class="bg-gray-50 mt-6 rounded-lg p-4 flex justify-between items-center">
+      <h3 class="text-lg font-bold text-gray-800">TOTAL NET PAYABLE</h3>
+      <h3 class="text-xl font-bold text-green-700">₹<%= totalNetPay %></h3>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-4 text-center text-gray-500 text-xs space-y-1">
+      <p>This document has been automatically generated by <%= companyName %> Payroll.</p>
+      <p>Amount in Words: <%= amountInWords %></p>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,268 @@
+const express = require('express');
+const cors = require('cors');
+const {status} = require('http-status');
+const http = require('http');
+const morgan = require('./src/config/morgan');
+const routes = require("./src/routes/index");
+const { authLimiter } = require('./src/middlewares/rateLimiter');
+const socketIo = require('socket.io');
+const { errorConverter, errorHandler } = require('./src/middlewares/error');
+const path = require('path');
+const ApiError = require('./src/utils/apiError');
+const puppeteer = require("puppeteer");
+const ejs = require('ejs');
+const fs = require('fs');
+const socketRoute = require("./src/socket/index");
+
+
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+
+// Set up EJS as the view engine
+
+console.log(path.join(__dirname, 'src/views'),'sdsdsfdgcvfs')
+
+app.set('view engine', 'ejs');
+app.set('views', './src/views');
+
+
+app.use(cors());
+app.options("*", cors());
+
+app.use(morgan.successHandler);
+app.use(morgan.errorHandler);
+
+const server = http.createServer(app);
+const io = socketIo(server,{
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST","PUT", "DELETE"],
+        credentials: true
+      },
+});
+
+socketRoute(io);
+
+app.use((req, res, next) => {
+    req.io = io;
+    next();
+  });
+
+  io.on("connection", (socket) => {
+    const userId = socket.handshake.query.userId;
+    if (userId) {
+        req.io.connectedUsers[userId] = socket.id;
+    }
+
+    socket.on("disconnect", () => {
+        delete req.io.connectedUsers[userId];
+    });
+});
+
+
+app.get("/",(req, res)=>{
+    const data = {siteName : 'EOD Backend',message:null,siteLink:"http://localhost:5174"}
+    res.status(200).render('siteWorking', data)
+    // res.status(200).send({message:"EOD backend is working...🚀"})
+})
+
+// async function generatePDF(htmlContent) {
+//     const browser = await puppeteer.launch({
+//       headless: true, // Ensure Puppeteer runs in headless mode
+//       args: ['--no-sandbox', '--disable-setuid-sandbox'], // Safe args for deployment
+//     });
+//     const page = await browser.newPage();
+
+//     // Set HTML content
+//     await page.setContent(htmlContent, {
+//       waitUntil: 'networkidle0', // Ensure all resources are loaded
+//     });
+
+//     // Generate PDF with explicit options
+//     const pdfBuffer = await page.pdf({
+//       format: 'A4', // Standard PDF format
+//       printBackground: true, // Include background styles
+//       omitBackground:true,
+//     //   margin: {
+//     //     top: '20px',
+//     //     bottom: '20px',
+//     //     left: '20px',
+//     //     right: '20px',
+//     //   },
+//     });
+
+//     await browser.close();
+//     return pdfBuffer;
+//   }
+
+
+// app.get('/payslip', (req,res)=>{
+//     // const data = {
+//     //     companyName: "Your Company Name",
+//     //     companyLogo: "https://facesyncv1.s3.ap-south-1.amazonaws.com/candidate/37f6b674-1802-43ba-b002-7f30f7a0f599/ProfilePic.jpeg",
+//     //     companyAddress: "123, Business Street, City",
+//     //     salaryMonth:"06",
+//     //     salaryDate: "2024-06-01",
+//     //     employeeName: "John Doe",
+//     //     relationName: "Mark Doe",
+//     //     relationType: "Father",
+//     //     dateOfBirth: "1990-01-01",
+//     //     employeeNumber: "EMP001",
+//     //     accountNumber: "1234567890",
+//     //     department: "IT",
+//     //     designation: "Software Engineer",
+//     //     grade: "A",
+//     //     dateOfJoining: "2022-01-01",
+//     //     pfNumber: "PF123456",
+//     //     esiNumber: "ESI654321",
+//     //     salaryDays: 30,
+//     //     earnedDays: 30,
+//     //     compensatoryOff: 2,
+//     //     lossOfPayDays: 0,
+//     //     workingDays: 30,
+//     //     paidHolidays: 1,
+//     //     casualLeaveTaken: 1,
+//     //     sickLeaveTaken: 0,
+//     //     balanceLeave: 2,
+//     //     lateComings: 0,
+//     //     permissionsTaken: 0,
+//     //     basicSalaryEarned: 20000,
+//     //     houseRentAllowance: 5000,
+//     //     conveyance: 2000,
+//     //     otherAllowance: 3000,
+//     //     bonus: 1000,
+//     //     gratuity: 1000,
+//     //     pfContribution: 1500,
+//     //     esiContribution: 500,
+//     //     professionalTax: 200,
+//     //     transportDeduction: 0,
+//     //     otherDeductions: 100,
+//     //     totalEarnings: 31000,
+//     //     totalDeductions: 2300,
+//     //     netPay: 28700,
+//     //     basicSalary: 6543,
+//     // }
+//     const paySlipData = {
+//       colorCode: "#531d6b",
+//       companyLogo: 'https://facesync.app/wp-content/uploads/2024/02/FaceSync-white-background-02-1024x503.png', // Path to your logo
+//       companyName: 'Facesync',
+//       companyLocation: 'Chennai, India',
+//       paySlipMonth: 'December 2024',
+//       employeeName: 'Syed Abuthahir',
+//       designation: 'Full Stack Developer',
+//       employeeId: '12345',
+//       department: 'Web Developer',
+//       dateOfJoining: '01/01/2023',
+//       payDate: '07/12/2024',
+//       pfAccountNumber: 'AA/BBB/1234567/12C/123456',
+//       uan: '9876543210',
+//       casualLeaveAvailable: 1,
+//       casualLeaveUsed: 1,
+//       casualLeaveBalance: 0,
+//       sickLeaveAvailable: 1,
+//       sickLeaveUsed: 0,
+//       sickLeaveBalance: 1,
+//       balanceLeaveAvailable: 2,
+//       balanceLeaveUsed: 0,
+//       balanceLeaveBalance: 2,
+//       compOffAvailable: 2,
+//       compOffUsed: 1,
+//       compOffBalance: 1,
+//       totalLeaveBalance: 3,
+//       netPay: '₹15,000',
+//       paidDays: 30,
+//       lopDays: 0,
+//       balanceLeave: 3,
+//       basic: '₹8000',
+//       hra: '₹3000',
+//       conveyance: '₹2000',
+//       fixedAllowance: '₹5000',
+//       grossEarnings: '₹18000',
+//       epfContribution: '₹1000',
+//       professionalTax: '₹200',
+//       lopDeduction: '₹0',
+//       totalDeductions: '₹1200',
+//       totalNetPay: '₹16800',
+//       amountInWords: 'Sixteen Thousand Eight Hundred Rupees Only'
+//     };
+//     res.status(200).render('payslip',paySlipData)
+// })
+
+// app.get('/payslip/pdf', async (req, res) => {
+//     const paySlipData = {
+//         colorCode: "#531d6b",
+//         companyLogo: 'https://facesync.app/wp-content/uploads/2024/02/FaceSync-white-background-02-1024x503.png', // Path to your logo
+//         companyName: 'Facesync',
+//         companyLocation: 'Chennai, India',
+//         paySlipMonth: 'December 2024',
+//         employeeName: 'Syed Abuthahir',
+//         designation: 'Full Stack Developer',
+//         employeeId: '12345',
+//         department: 'Web Developer',
+//         dateOfJoining: '01/01/2023',
+//         payDate: '07/12/2024',
+//         pfAccountNumber: 'AA/BBB/1234567/12C/123456',
+//         uan: '9876543210',
+//         casualLeaveAvailable: 1,
+//         casualLeaveUsed: 1,
+//         casualLeaveBalance: 0,
+//         sickLeaveAvailable: 1,
+//         sickLeaveUsed: 0,
+//         sickLeaveBalance: 1,
+//         balanceLeaveAvailable: 2,
+//         balanceLeaveUsed: 0,
+//         balanceLeaveBalance: 2,
+//         compOffAvailable: 2,
+//         compOffUsed: 1,
+//         compOffBalance: 1,
+//         totalLeaveBalance: 3,
+//         netPay: '₹15,000',
+//         paidDays: 30,
+//         lopDays: 0,
+//         balanceLeave: 3,
+//         basic: '₹8000',
+//         hra: '₹3000',
+//         conveyance: '₹2000',
+//         fixedAllowance: '₹5000',
+//         grossEarnings: '₹18000',
+//         epfContribution: '₹1000',
+//         professionalTax: '₹200',
+//         lopDeduction: '₹0',
+//         totalDeductions: '₹1200',
+//         totalNetPay: '₹16800',
+//         amountInWords: 'Sixteen Thousand Eight Hundred Rupees Only'
+//       };
+//     try {
+//       const htmlContent = await ejs.renderFile('./src/views/payslip.ejs',paySlipData);
+  
+//       const pdfBuffer = await generatePDF(htmlContent);
+        
+//     //   fs.writeFileSync("sample_payslip.pdf",pdfBuffer,)
+//       // Set headers
+//       res.setHeader('Content-Type', 'application/pdf');
+//       res.setHeader('Content-Disposition', 'inline; filename=payslip.pdf');
+  
+//       // Stream buffer
+//       res.write(pdfBuffer);
+//       res.end();
+//     } catch (error) {
+//       console.error('Error generating PDF:', error);
+//       res.status(500).send('Failed to generate PDF');
+//     }
+//   });
+app.use('/v1',routes);
+app.use('/v1/auth',authLimiter);
+
+
+// send back a 404 error for any unknown api request
+app.use((req, res, next) => {
+    next(new ApiError(status.NOT_FOUND, "Not found"));
+  });
+  require("aws-sdk/lib/maintenance_mode_message").suppress = true;
+  // handle error
+  app.use(errorConverter);
+  app.use(errorHandler);
+
+module.exports = server;
+
