@@ -15,18 +15,199 @@ const AddRole = () => {
   const [roles, setRoles] = useState([]);
   const [permissionGroups, setPermissionGroups] = useState({});
   const [isAddRoleModalOpen, setIsAddRoleModalOpen] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
   const [form] = Form.useForm();
+  const initialState = {
+    roleName: "",
+    admin: {
+      title: "Admin Management",
+      checkBoxs: [
+        { title: "Create", value: "create" },
+        { title: "Manage", value: "manage" },
+        { title: "Manage Own", value: "manageOwn" },
+        { title: "View", value: "view" },
+        { title: "View", value: "viewOwn" },
+      ],
+      GrantedPermission: [],
+    },
+    staffs:{
+      title: "Employee Management",
+      checkBoxs: [
+        { title: "Create", value: "create" },
+        { title: "Manage", value: "manage" },
+        { title: "Manage Own", value: "manageOwn" },
+        { title: "View", value: "view" },
+        { title: "View", value: "viewOwn" },
+      ],
+      GrantedPermission: [],
+    },
+    eod:{
+      title: "EOD Management",
+      checkBoxs: [
+        { title: "Create", value: "create" },
+        { title: "Manage", value: "manage" },
+        { title: "Manage Own", value: "manageOwn" },
+        { title: "View", value: "view" },
+        { title: "View", value: "viewOwn" },
+      ],
+      GrantedPermission: [],
+
+    },
+    assesment:{
+      title: "Assesment Management",
+      checkBoxs: [
+        { title: "Create", value: "create" },
+        { title: "Manage", value: "manage" },
+        { title: "Manage Own", value: "manageOwn" },
+        { title: "View", value: "view" },
+        { title: "View", value: "viewOwn" },
+      ],
+      GrantedPermission: [],
+
+    },
+    batch:{
+      title: "Batch Management",
+      checkBoxs: [
+        { title: "Create", value: "create" },
+        { title: "Manage", value: "manage" },
+        { title: "Manage Own", value: "manageOwn" },
+        { title: "View", value: "view" },
+        { title: "View", value: "viewOwn" },
+      ],
+      GrantedPermission: [],
+    },
+    task:{
+      title: "Task Management",
+      checkBoxs: [
+        { title: "Create", value: "create" },
+        { title: "Manage", value: "manage" },
+        { title: "Manage Own", value: "manageOwn" },
+        { title: "View", value: "view" },
+        { title: "View", value: "viewOwn" },
+      ],
+      GrantedPermission: [],
+    },
+    trainee:{
+      title: "Trainee Management",
+      checkBoxs: [
+        { title: "Create", value: "create" },
+        { title: "Manage", value: "manage" },
+        { title: "Manage Own", value: "manageOwn" },
+        { title: "View", value: "view" },
+        { title: "View", value: "viewOwn" },
+      ],
+      GrantedPermission: [],
+    },
+    shedule:{
+      title: "Shedule Management",
+      checkBoxs: [
+        { title: "Create", value: "create" },
+        { title: "Manage", value: "manage" },
+        { title: "Manage Own", value: "manageOwn" },
+        { title: "View", value: "view" },
+        { title: "View", value: "viewOwn" },
+      ],
+      GrantedPermission: [],
+    },
+    syllabus:{
+      title: "Syllabus Management",
+      checkBoxs: [
+        { title: "Create", value: "create" },
+        { title: "Manage", value: "manage" },
+        { title: "Manage Own", value: "manageOwn" },
+        { title: "View", value: "view" },
+        { title: "View", value: "viewOwn" },
+      ],
+      GrantedPermission: [],
+    },
+    leave:{
+      title: "Leave Management",
+      checkBoxs: [
+        { title: "Request", value: "request" },
+        { title: "Aprove", value: "aprove" },
+        { title: "Manage", value: "manage" },
+        { title: "View", value: "view" },
+        { title: "View", value: "viewOwn" },
+      ],
+      GrantedPermission: [],
+    },
+    payroll:{
+      title: "Payroll Management",
+      checkBoxs: [
+        { title: "Create", value: "create" },
+        { title: "Manage", value: "manage" },
+        { title: "View", value: "view" },
+        { title: "View", value: "viewOwn" },
+      ],
+      GrantedPermission: [],
+    },
+    
+    report:{
+      title: "Report Management",
+      checkBoxs: [
+        { title: "Create", value: "create" },
+        { title: "Manage", value: "manage" },
+        { title: "View", value: "view" },
+        { title: "View", value: "viewOwn" },
+      ],
+      GrantedPermission: [],
+    },
+    system:{
+      title: "System Management",
+      checkBoxs: [
+        { title: "Create", value: "create" },
+        { title: "Manage", value: "manage" },
+        { title: "View", value: "view" },
+      ],
+      GrantedPermission: [],
+    },
+    
+    role:{
+      title: "Role Management",
+      checkBoxs: [
+        { title: "Create", value: "create" },
+        { title: "Manage", value: "manage" },
+        { title: "View", value: "view" },
+      ],
+      GrantedPermission: [],
+    },
+    authorityLevel:{
+      title: "Authority Level",
+      checkBoxs: [
+        { title: "High", value: "high" },
+        { title: "Medium", value: "medium" },
+        { title: "Low", value: "low" },
+      ],
+      GrantedPermission: [],
+    }
+  };
+  const initialState2 = {
+    roleName: "",
+    admin: {
+      title: "Admin Management",
+      checkBoxs: [
+        { title: "Create", value: "create" },
+        { title: "Manage", value: "manage" },
+        { title: "Manage Own", value: "manageOwn" },
+        { title: "View", value: "view" },
+        { title: "View Own", value: "viewOwn" },
+      ],
+      GrantedPermission: [],
+    },
+   
+  };
+  const [postRoles, SetPostRoles] = useState(initialState);
 
   useEffect(() => {
     const fetchRoles = async () => {
       try {
         const response = await GetRole();
         if (response.status === 200) {
-          setRoles(response.data.data.roles);
-          setPermissionGroups(response.data.data.permissionGroups);
+          console.log(response.data.data);
+          setRoles(response.data.data);
         } else {
           message.error("Failed to load roles.");
         }
@@ -41,6 +222,15 @@ const AddRole = () => {
 
   const handleAddRoleClick = () => {
     setIsAddRoleModalOpen(true);
+    setIsEdit(false);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    SetPostRoles({
+      ...postRoles,
+      [name]: value,
+    });
   };
 
   const handleCancel = () => {
@@ -51,43 +241,40 @@ const AddRole = () => {
     form.resetFields();
   };
 
-  const handleFormSubmit = async (values) => {
-    // const payload = {
-    //   name: values.name,
-    //   permissions: values.permissions,
-    //   hierarchyLevel: parseInt(values.hierarchyLevel, 10),
-    // };
+  const handleChange = (name, value) => {
+    SetPostRoles((prev) => {
+      let previous = { ...prev };
 
-    try {
-      let response;
-      if (selectedRole) {
-        response = await UpdateRole(payload, selectedRole._id);
-        if (response.status === 200) {
-          message.success("Role updated successfully!");
-          setRoles(
-            roles.map((role) =>
-              role.id === selectedRole.id ? { ...role, ...payload } : role
-            )
-          );
-        }
-      } else {
-        response = await CreateRole(payload);
-        if (response.status === 200) {
-          message.success("Role added successfully!");
-          setRoles([
-            ...roles,
-            {
-              name: values.name,
-              permissions: values.permissions,
-              hierarchyLevel: values.hierarchyLevel,
-            },
-          ]);
-        }
+      if (previous[name]?.GrantedPermission?.includes(value)) {
+        let index = previous[name]?.GrantedPermission.indexOf(value);
+        previous[name]?.GrantedPermission.splice(index, 1);
+        return previous;
       }
-      handleCancel();
+      if (!previous[name]?.GrantedPermission) {
+        previous[name].GrantedPermission = [];
+      }
+      previous[name].GrantedPermission.push(value);
+
+      return previous;
+    });
+  };
+
+  const handleOk = async () => {
+    try {
+      console.log("hiii");
+
+      let validate = Object.keys(postRoles).some(
+        (item) => postRoles[item]?.GrantedPermission?.length > 0
+      );
+      console.log(postRoles);
+      console.log(validate, "m");
+      if (!validate) {
+        console.log("ko");
+        message.warning("Please select Permission");
+        return;
+      }
     } catch (error) {
-      console.error("Error handling role:", error);
-      message.error("Failed to process role. Please try again.");
+      console.log(error);
     }
   };
 
@@ -141,7 +328,7 @@ const AddRole = () => {
     },
     {
       name: "Role Name",
-      selector: (row) => row.name || "n",
+      selector: (row) => row.roleName || "n",
       sortable: true,
       center: true,
     },
@@ -240,9 +427,9 @@ const AddRole = () => {
           <p>
             <strong>Level:</strong> {selectedRole?.hierarchyLevel}
           </p>
-          <p>
+          {/* <p>
             <strong>Permissions:</strong> {selectedRole?.permissions.join(", ")}
-          </p>
+          </p> */}
         </div>
       </Modal>
 
@@ -254,7 +441,7 @@ const AddRole = () => {
         onCancel={handleCancel}
         footer={null}
       >
-        <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
+        <Form form={form} layout="vertical">
           <div className="flex gap-2">
             <div>
               <Form.Item
@@ -343,23 +530,28 @@ const AddRole = () => {
       {/* Add Role Modal */}
       <Modal
         width={600}
-        title="Add New Role"
+        title={`${isEdit ? "Edit role" : "Add Role"}`}
         visible={isAddRoleModalOpen}
         onCancel={handleCancel}
+        // onOk={handleOk}
         footer={null}
         className="text-lg"
       >
-        <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
+        <Form form={form} onFinish={handleOk} layout="vertical">
           <div className="flex gap-6 ">
             <Form.Item
-              name="name"
+              name="roleName"
               label="Role Name"
               rules={[
                 { required: true, message: "Please enter the role name" },
               ]}
               className="w-full flex-1"
             >
-              <Input placeholder="Enter role name" />
+              <Input
+                placeholder="Enter role name"
+                name="roleName"
+                onChange={handleInputChange}
+              />
             </Form.Item>
 
             <Form.Item
@@ -375,50 +567,215 @@ const AddRole = () => {
               ]}
               className="w-full flex-1"
             >
-              <Input placeholder="Enter hierarchy level (e.g., 1, 2, 3)" />
+              <Input
+                placeholder="Enter hierarchy level (e.g., 1, 2, 3)"
+                name="hierarchyLevel"
+                onChange={handleInputChange}
+              />
             </Form.Item>
           </div>
           <Form.Item
             name="permissions"
             label="Permissions"
-            rules={[{ required: true, message: "Please select permissions" }]}
+            // rules={[{ required: true, message: "Please select permissions" }]}
           >
-            {Object.keys(permissionGroups).map((permissionGroup) => {
-              const groupName = permissionGroup;
+            {/* Employee Management */}
+            {Object.keys(postRoles)
+              .filter(
+                (filterItem) =>
+                  postRoles[filterItem] &&
+                  Array.isArray(postRoles[filterItem]?.checkBoxs)
+              )
 
-              return (
-                <div className="pb-4">
-                  <p className="font capitalize text-orange-500 pb-2">
-                    {groupName.replace(/([a-z])([A-Z])/g, "$1 $2")}
-                  </p>
-                  <div className="flex gap-4">
-                    {Object.keys(permissionGroups[permissionGroup]).map(
-                      (permission) => {
-                        const permissionName = permission;
-                        return (
-                          <div className="flex capitalize " key={permission}>
-                                <Popover
-                                  onMouseEnter
-                                  content={generateContent(
-                                    permissionGroups[groupName][permission]
-                                  )}
-                                  title="Permissions"
-                                  >
-                            <Checkbox value={permissionName}>
-                              <div className="flex gap-2 items-center">
-                                {permissionName}
-
-                              </div>
-                            </Checkbox>
-                                </Popover>
-                          </div>
-                        );
-                      }
-                    )}
+              ?.map((item) => {
+                return (
+                  <div className="pb-4">
+                    <p className="font capitalize text-orange-500 pb-2">
+                      {postRoles[item] && postRoles[item].title}
+                    </p>
+                    <div className="flex gap-4">
+                    {postRoles[item] &&
+                      postRoles[item]?.checkBoxs?.length > 0 &&
+                      postRoles[item] &&
+                      postRoles[item]?.checkBoxs.map((list) => (
+                       
+                          <Checkbox
+                            value="Create"
+                            onChange={() => handleChange(item, list?.value)}
+                          >
+                            {list?.title}
+                          </Checkbox>
+                       
+                      ))} </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+              .filter((item) => item)}
+            {/* <div className="pb-4">
+              <p className="font capitalize text-orange-500 pb-2">
+                Employee Management
+              </p>
+              <div className="flex gap-4">
+                <Checkbox
+                  value="Create"
+                  onChange={() => handleChange("staffs", "Create")}
+                >
+                  Create
+                </Checkbox>
+                <Checkbox value="Manage">Manage</Checkbox>
+                <Checkbox value="employeeManageOwn">Manage Own</Checkbox>
+                <Checkbox value="employeeView">View</Checkbox>
+                <Checkbox value="employeeViewOwn">View Own</Checkbox>
+              </div>
+            </div> */}
+
+            {/* Admin Management */}
+            {/* <div className="pb-4">
+              <p className="font capitalize text-orange-500 pb-2">
+                Admin Management
+              </p>
+              <div className="flex gap-4">
+                <Checkbox value="adminCreate">Create</Checkbox>
+                <Checkbox value="adminManage">Manage</Checkbox>
+                <Checkbox value="adminManageOwn">Manage Own</Checkbox>
+                <Checkbox value="adminView">View</Checkbox>
+                <Checkbox value="adminViewOwn">View Own</Checkbox>
+              </div>
+            </div> */}
+
+            {/* Batch Management */}
+            {/* <div className="pb-4">
+              <p className="font capitalize text-orange-500 pb-2">
+                Batch Management
+              </p>
+              <div className="flex gap-4">
+                <Checkbox value="batchCreate">Create</Checkbox>
+                <Checkbox value="batchManage">Manage</Checkbox>
+                <Checkbox value="batchManageOwn">Manage Own</Checkbox>
+                <Checkbox value="batchView">View</Checkbox>
+                <Checkbox value="batchViewOwn">View Own</Checkbox>
+              </div>
+            </div> */}
+
+            {/* Task Management */}
+            {/* <div className="pb-4">
+              <p className="font capitalize text-orange-500 pb-2">
+                Task Management
+              </p>
+              <div className="flex gap-4">
+                <Checkbox value="taskCreate">Create</Checkbox>
+                <Checkbox value="taskManage">Manage</Checkbox>
+                <Checkbox value="taskManageOwn">Manage Own</Checkbox>
+                <Checkbox value="taskView">View</Checkbox>
+                <Checkbox value="taskViewOwn">View Own</Checkbox>
+              </div>
+            </div> */}
+
+            {/* Trainee Management */}
+            {/* <div className="pb-4">
+              <p className="font capitalize text-orange-500 pb-2">
+                Trainee Management
+              </p>
+              <div className="flex gap-4">
+                <Checkbox value="traineeCreate">Create</Checkbox>
+                <Checkbox value="traineeManage">Manage</Checkbox>
+                <Checkbox value="traineeManageOwn">Manage Own</Checkbox>
+                <Checkbox value="traineeView">View</Checkbox>
+                <Checkbox value="traineeViewOwn">View Own</Checkbox>
+              </div>
+            </div> */}
+
+            {/* Schedule Management */}
+            {/* <div className="pb-4">
+              <p className="font capitalize text-orange-500 pb-2">
+                Schedule Management
+              </p>
+              <div className="flex gap-4">
+                <Checkbox value="scheduleCreate">Create</Checkbox>
+                <Checkbox value="scheduleManage">Manage</Checkbox>
+                <Checkbox value="scheduleManageOwn">Manage Own</Checkbox>
+                <Checkbox value="scheduleView">View</Checkbox>
+                <Checkbox value="scheduleViewOwn">View Own</Checkbox>
+              </div>
+            </div> */}
+
+            {/* Syllabus Management */}
+            {/* <div className="pb-4">
+              <p className="font capitalize text-orange-500 pb-2">
+                Syllabus Management
+              </p>
+              <div className="flex gap-4">
+                <Checkbox value="syllabusCreate">Create</Checkbox>
+                <Checkbox value="syllabusManage">Manage</Checkbox>
+                <Checkbox value="syllabusManageOwn">Manage Own</Checkbox>
+                <Checkbox value="syllabusView">View</Checkbox>
+                <Checkbox value="syllabusViewOwn">View Own</Checkbox>
+              </div>
+            </div> */}
+
+            {/* Leave Management */}
+            {/* <div className="pb-4">
+              <p className="font capitalize text-orange-500 pb-2">
+                Leave Management
+              </p>
+              <div className="flex gap-4">
+                <Checkbox value="leaveRequest">Request</Checkbox>
+                <Checkbox value="leaveApprove">Approve</Checkbox>
+                <Checkbox value="leaveView">View</Checkbox>
+                <Checkbox value="leaveViewOwn">View Own</Checkbox>
+                <Checkbox value="leaveManage">Manage</Checkbox>
+              </div>
+            </div> */}
+
+            {/* Payroll Management */}
+            {/* <div className="pb-4">
+              <p className="font capitalize text-orange-500 pb-2">
+                Payroll Management
+              </p>
+              <div className="flex gap-4">
+                <Checkbox value="payrollCreate">Create</Checkbox>
+                <Checkbox value="payrollManage">Manage</Checkbox>
+                <Checkbox value="payrollView">View</Checkbox>
+                <Checkbox value="payrollViewOwn">View Own</Checkbox>
+              </div>
+            </div> */}
+
+            {/* Report Management */}
+            {/* <div className="pb-4">
+              <p className="font capitalize text-orange-500 pb-2">
+                Report Management
+              </p>
+              <div className="flex gap-4">
+                <Checkbox value="reportCreate">Create</Checkbox>
+                <Checkbox value="reportManage">Manage</Checkbox>
+                <Checkbox value="reportView">View</Checkbox>
+                <Checkbox value="reportViewOwn">View Own</Checkbox>
+              </div>
+            </div> */}
+
+            {/* System Management */}
+            {/* <div className="pb-4">
+              <p className="font capitalize text-orange-500 pb-2">
+                System Management
+              </p>
+              <div className="flex gap-4">
+                <Checkbox value="systemCreate">Create</Checkbox>
+                <Checkbox value="systemManage">Manage</Checkbox>
+                <Checkbox value="systemView">View</Checkbox>
+              </div>
+            </div> */}
+
+            {/* Role Management */}
+            {/* <div className="pb-4">
+              <p className="font capitalize text-orange-500 pb-2">
+                Role Management
+              </p>
+              <div className="flex gap-4">
+                <Checkbox value="roleCreate">Create</Checkbox>
+                <Checkbox value="roleManage">Manage</Checkbox>
+                <Checkbox value="roleView">View</Checkbox>
+              </div>
+            </div> */}
           </Form.Item>
 
           <div className="text-right">

@@ -341,7 +341,7 @@ export const EditEodById = async(data,eodId) => {
  }
 
  export const GetRole = async ()=>{
-  const res = await interceptors.get(`/role/get-all?p=${true}`)
+  const res = await interceptors.get(`/role/get-all`)
 return res;
  }
  export const UpdateRole = async (data, id)=>{
