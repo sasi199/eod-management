@@ -1,20 +1,18 @@
 const express = require('express');
+const router = express.Router();
 const chatController = require("../controller/chatController");
-const uploads = require("../middlewares/multer");
 const { verifyAuthToken } = require('../middlewares/jwt.config');
 
-const Router = express.Router();
-Router.use(verifyAuthToken)
 
+router.use(verifyAuthToken)
 
-Router.route('/createChat/:_id').post(chatController.createChat);
-Router.route('/sendMessage/:_id').post(uploads.fields([
-    { name: "imageUrl", maxCount: 1 },
-    { name: "videoUrl", maxCount: 1 },]),chatController.sendMessage);
+router
+    .route("/")
+    .get(chatController.getMembers)
+    .post(chatController.createChats)
 
-Router.route('/editMessage/:_id').post(uploads.single(''),chatController.editMessage);
-Router.route('/deleteMessage/:_id').post(chatController.deleteMessage);
+router.
+    route("/message")
+    .get(chatController.getMessaages);
 
-
-
-module.exports = Router;
+module.exports = router;

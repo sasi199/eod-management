@@ -15,7 +15,7 @@ exports.loginByEmailAndLogId = async(req)=>{
     const { email, password, latitude,longitude,} = req.body
     const user = await Auth.findOne({email}).populate({
       path:'role',
-      select:'name'
+      select:'roleName'
     });
     if (!user) {
         throw new ApiError(status.UNAUTHORIZED, {message:"Invalid credantials",status:false,});
@@ -53,7 +53,7 @@ exports.loginByEmailAndLogId = async(req)=>{
       
 
       let attendance = await AttendanceModel.findOne({
-        user: user._id, 
+        user: user.accountId, 
         dateString: startOfDay
       });
       console.log("aaaaaaaa",attendance);
