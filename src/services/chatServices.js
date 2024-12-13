@@ -73,24 +73,58 @@ const getMembers = async (req) => {
     ]);
 
     const data = getChat.map(chat => {
-        const userChatName = chat.chatName.find(cn => cn.userId === userId)?.name || "";
-        const userProfile = chat.profile.find(p => p.userId === userId)?.profile || "";
-        const userCount = chat.count.find(c => c.userId === userId)?.count || 0;
-
-        return {
+        if (chat.type === "individual") {
+            const userChatName = chat.chatName.find(cn => cn.userId === userId)?.name || "";
+            const userProfile = chat.profile.find(p => p.userId === userId)?.profile || "";
+            const userCount = chat.count.find(c => c.userId === userId)?.count || 0;
+    
+            return {
+                _id: chat._id,
+                chatName: userChatName,
+                type: chat.type,
+                profile: userProfile,
+                lastMessage: chat.lastMessage,
+                lastMessageUserId: chat.lastMessageUserId,
+                count: userCount,
+                messageTime: chat.messageTime,
+                participants: chat.participants,
+                roomId: chat.roomId,
+            };
+        }
+    
+        if (chat.type === "group") {
+            const userChatName = chat.chatName[0] || "";
+            const userProfile = chat.profile[0] || "";
+            const userCount = chat.count.find(c => c.userId === userId)?.count || 0;
+    
+            return {
+                _id: chat._id,
+                chatName: userChatName,
+                type: chat.type,
+                profile: userProfile,
+                lastMessage: chat.lastMessage,
+                lastMessageUserId: chat.lastMessageUserId,
+                count: userCount,
+                messageTime: chat.messageTime,
+                participants: chat.participants,
+                roomId: chat.roomId,
+            };
+        }
+    
+         return {
             _id: chat._id,
-            chatName: userChatName,
+            chatName: "Unknown Chat Type",
             type: chat.type,
-            profile: userProfile,
-            lastMessage: chat.lastMessage,
-            lastMessageUserId: chat.lastMessageUserId,
-            count: userCount,
-            messageTime: chat.messageTime,
-            participants: chat.participants,
-            roomId: chat.roomId,
+            profile: "",
+            lastMessage: "",
+            lastMessageUserId: "",
+            count: 0,
+            messageTime: "",
+            participants: [],
+            roomId: "",
         };
     });
-
+    
 
     if (val.length === 0) throw new ApiError(httpStatus.status.NOT_FOUND, "Data Not Found.");
     return { val, data };
@@ -263,37 +297,37 @@ const createChats = async (req) => {
 const getMessaages = async (req) => {
     const { roomId } = req.query;
     const user = req.user;
-  
+
     if (!roomId || !user || !user._id) {
-      throw new ApiError(httpStatus.status.BAD_REQUEST, "Invalid Request Parameters");
+        throw new ApiError(httpStatus.status.BAD_REQUEST, "Invalid Request Parameters");
     }
 
-      const updateGroupCountPromise = ChatModel.updateOne(
+    const updateGroupCountPromise = ChatModel.updateOne(
         { roomId },
         {
-          $set: {
-            "count.$[elem].count": 0,
-          },
+            $set: {
+                "count.$[elem].count": 0,
+            },
         },
         {
-          arrayFilters: [{ "elem.userId": user._id }],
+            arrayFilters: [{ "elem.userId": user._id }],
         }
-      );
-  
-      const findMessagesPromise = MessageModel.aggregate([{ $match: { roomId } }]);  
-      const [updateResult, findMessages] = await Promise.all([
+    );
+
+    const findMessagesPromise = MessageModel.aggregate([{ $match: { roomId } }]);
+    const [updateResult, findMessages] = await Promise.all([
         updateGroupCountPromise,
         findMessagesPromise,
-      ]);
-  
-      if (!findMessages || findMessages.length === 0) {
+    ]);
+
+    if (!findMessages || findMessages.length === 0) {
         throw new ApiError(httpStatus.status.BAD_REQUEST, "No Messages Found");
-      }
-  
-      return findMessages;
-   
-  };
-  
+    }
+
+    return findMessages;
+
+};
+
 
 module.exports = {
     getMembers,
