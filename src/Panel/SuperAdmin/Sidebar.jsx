@@ -22,6 +22,8 @@ import { GiNotebook } from "react-icons/gi";
 import logo from "../../assets/Login/NavbarLogo.png";
 import { GetProjects, logout } from "../../services";
 import { GrConfigure } from "react-icons/gr";
+import { IoSettings, IoDocument } from "react-icons/io5";
+import { RiBillFill } from "react-icons/ri";
 
 const Navbar = () => {
   const location = useLocation();
@@ -400,7 +402,7 @@ const Sidebar = () => {
                 isActive("/sidebar/config") ? "text-orange-600 bg-white" : ""
               } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
             >
-              <GrConfigure size={24} />
+              <IoSettings size={24} />
               Config
             </Link>
             <Link
@@ -409,8 +411,17 @@ const Sidebar = () => {
                 isActive("/sidebar/payroll") ? "text-orange-600 bg-white" : ""
               } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
             >
-              <GrConfigure size={24} />
+              <RiBillFill size={24} />
               Payroll
+            </Link>
+            <Link
+              to="/sidebar/leave"
+              className={`${
+                isActive("/sidebar/leave") ? "text-orange-600 bg-white" : ""
+              } flex items-center gap-4 px-4 py-2 text-lg font-semibold rounded-md transition-all duration-200 `}
+            >
+              <IoDocument size={24} />
+              Leave
             </Link>
           </div>
         ) : (

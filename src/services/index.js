@@ -395,3 +395,26 @@ return res;
   const res = await interceptors.get(`/pay-slip?m=${m}&y=${y}`);
   return res;
  }
+
+
+ // leave approval 
+
+ export const GetLeavesRequests = async ()=>{
+  const res = await interceptors.get('/leave/get-all');
+  return res;
+ }
+
+ export const SendLeaveRequest = async (data)=>{
+  console.log(data,"data")
+  const res = await interceptors.post('/leave/applyLeave',data);
+  return res;
+ }
+
+ export const ApproveLeaveRequest = async (id)=>{
+  const res = await interceptors.put(`/leave/approveLeave/${id}`);
+  return res;
+ }
+ export const UpdateLeaveStatus = async (id,status)=>{
+  const res = await interceptors.put(`/leave/approveLeave/${id}?ap=${status?1:0}`);
+  return res;
+ }
