@@ -142,7 +142,7 @@ const createChats = async (req) => {
             ],
             messageTime: dateFormat,
             lastMessageUserId: user._id,
-            lastMessage: `Hello from ${user.userName}`,
+            lastMessage: `Hello from ${user.fullName}`,
             count: participants.map((participant) => ({
                 userId: participant._id,
                 count: 1,
@@ -159,7 +159,7 @@ const createChats = async (req) => {
 
         let messageData = {
             messageTime: dateFormat,
-            message: `Chat initiated by ${user.userName}`,
+            message: `Chat initiated by ${user.fullName}`,
             messageType: "initial",
             senderId: user.adminId,
             receiverId: receiverIds,
@@ -205,7 +205,7 @@ const createChats = async (req) => {
         createdBy: user._id,
         messageTime: dateFormat,
         lastMessageUserId: user._id,
-        lastMessage: `Created by ${user.userName}`,
+        lastMessage: `Created by ${user.fullName}`,
         count: participants.map((participant) => ({
             userId: participant._id,
             count: 1,
@@ -213,7 +213,7 @@ const createChats = async (req) => {
         admins: [
             {
                 _id: user._id,
-                userName: user.userName,
+                userName: user.fullName,
             },
         ],
         participants,
@@ -226,7 +226,7 @@ const createChats = async (req) => {
 
     let messageData = {
         messageTime: dateFormat,
-        message: `${user.userName} created group "${req.body.chatName}"`,
+        message: `${user.fullName} created group "${req.body.chatName}"`,
         messageType: "initial",
         senderId: user.adminId,
         receiverId: receiverIds,
