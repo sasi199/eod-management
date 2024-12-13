@@ -73,6 +73,15 @@ exports.getScheduleAll = async(req)=>{
                 as: "details",
             },
         },
+
+        {
+            $lookup:{
+                from: "Staff",
+                localField: "trainer", 
+                foreignField: "trainer",
+                as: "trainerDetails",
+            },
+        },
             {
                 
                 $project: {
@@ -81,11 +90,13 @@ exports.getScheduleAll = async(req)=>{
                     date: 1,
                     createdAt: 1,
                     updatedAt: 1,
-                    "details.trainer": 1,
                     "details.startTime": 1,
                     "details.endTime": 1,
                     "details.subject": 1,
                     "details.status": 1,
+                    "trainerDetails._id": 1,
+                    "trainerDetails.fullName": 1,
+                    "trainerDetails.profilePic": 1,
                 },
         }
     ])
