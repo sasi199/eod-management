@@ -158,7 +158,7 @@ exports.createStaff = async(req)=>{
 
 
 exports.getStaffAll = async(req)=>{
-    const staff = await StaffModel.find({})
+    const staff = await StaffModel.find({}).populate("role").populate("designation").populate("department_id")
     if (!staff) {
         throw new ApiError(httpStatus.BAD_REQUEST, {message:"Staff not found"});
      }

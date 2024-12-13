@@ -10,9 +10,9 @@ const Router = express.Router();
 
 
 
-// Router.use(verifyAuthToken);
+// Router.use(verifyAuthToken); checkPermission(permissionGroups.adminManagement.create)
 
-Router.route('/createStaff').post(verifyAuthToken,checkPermission(permissionGroups.adminManagement.create),uploads.single('profilePic'),staffController.createStaff);
+Router.route('/createStaff').post(verifyAuthToken,uploads.single('profilePic'),staffController.createStaff);
 Router.route('/getStaffAll').get(staffController.getStaffAll);
 Router.route('/getFilterStaff').get(staffController.getFilterStaff);
 Router.route('/getStaffId/:_id').get(staffController.getStaffId);
