@@ -4,20 +4,19 @@ const { RoleModel } = require("../models/role.model");
 const { allPermissions, permissionGroups } = require("../config/permissions");
 
 exports.createRole = async(req)=>{
-    const {name, hierarchyLevel, permissions} = req.body;
+    const {roleName,hierarchyLevel} = req.body;
 
-    if(!name){
+    if(!roleName){
         throw new ApiError(status.BAD_REQUEST,'Please provide a name for role');
     }
     if(!hierarchyLevel){
         throw new ApiError(status.BAD_REQUEST,'Please provide a hierarchy level for role');
     }
-    if(!permissions){
-        throw new ApiError(status.BAD_REQUEST,'Please provide permissions for role');
-    }
+    // if(!permissions){
+    //     throw new ApiError(status.BAD_REQUEST,'Please provide permissions for role');
+    // }
 
-    const createdRole = await RoleModel.create({name, hierarchyLevel, permissions});
-    console.log(createdRole,"lalalalallalalala");
+    const createdRole = await RoleModel.create(req.body);
 
     if(!createdRole){
         throw new ApiError(status.INTERNAL_SERVER_ERROR,'Failed to create role');
@@ -38,6 +37,11 @@ exports.getAllRoles = async (req)=>{
     }
 
     return roles;
+}
+
+exports.getRoleById = async(req)=>{
+    const {user} = req;
+    
 }
 
 exports.updateRole = async (req)=>{

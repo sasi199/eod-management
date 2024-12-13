@@ -8,4 +8,4 @@ Router.get('/get-all', RoleController.getAllRoles);
 Router.put('/update/:role_id', RoleController.updateRole);
 Router.delete('/delete-h/:role_id', RoleController.deleteRole);
 
-module.exports = {path:'/role', route: Router};
+module.exports = Router

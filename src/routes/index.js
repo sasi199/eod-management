@@ -19,6 +19,7 @@ const studentAttendanceRouter = require("../routes/studentAttendanceRoute");
 const eodRouter = require("../routes/eodRoute");
 const leaveRouter = require("../routes/leaveRoute");
 const { requireAll } = require("../utils/requireAll");
+const roleRouter = require('./roleRoute');
 const { path } = require("./roleRoute");
 const AllRoutes = requireAll('./**.{js,ts}')
 
@@ -94,6 +95,10 @@ const Routes = [
   {
     path: "/leave",
     route: leaveRouter,
+  },
+  {
+    path: "/role",
+    route: roleRouter,
   },
 ];
 
