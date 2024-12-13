@@ -96,10 +96,10 @@ exports.createStaff = async(req)=>{
         profilePic = await uploadCloud(`staff/${staffId}/${fileName}`,req.file)
     }
 
-    if (!req.file) {
-        console.log("No file uploaded");
-        throw new ApiError(httpStatus.BAD_REQUEST, { message: "Profile picture is required" });
-    }
+    // if (!req.file) {
+    //     console.log("No file uploaded");
+    //     throw new ApiError(httpStatus.BAD_REQUEST, { message: "Profile picture is required" });
+    // }
 
     const isTrainer = staffData.isTrainer;
     let isTrainerBoolean = false;

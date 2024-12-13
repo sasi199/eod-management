@@ -11,7 +11,7 @@ const staffSchema = new mongoose.Schema({
     personalEmail: schemaFields.requireStringAndUnique,
     dob:schemaFields.requiredAndString,
     phoneNumber:schemaFields.requireNumberAndUnique, 
-    profilePic: schemaFields.requiredAndString,
+    profilePic: String,
     gender: schemaFields.requiredAndString,
     permanentAddress: schemaFields.requiredAndString,
     currentAddress: schemaFields.requiredAndString,
