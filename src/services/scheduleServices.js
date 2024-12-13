@@ -61,8 +61,6 @@ exports.createSchedule = async (req) => {
 
 };
 
-
-
 exports.getScheduleAll = async(req)=>{
     const schedule = await ScheduleModel.aggregate([
         {
@@ -71,6 +69,15 @@ exports.getScheduleAll = async(req)=>{
                 localField: "_id",
                 foreignField: "scheduleId",
                 as: "details",
+            },
+        },
+
+        {
+            $lookup:{
+                from: "Batch",
+                localField: "batch",
+                foreignField: "_id",
+                as: "batchDetails",
             },
         },
 
@@ -97,6 +104,8 @@ exports.getScheduleAll = async(req)=>{
                     "trainerDetails._id": 1,
                     "trainerDetails.fullName": 1,
                     "trainerDetails.profilePic": 1,
+                    "batchDetails._id": 1,
+                    "batchDetails.batchName": 1,
                 },
         }
     ])
