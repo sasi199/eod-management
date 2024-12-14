@@ -12,6 +12,7 @@ const ApiError = require('./src/utils/apiError');
 const puppeteer = require("puppeteer");
 const ejs = require('ejs');
 const fs = require('fs');
+const socketRoute = require("./src/socket/index");
 
 
 const app = express();
@@ -39,7 +40,9 @@ const io = socketIo(server,{
         methods: ["GET", "POST","PUT", "DELETE"],
         credentials: true
       },
-})
+});
+
+socketRoute(io);
 
 app.use((req, res, next) => {
     req.io = io;
