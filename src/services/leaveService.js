@@ -47,7 +47,7 @@ exports.applyLeaveRequset = async (req) => {
   }
 
   const leave = new LeaveApplyModel({
-    userId: userData._id,
+    userId: userData.accountId,
     date: startDate,
     endDate: endDate || null,
     leaveType: leaveType,

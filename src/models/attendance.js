@@ -5,7 +5,7 @@ const { required } = require('joi');
 
 const attendanceSchema = new mongoose.Schema({
     _id: schemaFields.idWithV4UUID,
-    date: schemaFields.DateWithDefault,
+    date: String,
     dateString: String,
     checkIn:{
         type: Date,
