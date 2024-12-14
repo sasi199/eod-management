@@ -12,7 +12,6 @@ const Chat = () => {
         <div className="w-1/4 border-r bg-gray-50">
           <ChatMembers />
         </div>
-
         <div className="flex-1">
           <ChatArea />
         </div>
