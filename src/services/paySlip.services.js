@@ -150,7 +150,7 @@ const getPaySlipData = async (query) => {
     compOffDays,
   } = getAttendanceDetails(staffAttendance);
 
-  let totalWorkingDays = monthlyPayroll.noOfWorkingDays;
+  let totalWorkingDays = monthlyPayroll.noOfWorkingDays + monthlyPayroll.numberOfPaidHolydays;
 
   let leaveBalance = 0;
 
