@@ -116,7 +116,8 @@ module.exports = {
       profile,
       userId,
       messageType,
-      groupType
+      groupType,
+      createdBy
     }
   ) => {
     const room = roomId;
@@ -167,7 +168,8 @@ module.exports = {
       profile,
       messageType,
       messageStatus,
-      groupType
+      groupType,
+      createdBy
     });
 
     const data = {
@@ -183,7 +185,8 @@ module.exports = {
       time,
       messageType,
       messageStatus,
-      groupType
+      groupType,
+      createdBy
     };
 
 
