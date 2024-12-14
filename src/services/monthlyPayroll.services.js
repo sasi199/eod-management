@@ -9,7 +9,7 @@ const {
 const { getData } = require("../config/json.config");
 
 exports.createMonthlyPayroll = async (req) => {
-  let { month, year } = req.body;
+  let { month, year, noOfWorkingDays, numberOfPaidHolydays,payDay } = req.body;
 
   let currentDate =new Date();
 
@@ -28,7 +28,8 @@ exports.createMonthlyPayroll = async (req) => {
 
   let { workingDays, holidays, startDate, endDate, payDate } = getWorkingDays(
     month, // Pass 1-based month
-    year
+    year,
+    payDay
   );
 
   startDate = formatDate(startDate); // Formats correctly
@@ -50,8 +51,8 @@ exports.createMonthlyPayroll = async (req) => {
   const dataToCreate = {
     dateString: formattedDateString,
     date: isoString,
-    noOfWorkingDays: workingDays,
-    numberOfPaidHolydays: holidays,
+    noOfWorkingDays: noOfWorkingDays??workingDays,
+    numberOfPaidHolydays: numberOfPaidHolydays??holidays,
     startDate,
     endDate,
     payDate,
@@ -97,7 +98,7 @@ exports.updateMonthlyPayroll = async (req) => {
   let {
     noOfWorkingDays,
     numberOfPaidHolydays,
-    payDate, // payDate just a date 7
+    payDay, // payDay just a date 7
   } = req.body;
 
   // Check if payroll exists
@@ -109,9 +110,9 @@ exports.updateMonthlyPayroll = async (req) => {
   const zeroBasedMonth = parseInt(startDateArray[1])-1
   const year = parseInt(startDateArray[2])
 
-  if(payDate){
-    const date = new Date(year, zeroBasedMonth, parseInt(payDate));
-    payDate = formatDate(date)
+  if(payDay){
+    const date = new Date(year, zeroBasedMonth, parseInt(payDay));
+    payDay = formatDate(date)
   }
 
   // Update the payroll
@@ -120,7 +121,7 @@ exports.updateMonthlyPayroll = async (req) => {
     {
       noOfWorkingDays,
       numberOfPaidHolydays,
-      payDate,
+      payDate:payDay,
     },
     { new: true }
   );
