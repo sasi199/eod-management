@@ -418,3 +418,21 @@ return res;
   const res = await interceptors.put(`/leave/approveLeave/${id}?ap=${status?1:0}`);
   return res;
  }
+
+
+ //chats
+
+ export const GetUsersByChats = async () => {
+  const res = await interceptors.get(`/chat`);
+  return res;
+ }
+
+ export const GetMessage = async (data) => {
+  const res = await interceptors.get(`/chat/message?roomId=${data}`);
+  return res;
+ }
+
+ export const CreateMeesage =async (data)=>{
+  const res= await interceptors.post('/chat',data);
+  return res;
+ }
