@@ -5,6 +5,7 @@ const { allPermissions, permissionGroups } = require("../config/permissions");
 
 exports.createRole = async(req)=>{
     const {roleName,hierarchyLevel} = req.body;
+    console.log(req.body);
 
     if(!roleName){
         throw new ApiError(status.BAD_REQUEST,'Please provide a name for role');
@@ -12,10 +13,6 @@ exports.createRole = async(req)=>{
     if(!hierarchyLevel){
         throw new ApiError(status.BAD_REQUEST,'Please provide a hierarchy level for role');
     }
-    // if(!permissions){
-    //     throw new ApiError(status.BAD_REQUEST,'Please provide permissions for role');
-    // }
-
     const createdRole = await RoleModel.create(req.body);
 
     if(!createdRole){
@@ -26,7 +23,7 @@ exports.createRole = async(req)=>{
 
 exports.getAllRoles = async (req)=>{
     const {p} = req.query;
-    let roles = await RoleModel.find();
+    let roles = await RoleModel.find({active:true});
 
     if(roles.length<1){
         throw new ApiError(status.NOT_FOUND,'No roles found');
@@ -45,13 +42,13 @@ exports.getRoleById = async(req)=>{
 }
 
 exports.updateRole = async (req)=>{
-    const {name} = req.body;
+    const {roleName} = req.body;
     const {role_id} = req.params;
 
-    if(name){
-       const role = await RoleModel.exists({name});
+    if(roleName){
+       const role = await RoleModel.findOne({_id: {$ne: role_id}, roleName: roleName,active:true});
         if(role){
-            throw new ApiError(status.BAD_REQUEST,`Role name ( ${name} ) already exist`);
+            throw new ApiError(status.BAD_REQUEST,`Role name ( ${roleName} ) already exist`);
         }
     }
     const updatedRole = await RoleModel.findByIdAndUpdate(role_id,req.body,{new:true});
@@ -72,7 +69,7 @@ exports.deleteRole = async (req)=>{
         throw new ApiError(status.NOT_FOUND,'Role not found');
     }
 
-    const deletedRole = await RoleModel.findByIdAndDelete(role_id);
+    const deletedRole = await RoleModel.findByIdAndUpdate(role_id,{active:false,isArchive:true},{new:true});
 
     if(!deletedRole){
         throw new ApiError(status.INTERNAL_SERVER_ERROR,'Failed to delete role');
