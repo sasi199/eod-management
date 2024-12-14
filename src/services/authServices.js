@@ -24,7 +24,7 @@ exports.loginByEmailAndLogId = async(req)=>{
     
       const now = new Date();
       const startOfDay = utils.Currentdate();
-      // const endOfDay = new Date(now.setHours(23, 59, 59, 999));
+      const endOfDay = utils.Currentdate();
       const workStart = new Date();
       workStart.setHours(10, 0, 0);
       const workEnd = new Date();
@@ -66,7 +66,18 @@ exports.loginByEmailAndLogId = async(req)=>{
         attendance.islate = now > workStart;
         attendance.location = { latitude, longitude };
         await attendance.save();
-      } 
+      }else{
+
+        attendance = new AttendanceModel({
+          user: user.accountId,
+          dateString: startOfDay,
+          checkIn: now,
+          status: now > workStart ? "Late" : "Present",
+          isLate: now > workStart,
+          location: { latitude, longitude }
+        });
+        await attendance.save();
+      }
 
       const token = jwt.sign(
         {id:user._id, role:user.role},
@@ -92,7 +103,7 @@ exports.createAttendance = async(req)=>{
 
     // Step 3: Filter employees who don't have attendance recorded yet
     const employeesWithoutAttendance = allEmployees.filter(
-      employee => !existingUserIds.includes(employee._id)
+      employee => !existingUserIds.includes(employee.accountId)
     );
 
 
@@ -100,7 +111,7 @@ exports.createAttendance = async(req)=>{
       dateString: todayDate,
       checkIn: null,
       checkOut: null,
-      user: employee._id,
+      user: employee.accountId,
       location: { latitude: 0, longitude: 0 },
       status: 'Absent',
       islate: false,
@@ -114,6 +125,8 @@ exports.createAttendance = async(req)=>{
       await AttendanceModel.insertMany(attendanceData);
       return { message: "Default attendance created for employees", count: attendanceData.length };
     }
+
+
 
 }
 

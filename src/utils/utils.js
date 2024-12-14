@@ -254,7 +254,7 @@ class Utils {
     };
   }
 
-  getWorkingDays(month, year, isAlternateSaturday = true) {
+  getWorkingDays(month, year,payDay=7, isAlternateSaturday = true) {
     const salaryConfig = getData();
     let workingDays = 0; // Counter for working days
     let totalHolidays = 0; // Counter for holidays
@@ -263,7 +263,7 @@ class Utils {
   
     const startDate = new Date(year, zeroBasedMonth, 1); // First day of the month
     const endDate = new Date(year, month, 0); // Last day of the current month
-    const payDate = new Date(year, zeroBasedMonth, salaryConfig.payDate ?? 7);
+    const payDate = new Date(year, zeroBasedMonth, salaryConfig.payDate ?? payDay);
   
     let saturdayCount = 0; // Track number of Saturdays in the month
   
